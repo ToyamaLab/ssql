@@ -16,14 +16,10 @@ import supersql.extendclass.ExtList;
 public class XMLManager extends Manager{
 
     XMLEnv xml_env;
-    XMLEnv xml_env2;
-
 
     public XMLManager(XMLEnv xenv, XMLEnv xenv2) {
         this.xml_env = xenv;
-        this.xml_env2 = xenv2;
     }
-
 
     public void generateCode(ITFE tfe_info, ExtList data_info) {
 
