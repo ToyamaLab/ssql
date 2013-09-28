@@ -1,11 +1,6 @@
 package supersql.codegenerator.XML;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -48,46 +43,6 @@ public class XMLManager extends Manager{
     }
 
 	public void generateCode(ITFE tfe_info, ExtList<ExtList<String>> data_info) {
-        xml_env.countfile = 0;
-        xml_env.code = new StringBuffer();
-        xml_env.header = new StringBuffer();
-
-        getOutfilename();
-        xml_env.filename = xml_env.outfile + ".xml";
-
-        if(data_info.size() == 0)
-        {
-        	Log.out("no data");
-        	xml_env.code.append("NO DATA FOUND");
-        }
-        else {
-        	tfe_info.work(data_info);
-        }
-
-        xml_env.getHeader();
-
-        try {
-        	if(!GlobalEnv.isOpt()){
-	        	PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(
-	                    xml_env.filename)));
-
-	            pw.println(xml_env.header);
-	            pw.println(xml_env.code);
-	            pw.close();
-        	}
-        } catch (FileNotFoundException fe) {
-        	fe.printStackTrace();
-        	System.err.println("Error: specified outdirectory \""
-                    + xml_env.outdir + "\" is not found to write " + xml_env.filename );
-            System.exit(-1);
-        } catch (IOException e) {
-            System.err.println("Error[XMLManager]: File IO Error in XMLManager");
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
-
-    public void generateDOMCode(ITFE tfe_info, ExtList<ExtList<String>> data_info) {
 		try {
 			Element rootElement = this.getDoc().createElement("ssql");
 			this.getDoc().appendChild(rootElement);

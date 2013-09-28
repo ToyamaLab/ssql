@@ -176,22 +176,7 @@ public class CodeGenerator{
 			data_info = (ExtList) data_info.get(0);
 		}
 
-//		manager.generateCode(tfe_info, data_info);
-		manager.generateDOMCode(tfe_info, data_info);
-//		Element result = (Element)manager.generateCodeForJsoup(tfe_info, data_info);
-//		if (result != null){
-//			try {
-//				String filename = result.baseUri();
-//				Writer out = new BufferedWriter(new OutputStreamWriter(
-//					    new FileOutputStream(filename), "UTF-8"));
-//				out.write(result.html());
-//				out.close();
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
-
+		manager.generateCode(tfe_info, data_info);
 		manager.finish();
 	};
 

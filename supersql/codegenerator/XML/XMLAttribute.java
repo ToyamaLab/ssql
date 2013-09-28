@@ -1,11 +1,9 @@
 package supersql.codegenerator.XML;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import supersql.codegenerator.Attribute;
 import supersql.codegenerator.Manager;
-import supersql.common.Log;
 import supersql.extendclass.ExtList;
 
 public class XMLAttribute extends Attribute {
@@ -35,22 +33,22 @@ public class XMLAttribute extends Attribute {
         this.xml_env = xenv;
     }
 
-    public void work(ExtList data_info){
-    	Log.out("[ XMLAttribute ]");
-
-    	XMLFunction.function_close = 0;
-    	
-    	tag = this.toString();
-    	
-    	if(decos.containsKey("tag")) 
-    		tag = decos.getStr("tag");
-
-    	xml_env.code.append("<" + tag + ">");
-    	xml_env.code.append(data_info.get(0).toString());
-    	xml_env.code.append("</" + tag + ">");
-
-    	XMLC0.tagclose_flag = 0;
-    }
+//    public void work(ExtList data_info){
+//    	Log.out("[ XMLAttribute ]");
+//
+//    	XMLFunction.function_close = 0;
+//    	
+//    	tag = this.toString();
+//    	
+//    	if(decos.containsKey("tag")) 
+//    		tag = decos.getStr("tag");
+//
+//    	xml_env.code.append("<" + tag + ">");
+//    	xml_env.code.append(data_info.get(0).toString());
+//    	xml_env.code.append("</" + tag + ">");
+//
+//    	XMLC0.tagclose_flag = 0;
+//    }
     
     public Object createNode(ExtList data_info) {
     	tag = this.toString();
