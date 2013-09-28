@@ -1,5 +1,9 @@
 package supersql.codegenerator.XML;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import supersql.codegenerator.Grouper;
 import supersql.codegenerator.Manager;
 import supersql.common.Log;
@@ -7,16 +11,16 @@ import supersql.extendclass.ExtList;
 
 public class XMLG0 extends Grouper {
 
-    Manager manager;
+    XMLManager manager;
     XMLEnv xml_env;
 
     public XMLG0(Manager manager, XMLEnv xenv) {
-        this.manager = manager;
+        this.manager = (XMLManager) manager;
         this.xml_env = xenv;
     }
 
     @Override
-	public void work(ExtList data_info) {
+	public void work(ExtList<ExtList<String>> data_info) {
         Log.out("************* XMLG0 *************");
         this.setDataList(data_info);
 
@@ -86,6 +90,29 @@ public class XMLG0 extends Grouper {
 
         Log.out("G0 tag(end) : " + tag);
         Log.out("TFEId = " + XMLEnv.getClassID(this));
+    }
+    
+    public Object createNode(ExtList<ExtList<String>> data_info) {
+        Log.out("************* XMLG0 *************");
+        this.setDataList(data_info);
+        
+        String tag = "";
+        if(decos.containsKey("tag")) {
+        	tag = decos.getStr("tag");
+        }
+        if(tag.equals("")) {
+        	tag = "grouper";
+        }
+
+        Element node = this.manager.getDoc().createElement(tag);
+
+        Element childNode;
+        while (this.hasMoreItems()) {
+        	childNode = (Element) this.createNextItemNode();
+        	node.appendChild(childNode);
+        }
+        
+		return node;
     }
 
     @Override

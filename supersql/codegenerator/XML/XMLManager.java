@@ -1,10 +1,25 @@
 package supersql.codegenerator.XML;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import supersql.codegenerator.ITFE;
 import supersql.codegenerator.Manager;
@@ -16,13 +31,23 @@ import supersql.extendclass.ExtList;
 public class XMLManager extends Manager{
 
     XMLEnv xml_env;
+    private Document doc;
 
     public XMLManager(XMLEnv xenv) {
         this.xml_env = xenv;
+
+		try {
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			this.setDoc(docBuilder.newDocument());
+
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
-    @SuppressWarnings("unchecked")
-	public void generateCode(ITFE tfe_info, ExtList data_info) {
+	public void generateCode(ITFE tfe_info, ExtList<ExtList<String>> data_info) {
         xml_env.countfile = 0;
         xml_env.code = new StringBuffer();
         xml_env.header = new StringBuffer();
@@ -62,6 +87,42 @@ public class XMLManager extends Manager{
         }
     }
 
+    public void generateDOMCode(ITFE tfe_info, ExtList<ExtList<String>> data_info) {
+		try {
+			Element rootElement = this.getDoc().createElement("ssql");
+			this.getDoc().appendChild(rootElement);
+
+	        if(data_info.size() == 0)
+	        {
+	        	Log.out("no data");
+	        	rootElement.appendChild(this.getDoc().createTextNode("NO DATA FOUND"));
+	        }
+	        else {
+	        	Element childNode = (Element) tfe_info.createNode(data_info);
+		        rootElement.appendChild(childNode);
+	        }
+	        
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			
+	        getOutfilename();
+	        xml_env.filename = xml_env.outfile + ".xml";
+			StreamResult result = new StreamResult(new File(xml_env.filename));
+			DOMSource source = new DOMSource(this.getDoc());
+			transformer.transform(source, result);
+
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  	
+    }
+    
     private void getOutfilename() {
         String file = GlobalEnv.getfilename();
         String outdir = GlobalEnv.getoutdirectory();
@@ -125,4 +186,13 @@ public class XMLManager extends Manager{
     public void finish() {
 
     }
+
+
+	public Document getDoc() {
+		return doc;
+	}
+
+	public void setDoc(Document doc) {
+		this.doc = doc;
+	}
 }

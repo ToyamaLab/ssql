@@ -1,5 +1,8 @@
 package supersql.codegenerator.XML;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import supersql.codegenerator.Attribute;
 import supersql.codegenerator.Manager;
 import supersql.common.Log;
@@ -7,7 +10,7 @@ import supersql.extendclass.ExtList;
 
 public class XMLAttribute extends Attribute {
 
-    Manager manager;
+    XMLManager manager;
     XMLEnv xml_env;
 
 	public static String tag;
@@ -28,7 +31,7 @@ public class XMLAttribute extends Attribute {
 
     public XMLAttribute(Manager manager, XMLEnv xenv) {
         super();
-        this.manager = manager;
+        this.manager = (XMLManager) manager;
         this.xml_env = xenv;
     }
 
@@ -47,5 +50,15 @@ public class XMLAttribute extends Attribute {
     	xml_env.code.append("</" + tag + ">");
 
     	XMLC0.tagclose_flag = 0;
+    }
+    
+    public Object createNode(ExtList data_info) {
+    	tag = this.toString();
+    	if(decos.containsKey("tag"))
+    		tag = decos.getStr("tag");
+    	
+    	Element node = this.manager.getDoc().createElement(tag);
+    	node.appendChild(this.manager.getDoc().createTextNode(data_info.get(0).toString()));
+    	return node;
     }
 }

@@ -1,5 +1,9 @@
 package supersql.codegenerator.XML;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import supersql.codegenerator.Attribute;
 import supersql.codegenerator.Connector;
 import supersql.codegenerator.Function;
@@ -10,8 +14,8 @@ import supersql.extendclass.ExtList;
 import supersql.parser.TFEparser;
 
 public class XMLC0 extends Connector {
-    Manager manager;
-    public static XMLEnv xml_env;
+    XMLManager manager;
+    public XMLEnv xml_env;
     public static int attflag = 0;
     public static int parent_attflag = 0;
     public static int tagclose_flag = 0;
@@ -20,17 +24,16 @@ public class XMLC0 extends Connector {
     TFEparser tfeps;
 
     public XMLC0(Manager manager, XMLEnv xenv) {
-        this.manager = manager;
+        this.manager = (XMLManager) manager;
         this.xml_env = xenv;
     }
 
     @Override
-    public void work(ExtList data_info) {
+    public void work(ExtList<ExtList<String>> data_info) {
     	Log.out("------------- XMLC0 -------------");
 
         this.setDataList(data_info);
 
-        int i = 0;
         String tag = null;
 
 	    if(decos.containsKey("tag")){
@@ -73,6 +76,41 @@ public class XMLC0 extends Connector {
 
 	   	Log.out("C0 tag(end) : " + tag);
 	   	Log.out("TFEId = " + XMLEnv.getClassID(this));
+    }
+    
+    public Object createNode(ExtList<ExtList<String>> data_info) {
+        this.setDataList(data_info);
+
+        String tag = "";
+        if(decos.containsKey("tag")) {
+        	tag = decos.getStr("tag");
+        }
+        if(tag.equals("")) {
+        	tag = "connector";
+        }
+        
+        Element node = this.manager.getDoc().createElement(tag);
+        
+        Element childNode;
+	    while(this.hasMoreItems()) {
+	    	ITFE tfe = (ITFE) tfes.get(sindex);
+	    	int ci = tfe.countconnectitem();
+
+	    	ExtList subdata = data.ExtsubList(dindex, dindex + ci);
+
+	    	if (tfe instanceof Connector || tfe instanceof Attribute
+	    			|| tfe instanceof Function) {
+	    		childNode = (Element) tfe.createNode(subdata);
+	    	} else {
+	    		childNode = (Element) tfe.createNode((ExtList) subdata.get(0));
+	    	}
+	    	
+	    	node.appendChild(childNode);
+	    	sindex++;
+	    	dindex += ci;	   		 
+	    }
+        
+    	return node;
     }
     
     public String getSymbol() {

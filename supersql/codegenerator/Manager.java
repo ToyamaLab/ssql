@@ -26,7 +26,7 @@ public abstract class Manager {
 	}
 	
 	//インスタンス移行プ?前ラムの生成
-	public void generateCode(ITFE tfe_info, ExtList data_info) {
+	public void generateCode(ITFE tfe_info, ExtList<ExtList<String>> data_info) {
 	}
 	
 	public StringBuffer generateCode2(ITFE tfe_info, ExtList data_info) {
@@ -68,6 +68,10 @@ public abstract class Manager {
 	//後処?
 	public abstract void finish();
 
+	public void generateDOMCode(ITFE tfe_info, ExtList<ExtList<String>> data_info) {
+		
+	}
+	
 	public Object generateCodeForJsoup(ITFE tfe_info, ExtList data_info) {
 		// TODO Auto-generated method stub
 		return null;

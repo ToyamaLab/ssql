@@ -176,7 +176,8 @@ public class CodeGenerator{
 			data_info = (ExtList) data_info.get(0);
 		}
 
-		manager.generateCode(tfe_info, data_info);
+//		manager.generateCode(tfe_info, data_info);
+		manager.generateDOMCode(tfe_info, data_info);
 //		Element result = (Element)manager.generateCodeForJsoup(tfe_info, data_info);
 //		if (result != null){
 //			try {
@@ -192,8 +193,6 @@ public class CodeGenerator{
 //		}
 
 		manager.finish();
-
-
 	};
 
 	//tk start//////////////////////////////////////////////////////////////////////////////
