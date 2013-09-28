@@ -52,7 +52,6 @@ public class XMLEnv extends LocalEnv {
    		else{
    			header.insert(index, "<?xml version=\"1.0\" encoding=\"EUC_JP\" ?>\n");
    		}
-
     }
 
     public void getFooter() {

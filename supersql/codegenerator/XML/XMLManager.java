@@ -39,11 +39,11 @@ public class XMLManager extends Manager{
         	Log.out("no data");
         	xml_env.code.append("NO DATA FOUND");
         }
-        else
+        else {
         	tfe_info.work(data_info);
+        }
 
         xml_env.getHeader();
-        xml_env.getFooter();
 
         try {
         	if(!GlobalEnv.isOpt()){

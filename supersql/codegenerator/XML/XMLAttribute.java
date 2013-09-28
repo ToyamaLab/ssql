@@ -47,6 +47,5 @@ public class XMLAttribute extends Attribute {
     	xml_env.code.append("</" + tag + ">");
 
     	XMLC0.tagclose_flag = 0;
-
     }
 }

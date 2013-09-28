@@ -40,34 +40,22 @@ public class XMLG0 extends Grouper {
 		       xml_env.code.append("<" + tag);
 		       Grouper_flag = 1;
         }
-
-
         else{
      	   tag = "null";
      	   Grouper_flag = 0;
         }
 
-
        if(decos.containsKey("root_att") && decos.containsKey("value")){
+    	   grouper_att0 = decos.getStr("root_att");
+    	   XMLFunction.Func_att_replace(grouper_att0);
 
-		   	if(decos.containsKey("root_att")){
-		   		grouper_att0 = decos.getStr("root_att");
-		   		XMLFunction.Func_att_replace(grouper_att0);
-		   	}
+    	   grouper_att_value0 = decos.getStr("value");
+    	   XMLFunction.Func_att_replace(grouper_att_value0);
 
-
-		   	if(decos.containsKey("value")){
-		   		grouper_att_value0 = decos.getStr("value");
-		   		XMLFunction.Func_att_replace(grouper_att_value0);
-		   	}
-
-
-			xml_env.code.append(" " + grouper_att0 + "=\"" + grouper_att_value0 + "\"");
+    	   xml_env.code.append(" " + grouper_att0 + "=\"" + grouper_att_value0 + "\"");
        }
 
-
        if(decos.containsKey("root_att1") && decos.containsKey("value1")){
-
     	   int attNo = 1;
 
 		   while (decos.containsKey("root_att"+attNo)){
@@ -82,19 +70,15 @@ public class XMLG0 extends Grouper {
 			   		XMLFunction.Func_att_replace(grouper_att_value);
 			   	}
 
-
 			   	xml_env.code.append(" " + grouper_att + "=\"" + grouper_att_value + "\"");
-
 			   	attNo++;
 		   }
        }
 
-
        if(Grouper_flag == 1){
     	   xml_env.code.append(">");
        }
-
-        Log.out("G0 tag(start) : " + tag);
+       Log.out("G0 tag(start) : " + tag);
 
         while (this.hasMoreItems()) {
         	this.worknextItem();
@@ -108,9 +92,7 @@ public class XMLG0 extends Grouper {
         XMLAttribute.tagcount = 0;
 
         Log.out("G0 tag(end) : " + tag);
-
         Log.out("TFEId = " + XMLEnv.getClassID(this));
-
     }
 
     @Override

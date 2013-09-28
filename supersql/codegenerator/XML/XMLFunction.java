@@ -8,7 +8,6 @@ import supersql.parser.SSQLparser;
 
 
 public class XMLFunction extends Function {
-
     Manager manager;
     XMLEnv xml_env;
     boolean embedflag = false;
@@ -26,7 +25,6 @@ public class XMLFunction extends Function {
 
         String FuncName = this.getFuncName();
 
-
         if(FuncName.equalsIgnoreCase("null")) {
 
         	if(XMLAttribute.absent_on_null_flag != 1){
@@ -36,7 +34,6 @@ public class XMLFunction extends Function {
         	}
 
         	XMLAttribute.absent_on_null_flag = 0;
-
         	XMLAttribute.tagcount = 0;
 
             Func_null();
@@ -44,17 +41,12 @@ public class XMLFunction extends Function {
             XMLAttribute.no_close_tag_flag = 1;
             function_close = 1;
         }
-
-
-
         else if(FuncName.equalsIgnoreCase("text")){
 
         	if(XMLC0.parent_attflag == 1){
         		xml_env.code.append(">");
         		XMLC0.parent_attflag = 2;
         	}
-
-
         	if(XMLAttribute.absent_on_null_flag != 1){
 	        	if(XMLAttribute.tagcount!=0){
 	    			xml_env.code.append(">" + XMLAttribute.tag_value + "</" + XMLAttribute.tag + ">");
@@ -62,7 +54,6 @@ public class XMLFunction extends Function {
         	}
 
         	XMLAttribute.absent_on_null_flag = 0;
-
         	XMLAttribute.tagcount = 0;
 
         	Func_text(data_info);
@@ -70,17 +61,12 @@ public class XMLFunction extends Function {
         	XMLAttribute.no_close_tag_flag = 1;
         	function_close = 1;
         }
-
-
-
         else if(FuncName.equalsIgnoreCase("xmlquery")){
 
         	if(XMLC0.parent_attflag == 1){
         		xml_env.code.append(">");
         		XMLC0.parent_attflag = 2;
         	}
-
-
         	if(xpath_first == 0){
         		if(XMLAttribute.absent_on_null_flag != 1){
 	        		if(XMLAttribute.tagcount!=0){
@@ -98,17 +84,12 @@ public class XMLFunction extends Function {
         	XMLAttribute.no_close_tag_flag = 1;
         	function_close = 1;
         }
-
-
-
         else if(FuncName.equalsIgnoreCase("xpath")){
 
         	if(XMLC0.parent_attflag == 1){
         		xml_env.code.append(">");
         		XMLC0.parent_attflag = 2;
         	}
-
-
         	if(xpath_first == 0){
         		if(XMLAttribute.absent_on_null_flag != 1){
 	        		if(XMLAttribute.tagcount!=0){
@@ -125,17 +106,12 @@ public class XMLFunction extends Function {
         	XMLAttribute.no_close_tag_flag = 1;
         	function_close = 1;
         }
-
-
-
         else if(FuncName.equalsIgnoreCase("comment")){
 
         	if(XMLC0.parent_attflag == 1){
         		xml_env.code.append(">");
         		XMLC0.parent_attflag = 2;
         	}
-
-
         	if(XMLAttribute.absent_on_null_flag != 1){
 	        	if(XMLAttribute.tagcount!=0){
 	    			xml_env.code.append(">" + XMLAttribute.tag_value + "</" + XMLAttribute.tag + ">");
@@ -143,13 +119,11 @@ public class XMLFunction extends Function {
         	}
 
         	XMLAttribute.absent_on_null_flag = 0;
-
         	XMLAttribute.tagcount = 0;
 
         	Func_comment(data_info);
 
         	XMLAttribute.no_close_tag_flag = 1;
-
         	function_close = 1;
         }
 
@@ -162,7 +136,6 @@ public class XMLFunction extends Function {
 
     public void Func_text(ExtList data_info){
      	String tag_value = new String();
-
      	tag_value = data_info.get(0).toString().substring(4);
 
      	Func_replace(tag_value);
@@ -177,38 +150,26 @@ public class XMLFunction extends Function {
 
     	comment_value = data_info.get(0).toString().substring(4);
 
-    	//if(!comment_value.equals("")){
-    		if(!comment_value.contains("--")){
-    			//if(!comment_value.endsWith("-")){
- 		    		xml_env.code.append("<!-- ");
- 		    		xml_env.code.append(comment_value);
- 		    		xml_env.code.append(" -->");
-    			//}
-    		}
-    	//}
+    	if(!comment_value.contains("--")){
+    		xml_env.code.append("<!-- ");
+    		xml_env.code.append(comment_value);
+    		xml_env.code.append(" -->");
+    	}
     }
 
     public void Func_xmlquery(ExtList data_info){
-
     	String xml_value = new String();
-
     	xml_value = data_info.get(0).toString().substring(4);
 
     	xml_value = xml_value.toString().replace("{", "");
     	xml_value = xml_value.toString().replace("}", "");
 
-    	if(SSQLparser.xmlTextFlag == 1){
-
-    	}
-    	else{
+    	if(SSQLparser.xmlTextFlag != 1){
     		xml_value = xml_value.toString().replace(",", "");
     	}
 
-
     	if(SSQLparser.xpathTagExist == 1){
-
     		if(SSQLparser.xmlTextFlag == 1){
-
             	String[] text_tagvalue = xml_value.split(",");
 
         		for(int count=0; count < text_tagvalue.length; count++){
@@ -217,25 +178,19 @@ public class XMLFunction extends Function {
         			xml_env.code.append("</" + SSQLparser.xpathTag + ">");
         		}
     		}
-
     		else{
 		    	xml_env.code.append("<" + SSQLparser.xpathTag + ">");
 		        xml_env.code.append(xml_value);
 		    	xml_env.code.append("</" + SSQLparser.xpathTag + ">");
     		}
-
     	}
-
-
     	else{
     		xml_env.code.append(xml_value);
     	}
     }
 
     public void Func_xpath(ExtList data_info){
-
     	String xml_value = new String();
-
     	xml_value = data_info.get(0).toString().substring(4);
 
     	xml_value = xml_value.toString().replace("{", "");
@@ -248,9 +203,7 @@ public class XMLFunction extends Function {
     		xml_value = xml_value.toString().replace(",", "");
     	}
 
-
     	if(SSQLparser.xpathTagExist == 1){
-
     		if(SSQLparser.xmlTextFlag == 1){
 
             	String[] text_tagvalue = xml_value.split(",");
@@ -261,15 +214,12 @@ public class XMLFunction extends Function {
         			xml_env.code.append("</" + SSQLparser.xpathTag + ">");
         		}
     		}
-
     		else{
 		    	xml_env.code.append("<" + SSQLparser.xpathTag + ">");
 		        xml_env.code.append(xml_value);
 		    	xml_env.code.append("</" + SSQLparser.xpathTag + ">");
     		}
     	}
-
-
     	else{
     		xml_env.code.append(xml_value);
     	}

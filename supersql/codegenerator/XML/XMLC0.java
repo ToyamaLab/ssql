@@ -10,7 +10,6 @@ import supersql.extendclass.ExtList;
 import supersql.parser.TFEparser;
 
 public class XMLC0 extends Connector {
-
     Manager manager;
     public static XMLEnv xml_env;
     public static int attflag = 0;
@@ -35,19 +34,17 @@ public class XMLC0 extends Connector {
         this.setDataList(data_info);
 
         int i = 0;
-
         String tag = null;
 
 	    if(decos.containsKey("tag")){
         	tag = decos.getStr("tag");
-
 	        xml_env.code.append("<" + tag + ">");
 		    parent_attflag = 1;
 		    decos_tag_flag = 1;
 	   }
-	    else{
-	    	decos_tag_flag = 0;
-	    }
+	   else {
+		   decos_tag_flag = 0;
+	   }
 
 	    while(this.hasMoreItems()) {
 	    	ITFE tfe = (ITFE) tfes.get(sindex);
@@ -64,6 +61,7 @@ public class XMLC0 extends Connector {
 	    	} else {
 	    		tfe.work((ExtList) subdata.get(0));
 	    	}
+	    	
 	    	sindex++;
 	    	dindex += ci;
 	    	Log.out("tfe.countconnectitem() : " + ci);	   		 
