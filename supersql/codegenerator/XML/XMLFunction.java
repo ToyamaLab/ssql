@@ -10,27 +10,16 @@ import supersql.parser.SSQLparser;
 public class XMLFunction extends Function {
 
     Manager manager;
-
     XMLEnv xml_env;
-    XMLEnv xml_env2;
-
     boolean embedflag = false;
     public static int xpath_first = 0;
     public static int function_close = 0;
-
-    public XMLFunction()
-    {
-
-    }
-
 
     public XMLFunction(Manager manager, XMLEnv xenv, XMLEnv xenv2) {
         super();
         this.manager = manager;
         this.xml_env = xenv;
-        this.xml_env2 = xenv2;
     }
-
 
     public void work(ExtList data_info) {
         this.setDataList(data_info);
@@ -167,13 +156,9 @@ public class XMLFunction extends Function {
         Log.out("TFEId = " + XMLEnv.getClassID(this));
     }
 
-
-
     private void Func_null() {
         return;
     }
-
-
 
     public void Func_text(ExtList data_info){
      	String tag_value = new String();
@@ -186,8 +171,6 @@ public class XMLFunction extends Function {
      		xml_env.code.append(tag_value + "\n");
      	}
      }
-
-
 
     public void Func_comment(ExtList data_info) {
     	String comment_value = new String();
@@ -204,8 +187,6 @@ public class XMLFunction extends Function {
     		}
     	//}
     }
-
-
 
     public void Func_xmlquery(ExtList data_info){
 
@@ -251,8 +232,6 @@ public class XMLFunction extends Function {
     	}
     }
 
-
-
     public void Func_xpath(ExtList data_info){
 
     	String xml_value = new String();
@@ -296,8 +275,6 @@ public class XMLFunction extends Function {
     	}
     }
 
-
-
     public static String Func_replace(String s){
 	    if(s.contains("&"))
 	    	s = s.replace("&", "&amp;");
@@ -308,8 +285,6 @@ public class XMLFunction extends Function {
 
 	    return s;
     }
-
-
 
     public static String Func_att_replace(String s){
     	if(s.contains("'"))

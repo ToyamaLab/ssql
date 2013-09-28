@@ -9,35 +9,20 @@ import supersql.codegenerator.LocalEnv;
 
 public class XMLEnv extends LocalEnv {
     String data;
-
     String pre_operator;
-
     Vector written_classid;
-
     Vector not_written_classid;
-
     int total_element = 0;
-
     int glevel = 0;
-
     String filename;
-
     String outfile;
-
     String linkoutfile;
-
     String nextbackfile = new String();
-
     String outdir;
-
     int countfile;
-
     PrintWriter writer;
-
     public StringBuffer code;
-
     StringBuffer header;
-
     StringBuffer footer;
 
     public XMLEnv() {

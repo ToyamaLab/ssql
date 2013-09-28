@@ -12,10 +12,7 @@ import supersql.parser.TFEparser;
 public class XMLC0 extends Connector {
 
     Manager manager;
-
     public static XMLEnv xml_env;
-    XMLEnv xml_env2;
-
     public static int attflag = 0;
     public static int parent_attflag = 0;
     public static int tagclose_flag = 0;
@@ -27,7 +24,6 @@ public class XMLC0 extends Connector {
     public XMLC0(Manager manager, XMLEnv xenv, XMLEnv xenv2) {
         this.manager = manager;
         this.xml_env = xenv;
-        this.xml_env2 = xenv2;
     }
 
     @Override

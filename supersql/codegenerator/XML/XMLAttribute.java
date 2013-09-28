@@ -8,9 +8,7 @@ import supersql.extendclass.ExtList;
 public class XMLAttribute extends Attribute {
 
     Manager manager;
-
     XMLEnv xml_env;
-    XMLEnv xml_env2;
 
 	public static String tag;
 	public static String tag_value;
@@ -32,7 +30,6 @@ public class XMLAttribute extends Attribute {
         super();
         this.manager = manager;
         this.xml_env = xenv;
-        this.xml_env2 = xenv2;
     }
 
     public void work(ExtList data_info){

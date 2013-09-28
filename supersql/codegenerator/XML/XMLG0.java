@@ -8,15 +8,11 @@ import supersql.extendclass.ExtList;
 public class XMLG0 extends Grouper {
 
     Manager manager;
-
     XMLEnv xml_env;
-    XMLEnv xml_env2;
-
 
     public XMLG0(Manager manager, XMLEnv xenv, XMLEnv xenv2) {
         this.manager = manager;
         this.xml_env = xenv;
-        this.xml_env2 = xenv2;
     }
 
     @Override
