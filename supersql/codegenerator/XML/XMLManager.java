@@ -21,17 +21,13 @@ public class XMLManager extends Manager{
         this.xml_env = xenv;
     }
 
-    public void generateCode(ITFE tfe_info, ExtList data_info) {
+    @SuppressWarnings("unchecked")
+	public void generateCode(ITFE tfe_info, ExtList data_info) {
         xml_env.countfile = 0;
         xml_env.code = new StringBuffer();
-
         xml_env.header = new StringBuffer();
-        xml_env.footer = new StringBuffer();
 
         getOutfilename();
-
-        Log.out("[XMLManager:generateCode]");
-
         xml_env.filename = xml_env.outfile + ".xml";
 
         if(data_info.size() == 0)
@@ -52,7 +48,6 @@ public class XMLManager extends Manager{
 
 	            pw.println(xml_env.header);
 	            pw.println(xml_env.code);
-	            pw.println(xml_env.footer);
 	            pw.close();
         	}
         } catch (FileNotFoundException fe) {

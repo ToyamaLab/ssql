@@ -39,16 +39,13 @@ public class XMLEnv extends LocalEnv {
     	}
     }
 
-
     public void getHeader() {
    		int index = 0;
-
    	   	String osname = System.getProperty("os.name");
 
    		if(osname.indexOf("Windows")>=0){
    			header.insert(index, "<?xml version=\"1.0\" encoding=\"Shift_JIS\" ?>\n");
    		}
-
    		else{
    			header.insert(index, "<?xml version=\"1.0\" encoding=\"EUC_JP\" ?>\n");
    		}

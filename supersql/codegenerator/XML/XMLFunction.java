@@ -147,7 +147,6 @@ public class XMLFunction extends Function {
 
     public void Func_comment(ExtList data_info) {
     	String comment_value = new String();
-
     	comment_value = data_info.get(0).toString().substring(4);
 
     	if(!comment_value.contains("--")){

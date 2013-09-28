@@ -20,7 +20,7 @@ public class XMLG0 extends Grouper {
         Log.out("************* XMLG0 *************");
         this.setDataList(data_info);
 
-        String tag;
+        String tag = "";
 
         String grouper_att0 = null;
         String grouper_att_value0 = null;
@@ -28,21 +28,14 @@ public class XMLG0 extends Grouper {
         String grouper_att = null;
         String grouper_att_value = null;
 
-        int Grouper_flag = 0;
+        boolean Grouper_flag = false;
 
         if(decos.containsKey("tag")){
-		       tag = decos.getStr("tag");
-
-		       if(tag.equals("")){
-		    	   tag = "null";
-		       }
-
-		       xml_env.code.append("<" + tag);
-		       Grouper_flag = 1;
-        }
-        else{
-     	   tag = "null";
-     	   Grouper_flag = 0;
+        	tag = decos.getStr("tag");
+        	if(!tag.equals("")){
+        		xml_env.code.append("<" + tag);
+        		Grouper_flag = true;
+        	}
         }
 
        if(decos.containsKey("root_att") && decos.containsKey("value")){
@@ -75,7 +68,7 @@ public class XMLG0 extends Grouper {
 		   }
        }
 
-       if(Grouper_flag == 1){
+       if(Grouper_flag){
     	   xml_env.code.append(">");
        }
        Log.out("G0 tag(start) : " + tag);
@@ -84,9 +77,9 @@ public class XMLG0 extends Grouper {
         	this.worknextItem();
         }
 
-        if(Grouper_flag == 1){
+        if(Grouper_flag){
         	xml_env.code.append("</" + tag + ">");
-        	Grouper_flag = 0;
+        	Grouper_flag = false;
         }
 
         XMLAttribute.tagcount = 0;

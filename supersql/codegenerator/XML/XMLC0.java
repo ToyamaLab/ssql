@@ -16,7 +16,6 @@ public class XMLC0 extends Connector {
     public static int parent_attflag = 0;
     public static int tagclose_flag = 0;
     public static int decos_tag_flag = 0;
-    public static int XMLC0_passflag = 0;
 
     TFEparser tfeps;
 
@@ -28,8 +27,6 @@ public class XMLC0 extends Connector {
     @Override
     public void work(ExtList data_info) {
     	Log.out("------------- XMLC0 -------------");
-
-    	XMLC0_passflag++;
 
         this.setDataList(data_info);
 
