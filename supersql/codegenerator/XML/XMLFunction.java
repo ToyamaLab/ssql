@@ -15,7 +15,7 @@ public class XMLFunction extends Function {
     public static int xpath_first = 0;
     public static int function_close = 0;
 
-    public XMLFunction(Manager manager, XMLEnv xenv, XMLEnv xenv2) {
+    public XMLFunction(Manager manager, XMLEnv xenv) {
         super();
         this.manager = manager;
         this.xml_env = xenv;

@@ -26,7 +26,7 @@ public class XMLAttribute extends Attribute {
 	public static int absent_on_null_flag;
 
 
-    public XMLAttribute(Manager manager, XMLEnv xenv, XMLEnv xenv2) {
+    public XMLAttribute(Manager manager, XMLEnv xenv) {
         super();
         this.manager = manager;
         this.xml_env = xenv;

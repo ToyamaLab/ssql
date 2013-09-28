@@ -21,7 +21,7 @@ public class XMLC0 extends Connector {
 
     TFEparser tfeps;
 
-    public XMLC0(Manager manager, XMLEnv xenv, XMLEnv xenv2) {
+    public XMLC0(Manager manager, XMLEnv xenv) {
         this.manager = manager;
         this.xml_env = xenv;
     }

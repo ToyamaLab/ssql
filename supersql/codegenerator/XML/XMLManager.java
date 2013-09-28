@@ -17,7 +17,7 @@ public class XMLManager extends Manager{
 
     XMLEnv xml_env;
 
-    public XMLManager(XMLEnv xenv, XMLEnv xenv2) {
+    public XMLManager(XMLEnv xenv) {
         this.xml_env = xenv;
     }
 
