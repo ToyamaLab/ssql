@@ -20,35 +20,28 @@ import supersql.common.Log;
 import supersql.db.ConnectDB;
 import supersql.db.GetFromDB;
 import supersql.extendclass.ExtList;
+import supersql.extendclass.Node;
 import supersql.parser.SSQLparser;
 
 public class DataConstructor {
 
-	private ExtList data_info;
-
+	private ExtList<ExtList<String>> data_info;
+	private Node<String> dataTree;
 	private ArrayList<SQLQuery> sqlQueries = null;
 	private QueryDivider qd; 
 	private String key = null;
 	private Attribute keyAtt = null;
 	private int col = -1;
-	private long[] exectime = new long[4];
-	private final int ISDIVIS = 0;
-	private final int MAKESQL = 1;
-	private final int EXECSQL = 2;
-	private final int MKETREE = 3;
 	private boolean flag = true;
 	public static String SQL_string;	//added by goto 20130306  "FROMなしクエリ対策"
 	
 	public DataConstructor(SSQLparser parser) {
-
 		ExtList sep_sch;
 		ExtList sep_data_info;
-		
 		MakeSQL msql = null;
 
 		//Make schema
 		sep_sch = parser.get_TFEschema().makesch();
-		System.out.println("Schema: " + sep_sch);
 		
 		//Check Optimization Parameters
 		if ( GlobalEnv.getOptLevel() == 0 || !GlobalEnv.isOptimizable() || SSQLparser.isDbpediaQuery())
@@ -58,13 +51,9 @@ public class DataConstructor {
 		else
 		{
 			//Initialize QueryDivider
-			long start = System.nanoTime();
-			
 			try 
 			{
 			    qd = new QueryDivider( parser );
-			
-			
 			    if ( qd.MakeGraph() )
 			    {
 			    	//if graph was made successfully, divide
@@ -73,12 +62,7 @@ public class DataConstructor {
 			}
 			catch ( Exception e )
 			{
-				;
-				//System.out.println( e.getMessage() );		//commented out by goto 20120620
 			}
-			
-			long end = System.nanoTime(); 
-			exectime[ISDIVIS] = end - start;
 		}
 		
 		//Make SQL
@@ -90,26 +74,14 @@ public class DataConstructor {
 			msql = new MakeSQL(parser);
 		}
 
-		sep_data_info = new ExtList();
+		sep_data_info = new ExtList<ExtList<String>>();
 		if(SSQLparser.isDbpediaQuery()){
 			sep_data_info = schemaToData(parser, sep_sch, sep_data_info);
 		}
 		else{
-			sep_data_info = schemaToData(parser, msql, sep_sch, sep_data_info);
+			dataTree = schemaToDataNew(parser, msql, sep_sch, sep_data_info);
+			data_info = schemaToData(parser, msql, sep_sch, sep_data_info);
 		}
-		data_info = sep_data_info;
-
-		//changed by goto 20120620 start
-		/*
-		System.out.print( "exec_time = " );
-		for (int i = 0; i < 4; i ++ )
-			System.out.print( (exectime[i]/1000000.0) + "\t");
-		System.out.println();
-		*/
-		//changed by goto 20120620 end
-		
-		Log.out("## Result ##");
-		Log.out(data_info);
 	}
 
 	private ExtList schemaToData(SSQLparser parser, ExtList sep_sch,
@@ -130,34 +102,35 @@ public class DataConstructor {
 	private ExtList schemaToData(SSQLparser parser, MakeSQL msql, ExtList sep_sch,
 			ExtList sep_data_info) {
 
-		long start, end;
-		
 		if ( msql != null )
 		{
 		    getFromDB(msql, sep_sch, sep_data_info);
-		    sep_data_info = makeTree(sep_sch, sep_data_info);
-			
+		    sep_data_info = makeTree(sep_sch, sep_data_info); 
 		}
 		else 
 		{
 	        getTuples(sep_sch, sep_data_info);
-	        start = System.nanoTime();
 		    sep_data_info = MakeTree( qd.getSchema() );
-		    //System.out.println(sep_data_info);
-		    end = System.nanoTime();
-		    
-		    exectime[MKETREE] = end - start;
 		}
 		
         return sep_data_info;
-		
 	}
 
-	private ExtList[] getTuples( ExtList sep_sch, ExtList sep_data_info) {
-
-		long start, end;
-		start = System.nanoTime();
+	private Node<String> schemaToDataNew(SSQLparser parser, MakeSQL msql, ExtList sep_sch, ExtList<ExtList<String>> data) {
+		Node<String> dataTree = new Node<String>();
+		TreeGenerator tg = new TreeGenerator();
 		
+		if(msql != null) {
+		    data = getFromDB(msql, sep_sch, data);
+			dataTree = tg.makeTreeNew(sep_sch, (ExtList<ExtList<String>>) data); 
+		} else {
+	        //getTuples(schema, data);
+		    //sep_data_info = MakeTree( qd.getSchema() );
+		}
+		return dataTree;
+	}
+	
+	private ExtList[] getTuples( ExtList sep_sch, ExtList sep_data_info) {
 		ExtList[] table;
 		GetFromDB gfd;
 		int comp_size;
@@ -181,51 +154,27 @@ public class DataConstructor {
 			gfd = new GetFromDB();
 		}
 
-        long time = 0;
-
-        //changed by goto 20120630
-        System.out.println("sqlQueries.size() = "+sqlQueries.size());
-        //for (int i = 0; i < sqlQueries.size(); i++)
         for (int i = 0; i < sqlQueries.size()-1; i++)       
 		{
 			table[i] = new ExtList();
 			
 			long time1 = System.nanoTime();
 			String s = sqlQueries.get(i).getString();
-			time += (System.nanoTime() - time1);
 			
 			gfd.execQuery( s, table[i] );
 			sqlQueries.get(i).setResult(table[i]);
 		}
 
 		gfd.close();
-		end = System.nanoTime();
-		
-		exectime[EXECSQL] = end - start - time;
-		exectime[MAKESQL] = time;
-		
-		Log.out("## DB result ##");
-		
 		return table;
-
 	}
 
-	private ExtList getFromDB(MakeSQL msql, ExtList sep_sch,
+	private ExtList<ExtList<String>> getFromDB(MakeSQL msql, ExtList sep_sch,
 			ExtList sep_data_info) {
 
         //MakeSQL
-		long start, end;
-		start = System.nanoTime();                
-		
 		SQL_string = msql.makeSQL(sep_sch);
-		
-		end = System.nanoTime();
-		exectime[MAKESQL] = end - start;
-		Log.out("## SQL Query ##");
-		Log.out(SQL_string);
-
 		//Connect to DB
-		start = System.nanoTime(); 
 		
 		GetFromDB gfd;
 		if(GlobalEnv.isMultiThread())
@@ -239,47 +188,32 @@ public class DataConstructor {
 		
 			gfd = new GetFromDB(cdb);
 		}
-
-		else{
+		else {
 			gfd = new GetFromDB();
 		}
 
 		gfd.execQuery(SQL_string, sep_data_info);
-
 		gfd.close();
         
-		end = System.nanoTime(); 
-		exectime[EXECSQL] = end - start;
-		
-		Log.info("## DB result ##");
-		Log.info(sep_data_info);
-
 		return sep_data_info;
-
 	}
 
-	private ExtList makeTree(ExtList sep_sch, ExtList sep_data_info) {
-
-        //MakeTree
-        long start, end;
-        start = System.nanoTime();
-        
-		TreeGenerator tg = new TreeGenerator();
-
-		sep_data_info = tg.makeTree(sep_sch, sep_data_info);
+	private ExtList<ExtList<String>> getFromDBNew(MakeSQL msql, SSQLparser parser, ExtList<ExtList<String>> data) {
+		return data;
+	}
 	
-		end = System.nanoTime();
-		
-		exectime[MKETREE] = end - start;
-		
-		Log.out("## constructed Data ##");
-		Log.out(sep_data_info);
-
+	private ExtList makeTree(ExtList sep_sch, ExtList sep_data_info) {
+		TreeGenerator tg = new TreeGenerator();
+		sep_data_info = tg.makeTree(sep_sch, sep_data_info);
 		return sep_data_info;
 	}
 
 	public ExtList getData() {
 		return data_info;
+	}
+	
+	public Node getDataTree() {
+		return dataTree;
 	}
 	
 	private ExtList MakeTree( ExtList schema ) 

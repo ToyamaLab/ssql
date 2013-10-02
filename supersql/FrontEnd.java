@@ -41,6 +41,7 @@ public class FrontEnd {
 
 				if (GlobalEnv.getErrFlag() == 0) {
 					codegenerator.generateCode(parser, dc.getData());
+					//codegenerator.generateCodeNew(parser, dc.getDataTree());
 					aftercg = System.currentTimeMillis();
 				}
 			}

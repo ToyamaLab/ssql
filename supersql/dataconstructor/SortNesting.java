@@ -5,6 +5,8 @@ import java.util.Hashtable;
 
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
+import supersql.extendclass.Leaf;
+import supersql.extendclass.Node;
 
 /* ŽÆ?ŽÎŽÏŽ¤ŽÏ schŽ¤ŽËŽ¤Ž½Ž¤ŽÃŽ¤Ž¿nestŽ¤Ž¬Ž½ŽªŽ¤?Ž¤ŽÃŽ¤Ž¿tupleŽ¤ŽÇŽ¤Ž¢Ž¤?Ž¤Ž³Ž¤ŽÈ */
 
@@ -14,12 +16,10 @@ public class SortNesting {
 
 	public SortNesting() {
 		BufferedData = new Hashtable();
-		//	  Log.out("## new buffer ##");
 	}
 
 	public SortNesting(ExtList t) {
 		BufferedData = new Hashtable();
-		//	  Log.out("## new buffer ##");
 		buffered(t);
 	}
 
@@ -30,11 +30,8 @@ public class SortNesting {
 	}
 
 	private void buffered(ExtList t) {
-
-		//	  Log.out("buffering : "+t);
 		ExtList ExtListkey = this.KeyAtt(t);
-		//	  Log.out("ExtListKey = "+ ExtListkey);
-		//	  Log.out("BufferedData = "+ BufferedData);
+
 		if (!BufferedData.containsKey(ExtListkey)) {
 			ExtList buffer = new ExtList();
 			ExtList o;
@@ -46,12 +43,9 @@ public class SortNesting {
 					buffer.add(s);
 				}
 			}
-			//		Log.out("putting ExtListKey = "+ ExtListkey);
-			//		Log.out("putting buffer = "+ buffer);
 			BufferedData.put(ExtListkey, buffer);
 		} else {
 			ExtList gotExtList = (ExtList) (BufferedData.get(ExtListkey));
-			//		Log.out("gotExtList = "+ gotExtList);
 			for (int idx = 0; idx < gotExtList.size(); idx++) {
 				Object o;
 				o = gotExtList.get(idx);
@@ -59,12 +53,9 @@ public class SortNesting {
 					((SortNesting) o).buffered((ExtList) t.get(idx));
 				}
 			}
-			//		Log.out("replacing ExtListKey = "+ ExtListkey);
-			//		Log.out("replacing buffer = "+ gotExtList);
 			BufferedData.remove(ExtListkey);
 			BufferedData.put(ExtListkey, gotExtList);
 		}
-
 	}
 
 	private ExtList KeyAtt(ExtList t) {
@@ -80,7 +71,6 @@ public class SortNesting {
 	}
 
 	public ExtList GetResult() {
-
 		ExtList result = new ExtList();
 		ExtList buffer, buffer1;
 
@@ -100,6 +90,28 @@ public class SortNesting {
 		return result;
 	}
 
+	public Node<String> getResultNew() {
+		ExtList buffer;
+		Node<String> result = new Node<String>();
+		Enumeration e = BufferedData.elements();
+
+		while (e.hasMoreElements()) {
+			buffer = (ExtList) e.nextElement();
+			Node<String> child = new Node<String>();
+			for (int i = 0; i < buffer.size(); i++) {
+				Object bufferItem = buffer.get(i);
+				if (buffer.get(i) instanceof SortNesting) {
+					child = ((SortNesting) (bufferItem)).getResultNew();
+				} else {
+					child = new Leaf<String>(bufferItem.toString());
+				}
+				result.addChild(child);
+			}
+		}
+		
+		return result;
+	}
+	
 	//hanki start
 	public ExtList GetResultWithOrderBy(ExtList info, ExtList sch) {
 
@@ -147,5 +159,4 @@ public class SortNesting {
 	public String toString() {
 		return "[SortNesting:" + BufferedData + "]";
 	}
-
 }
