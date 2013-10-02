@@ -1,6 +1,7 @@
 package supersql.codegenerator;
 
 import supersql.extendclass.ExtList;
+import supersql.extendclass.Node;
 
 public class TFE implements ITFE {
 
@@ -99,4 +100,13 @@ public class TFE implements ITFE {
 		return null;
 	}
 
+	public Object createNodeNew(Node<String> dataNode) {
+		return null;
+	}
+
+	@Override
+	public Node<String> makeTreeSchema() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

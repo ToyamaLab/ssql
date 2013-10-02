@@ -21,6 +21,7 @@ import supersql.codegenerator.Manager;
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
+import supersql.extendclass.Node;
 
 
 public class XMLManager extends Manager{
@@ -78,6 +79,42 @@ public class XMLManager extends Manager{
 		}  	
     }
     
+	public void generateCodeNew(ITFE tfeInfo, Node<String> dataRoot) {
+		try {
+			Element rootElement = this.getDoc().createElement("ssql");
+			this.getDoc().appendChild(rootElement);
+
+	        if(dataRoot.isEmpty())
+	        {
+	        	Log.out("no data");
+	        	rootElement.appendChild(this.getDoc().createTextNode("NO DATA FOUND"));
+	        }
+	        else {
+	        	Element childNode = (Element) tfeInfo.createNodeNew(dataRoot);
+		        rootElement.appendChild(childNode);
+	        }
+	        
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			
+	        getOutfilename();
+	        xml_env.filename = xml_env.outfile + ".xml";
+			StreamResult result = new StreamResult(new File(xml_env.filename));
+			DOMSource source = new DOMSource(this.getDoc());
+			transformer.transform(source, result);
+
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  	
+    }
+	
     private void getOutfilename() {
         String file = GlobalEnv.getfilename();
         String outdir = GlobalEnv.getoutdirectory();
@@ -139,9 +176,7 @@ public class XMLManager extends Manager{
     }
 
     public void finish() {
-
     }
-
 
 	public Document getDoc() {
 		return doc;

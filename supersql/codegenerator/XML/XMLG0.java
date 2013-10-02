@@ -6,6 +6,7 @@ import supersql.codegenerator.Grouper;
 import supersql.codegenerator.Manager;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
+import supersql.extendclass.Node;
 
 public class XMLG0 extends Grouper {
 
@@ -91,7 +92,6 @@ public class XMLG0 extends Grouper {
 //    }
 
     public Object createNode(ExtList<ExtList<String>> data_info) {
-        Log.out("************* XMLG0 *************");
         this.setDataList(data_info);
         
         String tag = "";
@@ -107,6 +107,27 @@ public class XMLG0 extends Grouper {
         Element childNode;
         while (this.hasMoreItems()) {
         	childNode = (Element) this.createNextItemNode();
+        	node.appendChild(childNode);
+        }
+        
+		return node;
+    }
+    
+    public Object createNodeNew(Node<String> dataNode) {
+        String tag = "";
+
+        if(decos.containsKey("tag")) {
+        	tag = decos.getStr("tag");
+        }
+        if(tag.equals("")) {
+        	tag = "grouper";
+        }
+
+        Element node = this.manager.getDoc().createElement(tag);
+        Element childNode;
+        
+        for(Node<String> dataChild : dataNode.getChildren()) {
+        	childNode = (Element) tfe.createNodeNew(dataChild);
         	node.appendChild(childNode);
         }
         

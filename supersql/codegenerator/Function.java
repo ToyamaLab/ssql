@@ -26,7 +26,6 @@ public class Function extends Operand {
 	}
 
 	public void debugout(int count) {
-
 		Debug dbgout = new Debug();
 		dbgout.prt(count, "<Function Name=" + Name + " argitems=" + Args.size()
 				+ " decoitems=" + decos.size() + " id=" + id + ">");
@@ -54,7 +53,6 @@ public class Function extends Operand {
 	}
 
 	public ExtList makele0() {
-
 		ExtList le0 = new ExtList();
 		ExtList le0_1 = new ExtList();
 
@@ -66,7 +64,6 @@ public class Function extends Operand {
 		}
 
 		Log.out("Fnc le0:" + le0);
-
 		return le0;
 	}
 
@@ -146,7 +143,6 @@ public class Function extends Operand {
 	}
 
 	public String getClassName() {
-
 		FuncArg fa;
 		String result = null;
 
@@ -159,7 +155,6 @@ public class Function extends Operand {
 		
 		Log.out("getClassName = "+result);
 		return result;
-
 	}
 	
 	public ExtList makeschImage() {

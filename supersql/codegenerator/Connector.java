@@ -4,8 +4,7 @@ import supersql.codegenerator.XML.XMLAttribute;
 import supersql.codegenerator.XML.XMLC0;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
-//ryuryu
-//ryuryu
+import supersql.extendclass.Node;
 
 public class Connector extends Operator{
 
@@ -64,6 +63,14 @@ public class Connector extends Operator{
 			outsch.addAll(tfes.get(i).makesch());
 		}
 		return outsch;
+	}
+	
+	public Node<String> makeTreeSchema() {
+		Node<String> node = new Node<String>("connector");
+		for (int i = 0; i < tfeItems; i++) {
+			node.addChild(tfes.get(i).makeTreeSchema());
+		}
+		return node;
 	}
 
 	public ExtList makele0() {

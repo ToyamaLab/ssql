@@ -17,6 +17,7 @@ import supersql.codegenerator.XML.XMLFactory;
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
+import supersql.extendclass.Node;
 import supersql.parser.SSQLparser;
 
 /**
@@ -180,7 +181,12 @@ public class CodeGenerator{
 		manager.finish();
 	};
 
-	//tk start//////////////////////////////////////////////////////////////////////////////
+	public void generateCodeNew(SSQLparser parser, Node<String> dataTree) {
+		ITFE tfeInfo = parser.get_TFEschema();
+		manager.generateCodeNew(tfeInfo, dataTree);
+		manager.finish();
+	}
+	
 	public StringBuffer generateCode2(SSQLparser parser, ExtList data_info) {
 		ITFE tfe_info = parser.get_TFEschema();
 
@@ -188,22 +194,15 @@ public class CodeGenerator{
 		//	manager.preProcess(tab,le,le1,le2,le3);
 		//	manager.createSchema(tab,le,le1,le2,le3);
 
-		Log.out("===============================");
-		Log.out("     generateCode2 is start     ");
-		Log.out("===============================");
-
-
 		// ?�ֳ��� Grouper�ΤȤ���data_info��Ĵ����?
 		if (tfe_info instanceof Grouper && data_info.size() != 0) {
 			data_info = (ExtList) data_info.get(0);
 		}
-		Log.out("data_info.size " + data_info.size());
 
 		if(data_info.size() == 0)
 			return manager.generateCodeNotuple(tfe_info);
 		else
 			return manager.generateCode2(tfe_info, data_info);
-
 	};
 	public StringBuffer generateCode3(SSQLparser parser, ExtList data_info) {
 		ITFE tfe_info = parser.get_TFEschema();

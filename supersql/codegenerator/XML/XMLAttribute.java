@@ -5,6 +5,7 @@ import org.w3c.dom.Element;
 import supersql.codegenerator.Attribute;
 import supersql.codegenerator.Manager;
 import supersql.extendclass.ExtList;
+import supersql.extendclass.Node;
 
 public class XMLAttribute extends Attribute {
 
@@ -57,6 +58,17 @@ public class XMLAttribute extends Attribute {
     	
     	Element node = this.manager.getDoc().createElement(tag);
     	node.appendChild(this.manager.getDoc().createTextNode(data_info.get(0).toString()));
+    	return node;
+    }
+    
+    public Object createNodeNew(Node<String> dataNode) {
+    	tag = this.toString();
+    	if(decos.containsKey("tag"))
+    		tag = decos.getStr("tag");
+    	
+    	Element node = this.manager.getDoc().createElement(tag);
+    	String nodeData = dataNode.getNodeData();
+    	node.appendChild(this.manager.getDoc().createTextNode(nodeData));
     	return node;
     }
 }

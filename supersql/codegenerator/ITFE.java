@@ -2,7 +2,10 @@
 
 package supersql.codegenerator;
 
+import org.w3c.dom.Element;
+
 import supersql.extendclass.ExtList;
+import supersql.extendclass.Node;
 
 /**
  *
@@ -42,4 +45,8 @@ public interface ITFE {
 	ExtList makeschImage();
 
 	void addDeco(String name, String value, String condition);
+
+	Object createNodeNew(Node<String> dataRoot);
+
+	Node<String> makeTreeSchema();
 }

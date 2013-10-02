@@ -8,6 +8,7 @@ import supersql.codegenerator.Function;
 import supersql.codegenerator.ITFE;
 import supersql.codegenerator.Manager;
 import supersql.extendclass.ExtList;
+import supersql.extendclass.Node;
 import supersql.parser.TFEparser;
 
 public class XMLC0 extends Connector {
@@ -56,6 +57,30 @@ public class XMLC0 extends Connector {
 	    	sindex++;
 	    	dindex += ci;	   		 
 	    }
+        
+    	return node;
+    }
+    
+    public Object createNodeNew(Node<String> dataNode) {
+        String tag = "";
+        if(decos.containsKey("tag")) {
+        	tag = decos.getStr("tag");
+        }
+        if(tag.equals("")) {
+        	tag = "connector";
+        }
+        
+        Element node = this.manager.getDoc().createElement(tag);
+        
+        Element childNode;
+        int tfeIndex = 0;
+        int tfeLength = tfes.size();
+        for(Node dataChild : dataNode.getChildren()) {
+        	ITFE tfe = (ITFE) tfes.get(tfeIndex);
+        	childNode = (Element) tfe.createNodeNew(dataChild);
+        	node.appendChild(childNode);
+        	tfeIndex = (tfeIndex + 1) % tfeLength;
+        }
         
     	return node;
     }
