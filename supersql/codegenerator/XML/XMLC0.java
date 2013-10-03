@@ -9,6 +9,7 @@ import supersql.codegenerator.ITFE;
 import supersql.codegenerator.Manager;
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 import supersql.parser.TFEparser;
 
 public class XMLC0 extends Connector {
@@ -75,7 +76,7 @@ public class XMLC0 extends Connector {
         Element childNode;
         int tfeIndex = 0;
         int tfeLength = tfes.size();
-        for(Node dataChild : dataNode.getChildren()) {
+        for(TreeNode<String> dataChild : dataNode.getChildren()) {
         	ITFE tfe = (ITFE) tfes.get(tfeIndex);
         	childNode = (Element) tfe.createNodeNew(dataChild);
         	node.appendChild(childNode);

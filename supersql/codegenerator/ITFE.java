@@ -6,6 +6,7 @@ import org.w3c.dom.Element;
 
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 
 /**
  *
@@ -46,7 +47,7 @@ public interface ITFE {
 
 	void addDeco(String name, String value, String condition);
 
-	Object createNodeNew(Node<String> dataRoot);
+	Object createNodeNew(TreeNode<String> dataRoot);
 
 	Node<String> makeTreeSchema();
 }

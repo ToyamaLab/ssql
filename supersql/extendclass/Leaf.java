@@ -1,9 +1,8 @@
 package supersql.extendclass;
 
-public class Leaf<T> extends Node<T>{
-	
+public class Leaf<T> extends TreeNode<T>{
 	public Leaf(T nodeData) {
-		super(nodeData);
+		this.setNodeData(nodeData);
 	}
 	
 	public boolean isLeaf() {

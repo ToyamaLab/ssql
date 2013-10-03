@@ -7,6 +7,7 @@ import supersql.codegenerator.Manager;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 
 public class XMLG0 extends Grouper {
 
@@ -126,7 +127,7 @@ public class XMLG0 extends Grouper {
         Element node = this.manager.getDoc().createElement(tag);
         Element childNode;
         
-        for(Node<String> dataChild : dataNode.getChildren()) {
+        for(TreeNode<String> dataChild : dataNode.getChildren()) {
         	childNode = (Element) tfe.createNodeNew(dataChild);
         	node.appendChild(childNode);
         }

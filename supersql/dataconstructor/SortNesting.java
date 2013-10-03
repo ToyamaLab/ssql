@@ -7,6 +7,7 @@ import supersql.common.Log;
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Leaf;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 
 /* ŽÆ?ŽÎŽÏŽ¤ŽÏ schŽ¤ŽËŽ¤Ž½Ž¤ŽÃŽ¤Ž¿nestŽ¤Ž¬Ž½ŽªŽ¤?Ž¤ŽÃŽ¤Ž¿tupleŽ¤ŽÇŽ¤Ž¢Ž¤?Ž¤Ž³Ž¤ŽÈ */
 
@@ -97,7 +98,7 @@ public class SortNesting {
 
 		while (e.hasMoreElements()) {
 			buffer = (ExtList) e.nextElement();
-			Node<String> child = new Node<String>();
+			TreeNode<String> child = new Node<String>();
 			for (int i = 0; i < buffer.size(); i++) {
 				Object bufferItem = buffer.get(i);
 				if (buffer.get(i) instanceof SortNesting) {

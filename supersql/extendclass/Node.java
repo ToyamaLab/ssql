@@ -3,28 +3,23 @@ package supersql.extendclass;
 import java.util.ArrayList;
 import java.util.List;
     
-public class Node<T> {
-	private List<Node<T>> children;
-	private T nodeData;
+public class Node<T> extends TreeNode<T> {
+	private List<TreeNode<T>> children;
 
 	public Node() {
-		this.setChildren(new ArrayList<Node<T>>());
+		this.children = new ArrayList<TreeNode<T>>();
 	}
 
 	public Node(T nodeData) {
-		this.setChildren(new ArrayList<Node<T>>());
+		this.children = new ArrayList<TreeNode<T>>();
 		this.setNodeData(nodeData);
 	}
 
-	public List<Node<T>> getChildren() {
+	public List<TreeNode<T>> getChildren() {
 		return children;
 	}
 
-	public void setChildren(List<Node<T>> children) {
-		this.children = children;
-	}
-
-	public void addChild(Node<T> child) {
+	public void addChild(TreeNode<T> child) {
 		this.children.add(child);
 	}
 
@@ -36,18 +31,10 @@ public class Node<T> {
 		return this.children.isEmpty();
 	}
 
-	public void setNodeData(T nodeData) {
-		this.nodeData = nodeData;
-	}
-
-	public T getNodeData() {
-		return nodeData;
-	}
-
 	public String toString() {
 		String out = "[";
 		String delim = "";
-		for (Node<T> child : this.getChildren()) {
+		for (TreeNode<T> child : this.getChildren()) {
 			out += delim + child.toString();
 			delim = ", ";
 		}
