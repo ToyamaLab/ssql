@@ -34,7 +34,6 @@ public class SWFG4 extends Grouper implements SWFTFE{
 	public void work(ExtList data_info) {
 
 		System.out.println("------- G4 -------");
-		System.out.println("[SWFG4:work]tfe_info = " + makele0());
 		System.out.println("[SWFG4:work]data_info = " + data_info);
 		value = new SWFValue("G4");
 

@@ -24,8 +24,6 @@ public class PDFManager extends Manager {
 
 	@Override
 	public void generateCode(ITFE tfe_info, ExtList data_info) {
-		System.out.println("[PDFManager:generateCode]tfe_info = "
-				+ tfe_info.makele0());
 		System.out.println("[PDFManager:generateCode]data_info = " + data_info);
 
 		//’Ç‰Á10.14

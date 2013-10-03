@@ -31,7 +31,6 @@ public class SWFC4 extends Connector implements SWFTFE{
 		swf_env.level++;
 
 		System.out.println("------- C4 -------");
-		System.out.println("[SWFC4:work]tfe_info = " + makele0());
 		System.out.println("[SWFC4:work]data_info = " + data_info);
 
 		value = new SWFValue("C4");    

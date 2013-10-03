@@ -33,7 +33,6 @@ public class SWFG2 extends Grouper implements SWFTFE{
 
 		System.out.println("");
 		System.out.println("------- G2 -------");
-		System.out.println("[SWFG2:work]tfe_info = " + makele0());
 		System.out.println("[SWFG2:work]data_info = " + data_info);
 
 		value = new SWFValue("G2");

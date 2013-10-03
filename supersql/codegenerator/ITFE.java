@@ -2,8 +2,6 @@
 
 package supersql.codegenerator;
 
-import org.w3c.dom.Element;
-
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
 import supersql.extendclass.TreeNode;
@@ -27,7 +25,7 @@ public interface ITFE {
 	 */
 	ExtList<Integer> makesch();
 
-	ExtList makele0();
+	//ExtList makele0();
 
 	void work(ExtList<ExtList<String>> data_info);
 	Object createNode(ExtList<ExtList<String>> data_info);
@@ -43,7 +41,7 @@ public interface ITFE {
 	void setOrderBy(String order);
 	void setAggregate(String aggregate);
 
-	ExtList makeschImage();
+	//ExtList makeschImage();
 
 	void addDeco(String name, String value, String condition);
 

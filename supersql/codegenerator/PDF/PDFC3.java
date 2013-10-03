@@ -25,7 +25,6 @@ public class PDFC3 extends Connector {
 	public void work(ExtList data_info) {
 		System.out.println("");
 		System.out.println("------- C3 -------");
-		System.out.println("[PDFC3:work]tfe_info = " + makele0());
 		System.out.println("[PDFC3:work]data_info = " + data_info);
 
 		Vector vector_local = new Vector();

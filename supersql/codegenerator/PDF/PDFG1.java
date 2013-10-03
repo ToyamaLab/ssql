@@ -72,7 +72,6 @@ public class PDFG1 extends Grouper implements PDFTFE {
 		
 		System.out.println("");
 		System.out.println("------- G1 -------");
-		System.out.println("[PDFG1:work]tfe_info = " + makele0());
 		System.out.println("[PDFG1:work]data_info = " + data_info);
 
 		System.out.println("++++ G1でvalueをnewします");

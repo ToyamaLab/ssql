@@ -1,17 +1,12 @@
 package supersql.codegenerator;
 
-import org.jsoup.nodes.Element;
-
-//import common.Log;
 import supersql.extendclass.ExtList;
 
 
 public class FuncArg {
 
 	String Name; //
-
 	TFE tfe; //
-
 	ExtList Data = new ExtList(); //
 
 	public FuncArg(String nm, int tp, TFE t) {
@@ -24,32 +19,28 @@ public class FuncArg {
 	}
 
 	public void debugout(int count) {
-
 		Debug dbgout = new Debug();
 
 		dbgout.prt(count, "<FuncArg Name:" + Name + ">");
 		tfe.debugout(count + 1);
 		dbgout.prt(count, "</FuncArg>");
-
 	}
 
 	public ExtList makesch() {
-
 		return tfe.makesch();
-
 	}
 	
-	public ExtList makeschImage() {
-
-		return tfe.makeschImage();
-
-	}
-
-	public ExtList makele0() {
-
-		return tfe.makele0();
-
-	}
+//	public ExtList makeschImage() {
+//
+//		return tfe.makeschImage();
+//
+//	}
+//
+//	public ExtList makele0() {
+//
+//		return tfe.makele0();
+//
+//	}
 
 	public int countconnectitem() {
 		//	Log.out("FncArg le0:"+this.makele0());

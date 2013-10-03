@@ -4,7 +4,6 @@ import org.w3c.dom.Element;
 
 import supersql.codegenerator.Grouper;
 import supersql.codegenerator.Manager;
-import supersql.common.Log;
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
 import supersql.extendclass.TreeNode;

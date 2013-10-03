@@ -26,7 +26,6 @@ public class SWFC2 extends Connector implements SWFTFE{
 
 		System.out.println("");
 		System.out.println("------- C2 -------");
-		System.out.println("[SWFC2:work]tfe_info = " + makele0());
 		System.out.println("[SWFC2:work]data_info = " + data_info);
 
 		swf_env.level++;

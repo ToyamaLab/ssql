@@ -27,22 +27,22 @@ public class QueryDivider {
 	
     public boolean MakeGraph()
     {
-    	schema = parser.get_TFEschema().makeschImage();
-    	level = 0;
-    	num = 0;
-    	column = 0;
-    	vertices = new TreeMap<String, Attribute>();
-    	//System.out.println( schema );
-    	if ( MakeSchemaNodes( schema ) ) 	//make nodes from the schema
-    	{
-    		return false;
-    	}
-    	
-    	MakeWhereNodes(); 			//make nodes from the where
-    	g = new Graph( vertices ); 	//make the graph
-    	AddWhereEdges();  			//connect nodes equated in where
-    	g.setRoot();
-    	//g.printGraph();
+//    	schema = parser.get_TFEschema().makeschImage();
+//    	level = 0;
+//    	num = 0;
+//    	column = 0;
+//    	vertices = new TreeMap<String, Attribute>();
+//    	//System.out.println( schema );
+//    	if ( MakeSchemaNodes( schema ) ) 	//make nodes from the schema
+//    	{
+//    		return false;
+//    	}
+//    	
+//    	MakeWhereNodes(); 			//make nodes from the where
+//    	g = new Graph( vertices ); 	//make the graph
+//    	AddWhereEdges();  			//connect nodes equated in where
+//    	g.setRoot();
+//    	//g.printGraph();
     	return true;
     }
     

@@ -27,27 +27,24 @@ public class IfCondition extends Operator {
 		return "HTMLIfCondition";
 	}
 
-	public ExtList makesch() {
-		ExtList outsch = new ExtList();
-		outsch.addAll(condition.makesch());
-		outsch.addAll(thenTfe.makesch());
-		outsch.addAll(elseTfe.makesch());
-		return outsch;
-	}
+//	public ExtList makesch() {
+//		ExtList outsch = new ExtList();
+//		outsch.addAll(condition.makesch());
+//		outsch.addAll(thenTfe.makesch());
+//		outsch.addAll(elseTfe.makesch());
+//		return outsch;
+//	}
 
-	public ExtList makele0() {
-		ExtList le0 = new ExtList();
-
-		le0.add(this.getSymbol());
-		le0.addAll(condition.makele0());
-		le0.addAll(thenTfe.makele0());
-		le0.addAll(elseTfe.makele0());
-
-		return le0;
-	}
-
-	public void work(ExtList data_info) {
-	}
+//	public ExtList makele0() {
+//		ExtList le0 = new ExtList();
+//
+//		le0.add(this.getSymbol());
+//		le0.addAll(condition.makele0());
+//		le0.addAll(thenTfe.makele0());
+//		le0.addAll(elseTfe.makele0());
+//
+//		return le0;
+//	}
 
 	public int countconnectitem() {
 		// TODO Auto-generated method stub
@@ -57,14 +54,14 @@ public class IfCondition extends Operator {
 			return 2;
 	}
 
-	public ExtList makeschImage() {
-		// TODO Auto-generated method stub
-		ExtList outsch = new ExtList();
-		outsch.addAll(condition.makeschImage());
-		outsch.addAll(thenTfe.makeschImage());
-		outsch.addAll(elseTfe.makeschImage());
-		return outsch;
-	}
+//	public ExtList makeschImage() {
+//		// TODO Auto-generated method stub
+//		ExtList outsch = new ExtList();
+//		outsch.addAll(condition.makeschImage());
+//		outsch.addAll(thenTfe.makeschImage());
+//		outsch.addAll(elseTfe.makeschImage());
+//		return outsch;
+//	}
 
 	public Attribute getCondition() {
 		return condition;

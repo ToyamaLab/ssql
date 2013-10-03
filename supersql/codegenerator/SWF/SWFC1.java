@@ -30,7 +30,6 @@ public class SWFC1 extends Connector implements SWFTFE{
 
 		System.out.println("");
 		System.out.println("------- C1 -------");
-		System.out.println("[SWFC1:work]tfe_info = " + makele0());
 		System.out.println("[SWFC1:work]data_info = " + data_info);
 
 		System.out.println("++++ C1 +++++");

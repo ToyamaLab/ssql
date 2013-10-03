@@ -73,16 +73,16 @@ public class Connector extends Operator{
 		return node;
 	}
 
-	public ExtList makele0() {
-		ExtList le0 = new ExtList();
-		le0.add(this.getSymbol());
-		for (int i = 0; i < tfeItems; i++) {
-			le0.add(((ITFE) tfes.get(i)).makele0());
-		}
-
-		Log.out("Con le0:" + le0);
-		return le0;
-	}
+//	public ExtList makele0() {
+//		ExtList le0 = new ExtList();
+//		le0.add(this.getSymbol());
+//		for (int i = 0; i < tfeItems; i++) {
+//			le0.add(((ITFE) tfes.get(i)).makele0());
+//		}
+//
+//		Log.out("Con le0:" + le0);
+//		return le0;
+//	}
 
 	public String getSymbol() {
 		return "C?";
@@ -150,15 +150,15 @@ public class Connector extends Operator{
 		return tfes.get(i);
 	}
 
-	//added by ria 20110913 start
-	public ExtList makeschImage() {
-		ExtList outsch = new ExtList();
-		for (int i = 0; i < tfeItems; i++) {
-			outsch.addAll(((ITFE) tfes.get(i)).makeschImage());
-		}
-		return outsch;
-	}
-	//added by ria 20110913 end
+//	//added by ria 20110913 start
+//	public ExtList makeschImage() {
+//		ExtList outsch = new ExtList();
+//		for (int i = 0; i < tfeItems; i++) {
+//			outsch.addAll(((ITFE) tfes.get(i)).makeschImage());
+//		}
+//		return outsch;
+//	}
+//	//added by ria 20110913 end
 
 	public void addDeco(String key, String val, String condition) {
 		decos.put(key, val, condition);

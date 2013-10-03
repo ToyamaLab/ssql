@@ -2,9 +2,7 @@ package supersql.codegenerator.XML;
 
 import org.w3c.dom.Element;
 
-import supersql.codegenerator.Attribute;
 import supersql.codegenerator.Connector;
-import supersql.codegenerator.Function;
 import supersql.codegenerator.ITFE;
 import supersql.codegenerator.Manager;
 import supersql.extendclass.ExtList;
@@ -13,7 +11,7 @@ import supersql.extendclass.TreeNode;
 import supersql.parser.TFEparser;
 
 public class XMLC0 extends Connector {
-    XMLManager manager;
+    private XMLManager manager;
     public XMLEnv xml_env;
     public static int attflag = 0;
     public static int parent_attflag = 0;
@@ -39,26 +37,26 @@ public class XMLC0 extends Connector {
         }
         
         Element node = this.manager.getDoc().createElement(tag);
-        
-        Element childNode;
-	    while(this.hasMoreItems()) {
-	    	ITFE tfe = (ITFE) tfes.get(sindex);
-	    	int ci = tfe.countconnectitem();
-
-	    	ExtList subdata = data.ExtsubList(dindex, dindex + ci);
-
-	    	if (tfe instanceof Connector || tfe instanceof Attribute
-	    			|| tfe instanceof Function) {
-	    		childNode = (Element) tfe.createNode(subdata);
-	    	} else {
-	    		childNode = (Element) tfe.createNode((ExtList) subdata.get(0));
-	    	}
-	    	
-	    	node.appendChild(childNode);
-	    	sindex++;
-	    	dindex += ci;	   		 
-	    }
-        
+//        
+//        Element childNode;
+//	    while(this.hasMoreItems()) {
+//	    	ITFE tfe = (ITFE) tfes.get(sindex);
+//	    	int ci = tfe.countconnectitem();
+//
+//	    	ExtList subdata = data.ExtsubList(dindex, dindex + ci);
+//
+//	    	if (tfe instanceof Connector || tfe instanceof Attribute
+//	    			|| tfe instanceof Function) {
+//	    		childNode = (Element) tfe.createNode(subdata);
+//	    	} else {
+//	    		childNode = (Element) tfe.createNode((ExtList) subdata.get(0));
+//	    	}
+//	    	
+//	    	node.appendChild(childNode);
+//	    	sindex++;
+//	    	dindex += ci;	   		 
+//	    }
+//        
     	return node;
     }
     

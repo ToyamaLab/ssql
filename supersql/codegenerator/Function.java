@@ -52,20 +52,20 @@ public class Function extends Operand {
 		return outsch;
 	}
 
-	public ExtList makele0() {
-		ExtList le0 = new ExtList();
-		ExtList le0_1 = new ExtList();
-
-		for (int i = 0; i < Args.size(); i++) {
-			le0_1 = ((FuncArg) Args.get(i)).makele0();
-			if (!le0_1.isEmpty()) {
-				le0.addAll(le0_1);
-			}
-		}
-
-		Log.out("Fnc le0:" + le0);
-		return le0;
-	}
+//	public ExtList makele0() {
+//		ExtList le0 = new ExtList();
+//		ExtList le0_1 = new ExtList();
+//
+//		for (int i = 0; i < Args.size(); i++) {
+//			le0_1 = ((FuncArg) Args.get(i)).makele0();
+//			if (!le0_1.isEmpty()) {
+//				le0.addAll(le0_1);
+//			}
+//		}
+//
+//		Log.out("Fnc le0:" + le0);
+//		return le0;
+//	}
 
 	public void work(ExtList<ExtList<String>> data_info) {
 		Log.out("*Function");
@@ -157,19 +157,19 @@ public class Function extends Operand {
 		return result;
 	}
 	
-	public ExtList makeschImage() {
-		ExtList outsch = new ExtList();
-		ExtList outsch1 = new ExtList();
-
-		for (int i = 0; i < Args.size(); i++) {
-			outsch1 = Args.get(i).makeschImage();
-			if (!outsch1.isEmpty()) {
-				outsch.addAll(outsch1);
-			}
-		}
-
-		return outsch;
-	}
+//	public ExtList makeschImage() {
+//		ExtList outsch = new ExtList();
+//		ExtList outsch1 = new ExtList();
+//
+//		for (int i = 0; i < Args.size(); i++) {
+//			outsch1 = Args.get(i).makeschImage();
+//			if (!outsch1.isEmpty()) {
+//				outsch.addAll(outsch1);
+//			}
+//		}
+//
+//		return outsch;
+//	}
 
 	@Override
 	public Object createNode(ExtList<ExtList<String>> data_info) {

@@ -11,8 +11,4 @@ public abstract class Operator extends TFE implements IOperator {
     public Operator() {
     	super();
     }
-
-	@Override
-	public abstract void work(ExtList<ExtList<String>> data_info);
-
 }

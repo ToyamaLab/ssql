@@ -45,13 +45,13 @@ public class Grouper extends Operator {
 
     }
 
-    public ExtList makesch() {
-        ExtList outsch = new ExtList();
-        outsch.add(tfe.makesch());
-        //  Log.out("Grp outsch:"+outsch);
-
-        return outsch;
-    }
+//    public ExtList makesch() {
+//        ExtList outsch = new ExtList();
+//        outsch.add(tfe.makesch());
+//        //  Log.out("Grp outsch:"+outsch);
+//
+//        return outsch;
+//    }
 
 	public Node<String> makeTreeSchema() {
 		Node<String> node = new Node<String>("grouper");
@@ -59,13 +59,13 @@ public class Grouper extends Operator {
 		return node;
 	}
     
-    public ExtList makele0() {
-        ExtList le0 = new ExtList();
-        le0.add(this.getSymbol());
-        le0.add(tfe.makele0());
-        Log.out("Grp le0:" + le0);
-        return le0;
-    }
+//    public ExtList makele0() {
+//        ExtList le0 = new ExtList();
+//        le0.add(this.getSymbol());
+//        le0.add(tfe.makele0());
+//        Log.out("Grp le0:" + le0);
+//        return le0;
+//    }
 
     public String getSymbol() {
         return "G?";
@@ -99,7 +99,6 @@ public class Grouper extends Operator {
     }
 
     public void worknextItem() {
-
         ExtList subdata = (ExtList) (data.get(dindex));
         if (tfe instanceof Connector || tfe instanceof Attribute
                 || tfe instanceof Function || tfe instanceof IfCondition) {
@@ -109,21 +108,20 @@ public class Grouper extends Operator {
             Log.out(subdata.get(0));
         }
         dindex++;
-
     }
 
     public boolean isFirstItem() {
         return (dindex == 0);
     }
 
-	//added by ria 20110913 start
-	public ExtList makeschImage() {
-        ExtList outsch = new ExtList();
-        outsch.add(tfe.makeschImage());
-
-        return outsch;
-	}
-	//added by ria 20110913 end
+//	//added by ria 20110913 start
+//	public ExtList makeschImage() {
+//        ExtList outsch = new ExtList();
+//        outsch.add(tfe.makeschImage());
+//
+//        return outsch;
+//	}
+//	//added by ria 20110913 end
 
 	public void addDeco(String name, String value, String condition) {
         decos.put(name, value, condition);

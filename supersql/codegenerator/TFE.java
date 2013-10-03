@@ -31,11 +31,11 @@ public class TFE implements ITFE {
 		return null;
 	}
 
-	@Override
-	public ExtList makele0() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public ExtList makele0() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public void work(ExtList<ExtList<String>> data_info) {
@@ -74,11 +74,11 @@ public class TFE implements ITFE {
 	}
 
 
-	@Override
-	public ExtList makeschImage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public ExtList makeschImage() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public void addDeco(String key, Object val) {
@@ -97,7 +97,6 @@ public class TFE implements ITFE {
 
 	@Override
 	public Object createNode(ExtList<ExtList<String>> data_info) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

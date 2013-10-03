@@ -66,7 +66,6 @@ public class TFEparser {
 		try {
 			sch = schemaTop.makesch();
 			Log.out("Schema is " + sch);
-			Log.out("le0 is " + schemaTop.makele0());;
 		} catch (Exception e) {	}
 	}
 
@@ -556,8 +555,6 @@ public class TFEparser {
 		Log.out("[func*read start funcname]=" + fn);
 		/* func_read */
 		TFE read_tfe = connector(")");
-
-		Log.out("[func*TFE]=" + read_tfe.makele0());
 
 		if (read_tfe instanceof Connector) {
 			// many Attribute

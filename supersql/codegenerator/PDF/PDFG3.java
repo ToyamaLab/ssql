@@ -22,7 +22,6 @@ public class PDFG3 extends Grouper {
 	@Override
 	public void work(ExtList data_info) {
 		System.out.println("\n------- G3 -------");
-		System.out.println("[PDFG3:work]tfe_info = " + makele0());
 		System.out.println("[PDFG3:work]data_info = " + data_info);
 
 		PDFModifier modifier = new PDFModifier();
