@@ -47,5 +47,5 @@ public interface ITFE {
 
 	Object createNodeNew(TreeNode<String> dataRoot);
 
-	Node<String> makeTreeSchema();
+	TreeNode<String> makeTreeSchema();
 }

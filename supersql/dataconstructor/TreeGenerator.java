@@ -4,6 +4,7 @@ import supersql.common.Log;
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Leaf;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 import supersql.parser.Preprocessor;
 
 /**
@@ -11,8 +12,8 @@ import supersql.parser.Preprocessor;
  */
 public class TreeGenerator {
 
-	public Node<String> makeTreeNew(ExtList sch, ExtList<ExtList<String>> tuples) {
-		Node<String> result = new Node<String>();
+	public TreeNode<String> makeTreeNew(TreeNode<String> schemaTree, ExtList schema, ExtList<ExtList<String>> tuples) {
+		TreeNode<String> result = new Node<String>();
 		ExtList nestedTuple = new ExtList();
 
 		if (Preprocessor.isAggregate()) {
@@ -21,11 +22,11 @@ public class TreeGenerator {
 			Aggregate aggregate = new Aggregate();
 
 			info = Preprocessor.getAggregateList();
-			tuples = aggregate.aggregate(criteria_set, info, sch, tuples);
+			tuples = aggregate.aggregate(criteria_set, info, schema, tuples);
 		}
 
 		for (int i = 0; i < tuples.size(); i++) {
-			nestedTuple = nest_tuple(sch, (ExtList) tuples.get(i));
+			nestedTuple = nest_tuple(schema, (ExtList) tuples.get(i));
 			tuples.set(i, nestedTuple);
 		}
 
@@ -39,7 +40,7 @@ public class TreeGenerator {
 //				info = OrderBy.tableToList(Preprocessor.getOrderByTable());
 //				result = new ExtList(sn.GetResultWithOrderBy(info, sch));
 //			} else {
-			result = sn.getResultNew();
+			result.addChild(sn.getResultNew());
 			return result;
 		}
 		else
@@ -77,7 +78,7 @@ public class TreeGenerator {
 				result = new ExtList(sn.GetResult());
 			}
 			tuples.clear();
-			tuples.addAll(((ExtList) result.get(0)));
+			tuples.addAll(((ExtList) result));
 
 			return tuples;
 		}

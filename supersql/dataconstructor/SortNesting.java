@@ -14,6 +14,7 @@ import supersql.extendclass.TreeNode;
 public class SortNesting {
 
 	Hashtable BufferedData;
+	private TreeNode<String> schema;
 
 	public SortNesting() {
 		BufferedData = new Hashtable();
@@ -22,11 +23,16 @@ public class SortNesting {
 	public SortNesting(ExtList t) {
 		BufferedData = new Hashtable();
 		buffered(t);
+		this.schema = schema;
+	}
+	
+	public SortNesting(TreeNode<String> schema) {
+		this.schema = schema;
 	}
 
 	public void bufferall(ExtList tuples) {
 		for (int i = tuples.size() - 1; i >= 0; i--) {
-			buffered((ExtList) tuples.get(i));
+			buffered((ExtList) ((ExtList) tuples.get(i)).get(0));
 		}
 	}
 

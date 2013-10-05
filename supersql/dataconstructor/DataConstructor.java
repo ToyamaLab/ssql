@@ -21,12 +21,13 @@ import supersql.db.ConnectDB;
 import supersql.db.GetFromDB;
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 import supersql.parser.SSQLparser;
 
 public class DataConstructor {
 
 	private ExtList<ExtList<String>> dataTable;
-	private Node<String> dataTree;
+	private TreeNode<String> dataTree;
 	private ArrayList<SQLQuery> sqlQueries = null;
 	private QueryDivider qd; 
 	private String key = null;
@@ -112,13 +113,14 @@ public class DataConstructor {
         return sep_dataTable;
 	}
 
-	private Node<String> schemaToDataNew(SSQLparser parser, MakeSQL msql, ExtList sep_sch, ExtList<ExtList<String>> data) {
-		Node<String> dataTree = new Node<String>();
+	private TreeNode<String> schemaToDataNew(SSQLparser parser, MakeSQL msql, ExtList sep_sch, ExtList<ExtList<String>> data) {
+		TreeNode<String> dataTree = new Node<String>();
 		TreeGenerator tg = new TreeGenerator();
 		
 		if(msql != null) {
 		    data = getFromDB(msql, sep_sch, data);
-			dataTree = tg.makeTreeNew(sep_sch, (ExtList<ExtList<String>>) data); 
+		    TreeNode<String> schema = parser.get_TFEschema().makeTreeSchema();
+			dataTree = tg.makeTreeNew(schema, sep_sch, (ExtList<ExtList<String>>) data); 
 		} else {
 	        //getTuples(schema, data);
 		    //sep_dataTable = MakeTree( qd.getSchema() );
@@ -208,7 +210,7 @@ public class DataConstructor {
 		return dataTable;
 	}
 	
-	public Node getDataTree() {
+	public TreeNode<String> getDataTree() {
 		return dataTree;
 	}
 	

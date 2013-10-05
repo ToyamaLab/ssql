@@ -2,6 +2,7 @@ package supersql.codegenerator;
 
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 
 /**
  * ?象クラスManager。ソース生成にあたっての共通な機能をまとめた。 前処?、スキーマ生成、インスタンス移行、後処?。
@@ -78,7 +79,7 @@ public abstract class Manager {
 		return null;
 	}
 
-	public void generateCodeNew(ITFE tfeInfo, Node<String> dataRoot) {
+	public void generateCodeNew(ITFE tfeInfo, TreeNode<String> treeNode) {
 	}
 
 }

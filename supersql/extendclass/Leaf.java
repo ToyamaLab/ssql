@@ -19,4 +19,8 @@ public class Leaf<T> extends TreeNode<T>{
 	public List<TreeNode<T>> getChildren() {
 		return null;
 	}
+
+	@Override
+	public void addChild(TreeNode<T> child) {
+	}
 }

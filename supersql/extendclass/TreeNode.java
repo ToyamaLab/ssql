@@ -16,4 +16,5 @@ public abstract class TreeNode<T> {
 	public void setNodeData(T nodeData) {
 		this.nodeData = nodeData;
 	}
+	public abstract void addChild(TreeNode<T> child);
 }

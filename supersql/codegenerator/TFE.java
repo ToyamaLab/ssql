@@ -105,7 +105,7 @@ public class TFE implements ITFE {
 	}
 
 	@Override
-	public Node<String> makeTreeSchema() {
+	public TreeNode<String> makeTreeSchema() {
 		// TODO Auto-generated method stub
 		return null;
 	}

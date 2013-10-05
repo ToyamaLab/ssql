@@ -18,6 +18,7 @@ import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 import supersql.parser.SSQLparser;
 
 /**
@@ -181,7 +182,7 @@ public class CodeGenerator{
 		manager.finish();
 	};
 
-	public void generateCodeNew(SSQLparser parser, Node<String> dataTree) {
+	public void generateCodeNew(SSQLparser parser, TreeNode<String> dataTree) {
 		ITFE tfeInfo = parser.get_TFEschema();
 		manager.generateCodeNew(tfeInfo, dataTree);
 		manager.finish();
