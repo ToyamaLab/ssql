@@ -27,13 +27,13 @@ public class IfCondition extends Operator {
 		return "HTMLIfCondition";
 	}
 
-//	public ExtList makesch() {
-//		ExtList outsch = new ExtList();
-//		outsch.addAll(condition.makesch());
-//		outsch.addAll(thenTfe.makesch());
-//		outsch.addAll(elseTfe.makesch());
-//		return outsch;
-//	}
+	public ExtList makesch() {
+		ExtList outsch = new ExtList();
+		outsch.addAll(condition.makesch());
+		outsch.addAll(thenTfe.makesch());
+		outsch.addAll(elseTfe.makesch());
+		return outsch;
+	}
 
 //	public ExtList makele0() {
 //		ExtList le0 = new ExtList();

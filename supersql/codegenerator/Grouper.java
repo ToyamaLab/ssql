@@ -45,13 +45,13 @@ public class Grouper extends Operator {
 
     }
 
-//    public ExtList makesch() {
-//        ExtList outsch = new ExtList();
-//        outsch.add(tfe.makesch());
-//        //  Log.out("Grp outsch:"+outsch);
-//
-//        return outsch;
-//    }
+    public ExtList makesch() {
+        ExtList outsch = new ExtList();
+        outsch.add(tfe.makesch());
+        //  Log.out("Grp outsch:"+outsch);
+
+        return outsch;
+    }
 
 	public Node<String> makeTreeSchema() {
 		Node<String> node = new Node<String>("grouper");

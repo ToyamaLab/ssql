@@ -5,6 +5,7 @@ import org.w3c.dom.Element;
 import supersql.codegenerator.Attribute;
 import supersql.codegenerator.Manager;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 
 public class XMLAttribute extends Attribute {
 
@@ -60,7 +61,7 @@ public class XMLAttribute extends Attribute {
 //    	return node;
 //    }
     
-    public Object createNodeNew(Node<String> dataNode) {
+    public Object createNodeNew(TreeNode<String> dataNode) {
     	tag = this.toString();
     	if(decos.containsKey("tag"))
     		tag = decos.getStr("tag");

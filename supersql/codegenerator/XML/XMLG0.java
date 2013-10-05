@@ -113,7 +113,7 @@ public class XMLG0 extends Grouper {
 		return node;
     }
     
-    public Object createNodeNew(Node<String> dataNode) {
+    public Object createNodeNew(TreeNode<String> dataNode) {
         String tag = "";
 
         if(decos.containsKey("tag")) {

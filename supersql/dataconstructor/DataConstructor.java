@@ -25,7 +25,7 @@ import supersql.parser.SSQLparser;
 
 public class DataConstructor {
 
-	private ExtList<ExtList<String>> data_info;
+	private ExtList<ExtList<String>> dataTable;
 	private Node<String> dataTree;
 	private ArrayList<SQLQuery> sqlQueries = null;
 	private QueryDivider qd; 
@@ -36,12 +36,8 @@ public class DataConstructor {
 	public static String SQL_string;	//added by goto 20130306  "FROMなしクエリ対策"
 	
 	public DataConstructor(SSQLparser parser) {
-		ExtList sep_sch;
-		ExtList sep_data_info;
 		MakeSQL msql = null;
-
-		//Make schema
-		sep_sch = parser.get_TFEschema().makesch();
+		ExtList sep_sch = parser.get_TFEschema().makesch();
 		
 		//Check Optimization Parameters
 		if ( GlobalEnv.getOptLevel() == 0 || !GlobalEnv.isOptimizable() || SSQLparser.isDbpediaQuery())
@@ -74,18 +70,18 @@ public class DataConstructor {
 			msql = new MakeSQL(parser);
 		}
 
-		sep_data_info = new ExtList<ExtList<String>>();
+		ExtList<ExtList<String>> sep_dataTable = new ExtList<ExtList<String>>();
 		if(SSQLparser.isDbpediaQuery()){
-			sep_data_info = schemaToData(parser, sep_sch, sep_data_info);
+			sep_dataTable = schemaToData(parser, sep_sch, sep_dataTable);
 		}
-		else{
-			dataTree = schemaToDataNew(parser, msql, sep_sch, sep_data_info);
-			data_info = schemaToData(parser, msql, sep_sch, sep_data_info);
+		else {
+			dataTree = schemaToDataNew(parser, msql, sep_sch, sep_dataTable);
+			dataTable = schemaToData(parser, msql, sep_sch, sep_dataTable);
 		}
 	}
 
 	private ExtList schemaToData(SSQLparser parser, ExtList sep_sch,
-			ExtList sep_data_info) {
+			ExtList sep_dataTable) {
 		int attno = parser.get_att_info().size();
 		String[] array = new String[attno];
 		int i = 0;
@@ -94,26 +90,26 @@ public class DataConstructor {
 			array[i] = infoText;
 			i++;
 		}
-		sep_data_info = getDataFromDBPedia(parser.get_where_info().getSparqlWhereQuery(), array);
-		sep_data_info = makeTree(sep_sch, sep_data_info);
-		return sep_data_info;
+		sep_dataTable = getDataFromDBPedia(parser.get_where_info().getSparqlWhereQuery(), array);
+		sep_dataTable = makeTree(sep_sch, sep_dataTable);
+		return sep_dataTable;
 	}
 
 	private ExtList schemaToData(SSQLparser parser, MakeSQL msql, ExtList sep_sch,
-			ExtList sep_data_info) {
+			ExtList sep_dataTable) {
 
 		if ( msql != null )
 		{
-		    getFromDB(msql, sep_sch, sep_data_info);
-		    sep_data_info = makeTree(sep_sch, sep_data_info); 
+		    getFromDB(msql, sep_sch, sep_dataTable);
+		    sep_dataTable = makeTree(sep_sch, sep_dataTable); 
 		}
 		else 
 		{
-	        getTuples(sep_sch, sep_data_info);
-		    sep_data_info = MakeTree( qd.getSchema() );
+	        getTuples(sep_sch, sep_dataTable);
+		    sep_dataTable = MakeTree( qd.getSchema() );
 		}
 		
-        return sep_data_info;
+        return sep_dataTable;
 	}
 
 	private Node<String> schemaToDataNew(SSQLparser parser, MakeSQL msql, ExtList sep_sch, ExtList<ExtList<String>> data) {
@@ -125,12 +121,12 @@ public class DataConstructor {
 			dataTree = tg.makeTreeNew(sep_sch, (ExtList<ExtList<String>>) data); 
 		} else {
 	        //getTuples(schema, data);
-		    //sep_data_info = MakeTree( qd.getSchema() );
+		    //sep_dataTable = MakeTree( qd.getSchema() );
 		}
 		return dataTree;
 	}
 	
-	private ExtList[] getTuples( ExtList sep_sch, ExtList sep_data_info) {
+	private ExtList[] getTuples( ExtList sep_sch, ExtList sep_dataTable) {
 		ExtList[] table;
 		GetFromDB gfd;
 		int comp_size;
@@ -170,7 +166,7 @@ public class DataConstructor {
 	}
 
 	private ExtList<ExtList<String>> getFromDB(MakeSQL msql, ExtList sep_sch,
-			ExtList sep_data_info) {
+			ExtList sep_dataTable) {
 
         //MakeSQL
 		SQL_string = msql.makeSQL(sep_sch);
@@ -192,24 +188,24 @@ public class DataConstructor {
 			gfd = new GetFromDB();
 		}
 
-		gfd.execQuery(SQL_string, sep_data_info);
+		gfd.execQuery(SQL_string, sep_dataTable);
 		gfd.close();
         
-		return sep_data_info;
+		return sep_dataTable;
 	}
 
 	private ExtList<ExtList<String>> getFromDBNew(MakeSQL msql, SSQLparser parser, ExtList<ExtList<String>> data) {
 		return data;
 	}
 	
-	private ExtList makeTree(ExtList sep_sch, ExtList sep_data_info) {
+	private ExtList makeTree(ExtList sep_sch, ExtList sep_dataTable) {
 		TreeGenerator tg = new TreeGenerator();
-		sep_data_info = tg.makeTree(sep_sch, sep_data_info);
-		return sep_data_info;
+		sep_dataTable = tg.makeTree(sep_sch, sep_dataTable);
+		return sep_dataTable;
 	}
 
 	public ExtList getData() {
-		return data_info;
+		return dataTable;
 	}
 	
 	public Node getDataTree() {

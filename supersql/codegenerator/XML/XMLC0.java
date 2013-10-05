@@ -60,7 +60,7 @@ public class XMLC0 extends Connector {
     	return node;
     }
     
-    public Object createNodeNew(Node<String> dataNode) {
+    public Object createNodeNew(TreeNode<String> dataNode) {
         String tag = "";
         if(decos.containsKey("tag")) {
         	tag = decos.getStr("tag");

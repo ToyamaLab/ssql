@@ -1,5 +1,7 @@
 package supersql.extendclass;
 
+import java.util.List;
+
 public class Leaf<T> extends TreeNode<T>{
 	public Leaf(T nodeData) {
 		this.setNodeData(nodeData);
@@ -11,5 +13,10 @@ public class Leaf<T> extends TreeNode<T>{
 	
 	public String toString() {
 		return this.getNodeData().toString();
+	}
+
+	@Override
+	public List<TreeNode<T>> getChildren() {
+		return null;
 	}
 }
