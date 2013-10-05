@@ -8,7 +8,9 @@ import java.util.StringTokenizer;
 import supersql.common.Log;
 import supersql.extendclass.ExtHashSet;
 import supersql.extendclass.ExtList;
+import supersql.extendclass.Leaf;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 import supersql.parser.Preprocessor;
 
 public class Attribute extends Operand {
@@ -156,8 +158,8 @@ public class Attribute extends Operand {
 		return outsch;
 	}
 	
-	public Node<String> makeTreeSchema() {
-		Node<String> node = new Node<String>(Integer.toString(AttNo));
+	public TreeNode<String> makeTreeSchema() {
+		Leaf<String> node = new Leaf<String>(Integer.toString(AttNo));
 		return node;
 	}
 

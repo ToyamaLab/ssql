@@ -3,6 +3,7 @@ package supersql.codegenerator;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 
 public class Grouper extends Operator {
 
@@ -53,7 +54,7 @@ public class Grouper extends Operator {
         return outsch;
     }
 
-	public Node<String> makeTreeSchema() {
+	public TreeNode<String> makeTreeSchema() {
 		Node<String> node = new Node<String>("grouper");
 		node.addChild(tfe.makeTreeSchema());
 		return node;

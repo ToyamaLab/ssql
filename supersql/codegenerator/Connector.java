@@ -5,6 +5,7 @@ import supersql.codegenerator.XML.XMLC0;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 
 public class Connector extends Operator{
 
@@ -65,7 +66,7 @@ public class Connector extends Operator{
 		return outsch;
 	}
 	
-	public Node<String> makeTreeSchema() {
+	public TreeNode<String> makeTreeSchema() {
 		Node<String> node = new Node<String>("connector");
 		for (int i = 0; i < tfeItems; i++) {
 			node.addChild(tfes.get(i).makeTreeSchema());
