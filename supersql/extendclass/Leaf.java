@@ -23,4 +23,9 @@ public class Leaf<T> extends TreeNode<T>{
 	@Override
 	public void addChild(TreeNode<T> child) {
 	}
+
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
 }

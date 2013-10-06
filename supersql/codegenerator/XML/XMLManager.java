@@ -22,6 +22,7 @@ import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
+import supersql.extendclass.TreeNode;
 
 
 public class XMLManager extends Manager{
@@ -79,7 +80,7 @@ public class XMLManager extends Manager{
 		}  	
     }
     
-	public void generateCodeNew(ITFE tfeInfo, Node<String> dataRoot) {
+	public void generateCodeNew(ITFE tfeInfo, TreeNode<String> dataRoot) {
 		try {
 			Element rootElement = this.getDoc().createElement("ssql");
 			this.getDoc().appendChild(rootElement);
