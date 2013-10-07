@@ -30,7 +30,7 @@ public abstract class TreeNode<T> {
 		TreeNode<T> other = (TreeNode<T>) obj;
 		
 		if (this.getNodeData() == null) {
-			if (!(other.getNodeData() == null))
+			if (other.getNodeData() != null)
 				return false;
 		} else if (!this.getNodeData().equals(other.getNodeData())) {
 			return false;
@@ -38,6 +38,11 @@ public abstract class TreeNode<T> {
 		
 		if (this.isLeaf()) {
 			if (!other.isLeaf())
+				return false;
+		}
+		
+		if (this.isEmpty()) {
+			if (!other.isEmpty())
 				return false;
 		}
 		
@@ -52,5 +57,21 @@ public abstract class TreeNode<T> {
 		}
 		
 		return true;
+	}
+	
+	public int hashCode() {
+		int hash = 1;
+		T nodeData = this.getNodeData();
+		
+		if (nodeData != null) {
+			hash = hash * 31 + nodeData.hashCode();
+		}
+		if (!this.isLeaf() && !this.isEmpty()) {
+			for (TreeNode<T> child : this.getChildren()) {
+				hash = hash * 31 + child.hashCode();
+			}
+		}
+		
+		return hash;
 	}
 }
