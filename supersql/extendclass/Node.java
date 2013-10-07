@@ -15,20 +15,30 @@ public class Node<T> extends TreeNode<T> {
 		this.setNodeData(nodeData);
 	}
 
+	@Override
+	public int size() {
+		return this.children.size();
+	}
+	
+	public boolean isLeaf() {
+		return false;
+	}
+	
+	public boolean isEmpty() {
+		return this.children.isEmpty();
+	}
+	
 	public List<TreeNode<T>> getChildren() {
 		return children;
+	}
+	
+	@Override
+	public TreeNode<T> childAt(int index) {
+		return this.children.get(index);
 	}
 
 	public void addChild(TreeNode<T> child) {
 		this.children.add(child);
-	}
-
-	public boolean isLeaf() {
-		return false;
-	}
-
-	public boolean isEmpty() {
-		return this.children.isEmpty();
 	}
 
 	public String toString() {

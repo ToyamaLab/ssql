@@ -11,10 +11,11 @@ public class Leaf<T> extends TreeNode<T>{
 		return true;
 	}
 	
-	public String toString() {
-		return this.getNodeData().toString();
+	@Override
+	public int size() {
+		return 0;
 	}
-
+	
 	@Override
 	public List<TreeNode<T>> getChildren() {
 		return null;
@@ -26,6 +27,15 @@ public class Leaf<T> extends TreeNode<T>{
 
 	@Override
 	public boolean isEmpty() {
-		return false;
+		return true;
+	}
+
+	@Override
+	public TreeNode<T> childAt(int index) {
+		return null;
+	}
+	
+	public String toString() {
+		return this.getNodeData().toString();
 	}
 }
