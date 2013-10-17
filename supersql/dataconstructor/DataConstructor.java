@@ -92,7 +92,8 @@ public class DataConstructor {
 			i++;
 		}
 		sep_dataTable = getDataFromDBPedia(parser.get_where_info().getSparqlWhereQuery(), array);
-		sep_dataTable = makeTree(sep_sch, sep_dataTable);
+		TreeNode<String> schema = parser.get_TFEschema().makeTreeSchema();
+		sep_dataTable = makeTree(sep_sch, sep_dataTable, schema);
 		return sep_dataTable;
 	}
 
@@ -102,7 +103,8 @@ public class DataConstructor {
 		if ( msql != null )
 		{
 		    getFromDB(msql, sep_sch, sep_dataTable);
-		    sep_dataTable = makeTree(sep_sch, sep_dataTable); 
+		    TreeNode<String> schema = parser.get_TFEschema().makeTreeSchema();
+		    sep_dataTable = makeTree(sep_sch, sep_dataTable, schema); 
 		}
 		else 
 		{
@@ -120,7 +122,7 @@ public class DataConstructor {
 		if(msql != null) {
 		    data = getFromDB(msql, sep_sch, data);
 		    TreeNode<String> schema = parser.get_TFEschema().makeTreeSchema();
-			dataTree = tg.makeTreeNew(schema, sep_sch, (ExtList<ExtList<String>>) data); 
+			dataTree = tg.makeTreeNew(data, schema); 
 		} else {
 	        //getTuples(schema, data);
 		    //sep_dataTable = MakeTree( qd.getSchema() );
@@ -200,10 +202,10 @@ public class DataConstructor {
 		return data;
 	}
 	
-	private ExtList makeTree(ExtList sep_sch, ExtList sep_dataTable) {
+	private ExtList makeTree(ExtList sep_sch, ExtList sep_dataTable, TreeNode<String> schema) {
 		TreeGenerator tg = new TreeGenerator();
-		sep_dataTable = tg.makeTree(sep_sch, sep_dataTable);
-		return sep_dataTable;
+		dataTable = tg.makeTree(sep_sch, sep_dataTable);
+		return dataTable;
 	}
 
 	public ExtList getData() {

@@ -4,6 +4,7 @@ import org.w3c.dom.Element;
 
 import supersql.codegenerator.Attribute;
 import supersql.codegenerator.Manager;
+import supersql.extendclass.ExtList;
 import supersql.extendclass.Node;
 import supersql.extendclass.TreeNode;
 
@@ -51,15 +52,15 @@ public class XMLAttribute extends Attribute {
 //    	XMLC0.tagclose_flag = 0;
 //    }
     
-//    public Object createNode(ExtList data_info) {
-//    	tag = this.toString();
-//    	if(decos.containsKey("tag"))
-//    		tag = decos.getStr("tag");
-//    	
-//    	Element node = this.manager.getDoc().createElement(tag);
-//    	node.appendChild(this.manager.getDoc().createTextNode(data_info.get(0).toString()));
-//    	return node;
-//    }
+    public Object createNode(ExtList data_info) {
+    	tag = this.toString();
+    	if(decos.containsKey("tag"))
+    		tag = decos.getStr("tag");
+    	
+    	Element node = this.manager.getDoc().createElement(tag);
+    	node.appendChild(this.manager.getDoc().createTextNode(data_info.get(0).toString()));
+    	return node;
+    }
     
     public Object createNodeNew(TreeNode<String> dataNode) {
     	tag = this.toString();

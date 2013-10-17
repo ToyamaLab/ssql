@@ -67,7 +67,7 @@ public class Connector extends Operator{
 	}
 	
 	public TreeNode<String> makeTreeSchema() {
-		Node<String> node = new Node<String>("connector");
+		Node<String> node = new Node<String>("C");
 		for (int i = 0; i < tfeItems; i++) {
 			node.addChild(tfes.get(i).makeTreeSchema());
 		}

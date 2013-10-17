@@ -85,7 +85,7 @@ public class XMLManager extends Manager{
 			Element rootElement = this.getDoc().createElement("ssql");
 			this.getDoc().appendChild(rootElement);
 
-	        if(dataRoot.isEmpty())
+	        if(dataRoot.equals(null))
 	        {
 	        	Log.out("no data");
 	        	rootElement.appendChild(this.getDoc().createTextNode("NO DATA FOUND"));

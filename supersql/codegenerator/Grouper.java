@@ -55,7 +55,7 @@ public class Grouper extends Operator {
     }
 
 	public TreeNode<String> makeTreeSchema() {
-		Node<String> node = new Node<String>("grouper");
+		Node<String> node = new Node<String>("G");
 		node.addChild(tfe.makeTreeSchema());
 		return node;
 	}

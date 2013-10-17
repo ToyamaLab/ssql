@@ -13,26 +13,30 @@ import supersql.extendclass.TreeNode;
 
 public class SortNesting {
 
-	Hashtable BufferedData;
-	private TreeNode<String> schema;
-
+	private Hashtable BufferedData;
+	private Hashtable<ExtList<String>, SortNesting> nestingMap;
+	private TreeNode<String> buffer;
+	
 	public SortNesting() {
-		BufferedData = new Hashtable();
+		this.BufferedData = new Hashtable();
+		this.nestingMap = new Hashtable<ExtList<String>, SortNesting>();
+		this.buffer = new Node<String>();
 	}
 
 	public SortNesting(ExtList t) {
-		BufferedData = new Hashtable();
+		this.BufferedData = new Hashtable();
 		buffered(t);
-		this.schema = schema;
-	}
-	
-	public SortNesting(TreeNode<String> schema) {
-		this.schema = schema;
 	}
 
-	public void bufferall(ExtList tuples) {
-		for (int i = tuples.size() - 1; i >= 0; i--) {
-			buffered((ExtList) ((ExtList) tuples.get(i)).get(0));
+	public void bufferall(ExtList nestedTuples) {
+		for (int i = nestedTuples.size() - 1; i >= 0; i--) {
+			buffered((ExtList) ((ExtList) nestedTuples.get(i)).get(0));
+		}
+	}
+	
+	public void bufferallNew(TreeNode<String> nestedTuples) {
+		for(TreeNode<String> nestedTuple : nestedTuples.getChildren()) {
+			this.bufferedNew(nestedTuple);
 		}
 	}
 
@@ -65,6 +69,47 @@ public class SortNesting {
 		}
 	}
 
+	
+	private void bufferedNew(TreeNode<String> nestedTuple) {
+		if (nestedTuple.isLeaf()) {
+			this.buffer = nestedTuple;
+			return;
+		}
+		
+		ExtList<String> ExtListKey = this.KeyAttNew(nestedTuple);
+		SortNesting s;
+
+		// We only have attributes
+		if (ExtListKey.size() == nestedTuple.size()) {
+			for (TreeNode<String> child : nestedTuple.getChildren()) {
+				this.buffer.addChild(child);
+			}
+			return;
+		}
+		
+		// We have nested connectors or nested groupers
+		if (!nestingMap.containsKey(ExtListKey)) {
+			s = new SortNesting();
+			for (TreeNode<String> child : nestedTuple.getChildren()) {
+				if (child.isLeaf()) {
+					this.buffer.addChild(child);
+				} else {
+					s.bufferedNew(child);
+				}
+			}
+			this.nestingMap.put(ExtListKey, s);
+		} else {
+			s = this.nestingMap.get(ExtListKey);
+			for (TreeNode<String> child : nestedTuple.getChildren()) {
+				if (child.isLeaf()) {
+					this.buffer.addChild(child);
+				} else {
+					s.bufferedNew(child);
+				}
+			}
+		}
+	}
+
 	private ExtList KeyAtt(ExtList t) {
 		ExtList o;
 		ExtList result = new ExtList();
@@ -76,7 +121,19 @@ public class SortNesting {
 		}
 		return result;
 	}
+	
+	private ExtList<String> KeyAttNew(TreeNode<String> nestedTuple) {
+		ExtList<String> result = new ExtList<String>();
 
+		for (TreeNode<String> child : nestedTuple.getChildren()) {
+			if (child.isLeaf()) {
+				result.add(child.getNodeData());
+			}
+		}
+		
+		return result;
+	}
+	
 	public ExtList GetResult() {
 		ExtList result = new ExtList();
 		ExtList buffer, buffer1;
@@ -97,33 +154,28 @@ public class SortNesting {
 		return result;
 	}
 
-	public Node<String> getResultNew() {
-		ExtList buffer;
-		Node<String> result = new Node<String>();
-		Enumeration e = BufferedData.elements();
-
-		while (e.hasMoreElements()) {
-			buffer = (ExtList) e.nextElement();
-			TreeNode<String> child = new Node<String>();
-			for (int i = 0; i < buffer.size(); i++) {
-				Object bufferItem = buffer.get(i);
-				if (buffer.get(i) instanceof SortNesting) {
-					child = ((SortNesting) (bufferItem)).getResultNew();
-				} else {
-					child = new Leaf<String>(bufferItem.toString());
+	public TreeNode<String> getResult() {
+		TreeNode<String> result = new Node<String>();
+		
+		if (this.nestingMap.isEmpty()) {
+			result = this.buffer;
+		} else {
+			Enumeration<ExtList<String>> keyBuffers = this.nestingMap.keys();
+			while(keyBuffers.hasMoreElements()) {
+				ExtList<String> keyBuffer = keyBuffers.nextElement();
+				for (String field : keyBuffer) {
+					result.addChild(new Leaf<String>(field));
 				}
-				result.addChild(child);
+				result.addChild(nestingMap.get(keyBuffer).getResult());
 			}
 		}
 		
 		return result;
 	}
 	
-	//hanki start
 	public ExtList GetResultWithOrderBy(ExtList info, ExtList sch) {
 
 		int a;
-		
 		ExtList result = new ExtList();
 		ExtList buffer, buffer1;
 
@@ -160,10 +212,9 @@ public class SortNesting {
 	
 		return result;
 	}
-	//hanki end
-	
+
 	@Override
 	public String toString() {
-		return "[SortNesting:" + BufferedData + "]";
+		return "[SortNesting:" + this.buffer + "]";
 	}
 }
