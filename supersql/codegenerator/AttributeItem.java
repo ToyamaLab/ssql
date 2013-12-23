@@ -17,7 +17,7 @@ public class AttributeItem {
 
 	private ExtHashSet UseTables;
 
-	boolean IsStr;
+	public boolean IsStr;
 
 	public AttributeItem() {
 	}

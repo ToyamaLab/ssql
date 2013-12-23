@@ -646,19 +646,44 @@ public class HTMLFunction extends Function {
 	}
 
 	private Element FuncSinvoke(ExtList<ExtList<String>> data_info) {
-		checkArgsNumber(2);
+//		checkArgsNumber(2);
+		this.setDataList(data_info);
 
 		FuncArg content = this.Args.get(0);
-		FuncArg href = this.Args.get(1);
+		FuncArg href = null;
+		String hrefString = "";
+		if(this.ArgHash.containsKey("file")){
+			FuncArg file = this.ArgHash.get("file");
+			String filename = file.getStr().split("\\.")[0];
+			hrefString = filename;
+			if(this.ArgHash.containsKey("att"))
+				hrefString += "_" + ((Element)(this.ArgHash.get("att").createNode())).text();
+			else{
+				int i = 1;
+				boolean argumentsLeft = true;
+				while(argumentsLeft){
+					if(this.ArgHash.containsKey("att"+i)){
+						FuncArg att = this.ArgHash.get("att"+i);
+						hrefString += "_" + ((Element) (att.createNode())).text();
+					}
+					else
+						argumentsLeft = false;
+					i++;
+				}
+			}
+		}else{
+			 hrefString = ((Element) href.createNode()).text();
+		}
 
 		checkArgType(content, 0, TFE.class);
-		checkArgType(href, 1, HTMLC0.class);
+//		checkArgType(href, 1, HTMLC0.class);
 
 		Element result = new Element(Tag.valueOf("a"), "");
 		result.addClass("box").addClass("link");
 		result.appendChild((Element) content.createNode());
-		result.attr("href", ((Element) href.createNode()).text());
-		result.attributes().addAll(getAttributes());
+		result.attr("href", hrefString);
+			
+//		result.attributes().addAll(getAttributes());
 
 		if (GlobalEnv.isAjax()) {
 			HTMLEnv.ajaxCond = this.getAtt("ajaxcond") + "="

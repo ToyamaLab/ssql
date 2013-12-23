@@ -573,9 +573,9 @@ public class TFEparser {
 		Log.out("argsaregs: " + arg);
 
 		if (arg instanceof Attribute) {
-			out_fa = new FuncArg(((Attribute) arg).getKey(), 1, arg);
+			out_fa = new FuncArg(((Attribute) arg).getKey(), arg);
 		} else {
-			out_fa = new FuncArg("default", 1, arg);
+			out_fa = new FuncArg("default", arg);
 		}
 
 		return out_fa;

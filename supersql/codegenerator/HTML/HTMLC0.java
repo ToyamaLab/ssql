@@ -46,6 +46,8 @@ public class HTMLC0 extends Connector {
 		Iterator<TFE> it = tfes.iterator();
 		while(it.hasNext()){
 			TFE tfe = it.next();
+			if(tfe instanceof HTMLFunction)
+				return true;
 			if(!(tfe instanceof HTMLAttribute) && !(tfe instanceof HTMLFunction))
 				return false;
 		}

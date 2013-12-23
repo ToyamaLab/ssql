@@ -12,7 +12,7 @@ public class FuncArg {
 
 	ExtList Data = new ExtList(); //
 
-	public FuncArg(String nm, int tp, TFE t) {
+	public FuncArg(String nm, TFE t) {
 		Name = nm;
 		tfe = t;
 	}
