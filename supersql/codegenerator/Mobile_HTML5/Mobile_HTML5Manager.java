@@ -17,14 +17,14 @@ import supersql.common.Log;
 import supersql.dataconstructor.DataConstructor;
 import supersql.extendclass.ExtList;
 
-public class HTMLManager extends Manager{
+public class Mobile_HTML5Manager extends Manager{
 
     //����
-    HTMLEnv html_env;
-    HTMLEnv html_env2;
+    Mobile_HTML5Env html_env;
+    Mobile_HTML5Env html_env2;
 
     //���󥹥ȥ饯��
-    public HTMLManager(HTMLEnv henv,HTMLEnv henv2) {
+    public Mobile_HTML5Manager(Mobile_HTML5Env henv,Mobile_HTML5Env henv2) {
         this.html_env = henv;
         this.html_env2 = henv2;
     }
@@ -33,7 +33,7 @@ public class HTMLManager extends Manager{
     //replaceCode
     //replace a to b in html_env.code
     //(html_env.code内の「a」を「b」へ置換する)
-	public static boolean replaceCode(HTMLEnv html_env,String a,String b){
+	public static boolean replaceCode(Mobile_HTML5Env html_env,String a,String b){
 		try{
 	    	html_env.code.replace(
 	    			html_env.code.lastIndexOf(a), 
@@ -62,7 +62,7 @@ public class HTMLManager extends Manager{
     @Override
 	public void generateCode(ITFE tfe_info, ExtList data_info) {
 
-        HTMLEnv.initAllFormFlg();
+        Mobile_HTML5Env.initAllFormFlg();
 
         html_env.countfile = 0;
         html_env.code = new StringBuffer();
@@ -79,7 +79,7 @@ public class HTMLManager extends Manager{
         html_env2.footer = new StringBuffer();
         html_env2.foreach_flag = GlobalEnv.getForeachFlag();
         html_env2.written_classid = new Vector<String>();
-        HTMLEnv localenv = new HTMLEnv();
+        Mobile_HTML5Env localenv = new Mobile_HTML5Env();
 
         /*** start oka ***/
 
@@ -90,7 +90,7 @@ public class HTMLManager extends Manager{
         Log.out("[HTMLManager:generateCode]");
 
         // ?�ֳ�¦��G3��??
-        if (tfe_info instanceof HTMLG3) {
+        if (tfe_info instanceof Mobile_HTML5G3) {
             tfe_info.work(data_info);
             return;
         }
@@ -128,7 +128,7 @@ public class HTMLManager extends Manager{
 	            if (html_env.charset != null){
 		        	pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
 		        			new FileOutputStream(html_env.filename),html_env.charset)));
-		        	Log.info("File encoding: "+html_env.charset);
+		        	Log.info("\nFile encoding: "+html_env.charset);
 	            }else
 	            	pw = new PrintWriter(new BufferedWriter(new FileWriter(
 	        	                    html_env.filename)));
@@ -161,7 +161,7 @@ public class HTMLManager extends Manager{
 	            pw2.println(html_env2.code);
 	            pw2.println(html_env2.footer);
 	            pw2.close();
-	            HTMLoptimizer xml = new HTMLoptimizer();
+	            Mobile_HTML5optimizer xml = new Mobile_HTML5optimizer();
 	            String xml_str =  xml.generateHtml(html_env2.filename);
 	        	PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(
 	                    html_env.filename)));
@@ -179,7 +179,7 @@ public class HTMLManager extends Manager{
 	            pw3.close();
 	        }
 
-            HTMLEnv.initAllFormFlg();
+            Mobile_HTML5Env.initAllFormFlg();
         } catch (FileNotFoundException fe) {
         	fe.printStackTrace();
         	System.err.println("Error: specified outdirectory \""
@@ -213,7 +213,7 @@ public class HTMLManager extends Manager{
 	//tk start///////////////////////////////////////////////////////////////////////
     @Override
 	public StringBuffer generateCode2(ITFE tfe_info, ExtList data_info) {
-    	HTMLEnv.initAllFormFlg();
+    	Mobile_HTML5Env.initAllFormFlg();
 
         html_env.countfile = 0;
         html_env.code = new StringBuffer();
@@ -238,7 +238,7 @@ public class HTMLManager extends Manager{
         Log.out("[HTMLManager:generateCode2]");
 
         // ?�ֳ�¦��G3��??
-        if (tfe_info instanceof HTMLG3) {
+        if (tfe_info instanceof Mobile_HTML5G3) {
             tfe_info.work(data_info);
             return html_env.code;
         }
@@ -261,7 +261,7 @@ public class HTMLManager extends Manager{
         	xml_string.append(html_env2.header);
         	xml_string.append(html_env2.code);
         	xml_string.append(html_env2.footer);
-        	HTMLoptimizer xml = new HTMLoptimizer();
+        	Mobile_HTML5optimizer xml = new Mobile_HTML5optimizer();
         	//System.out.println(xml_string);		//commented out by goto 20120620
         	xml_str = xml.generateHtml(xml_string);
         	returncode.append(xml_str);
@@ -300,7 +300,7 @@ public class HTMLManager extends Manager{
 
     @Override
 	public StringBuffer generateCode3(ITFE tfe_info, ExtList data_info) {
-    	HTMLEnv.initAllFormFlg();
+    	Mobile_HTML5Env.initAllFormFlg();
 
         html_env.countfile = 0;
         html_env.code = new StringBuffer();
@@ -316,7 +316,7 @@ public class HTMLManager extends Manager{
         Log.out("[HTMLManager:generateCode]");
 
         // ?�ֳ�¦��G3��??
-        if (tfe_info instanceof HTMLG3) {
+        if (tfe_info instanceof Mobile_HTML5G3) {
             tfe_info.work(data_info);
             return html_env.code;
         }
@@ -333,7 +333,7 @@ public class HTMLManager extends Manager{
 
     @Override
 	public StringBuffer generateCode4(ITFE tfe_info, ExtList data_info) {
-    	HTMLEnv.initAllFormFlg();
+    	Mobile_HTML5Env.initAllFormFlg();
         html_env.countfile = 0;
         html_env.code = new StringBuffer();
         html_env.css = new StringBuffer();
@@ -350,7 +350,7 @@ public class HTMLManager extends Manager{
         html_env2.foreach_flag = GlobalEnv.getForeachFlag();
         html_env2.written_classid = new Vector<String>();
 
-        HTMLEnv localenv = new HTMLEnv();
+        Mobile_HTML5Env localenv = new Mobile_HTML5Env();
 
         // ���Ϥ�?�ե���?̾����?
         getOutfilename();

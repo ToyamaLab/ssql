@@ -46,7 +46,7 @@ public class PDFG2 extends Grouper implements PDFTFE {
 	}
 
 	@Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 		//追加10.14 メソッド内に移動10.24
 		float box_width = 0;
 		float box_height = 0;
@@ -278,6 +278,7 @@ public class PDFG2 extends Grouper implements PDFTFE {
 			}
 		}
 		//------------------------------------------------//
+		return null;
 		
 	}
 	

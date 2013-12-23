@@ -25,7 +25,7 @@ public class PDFC2 extends Connector implements PDFTFE {
 	}
 
 	@Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 		float box_width = 0;
 		float box_height = 0;
 		float tmp_width = 0;
@@ -36,7 +36,7 @@ public class PDFC2 extends Connector implements PDFTFE {
 		System.out.println("[PDFC2:work]data_info = " + data_info);
 
 		System.out.println("++++ C2 ++++");
-		//ÄÉ²Ã10.17
+		//ï¿½É²ï¿½10.17
 		value = new PDFValue("C2");
 		
 		PDFModifier modifier = new PDFModifier();
@@ -118,7 +118,7 @@ public class PDFC2 extends Connector implements PDFTFE {
 				worknextItem();
 				
 				System.out.println("++++ C2 ++++");
-				//ÄÉ²Ã10.17 value¤Î¥»¥Ã¥È
+				//ï¿½É²ï¿½10.17 valueï¿½Î¥ï¿½ï¿½Ã¥ï¿½
 				value.inList.add(((PDFTFE)tfe).getInstance());
 				
 				box_height += pdf_env.tmp_height;
@@ -161,6 +161,7 @@ public class PDFC2 extends Connector implements PDFTFE {
 		
 		pdf_env.tmp_width = box_width;
 		pdf_env.tmp_height = box_height;
+		return null;
 		
 	}
 

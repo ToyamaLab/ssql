@@ -19,7 +19,7 @@ public class SWFC1 extends Connector implements SWFTFE{
 	}
 
 	@Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 
 		int width = 0;
 		int height = 0;
@@ -111,6 +111,7 @@ public class SWFC1 extends Connector implements SWFTFE{
 		Log.out("value.inList.size()= " + value.inList.size());
 		Log.out("C1: value.width = "+value.width);
 		Log.out("C1: value.height = "+value.height);
+		return null;
 	}
 
 	public SWFValue C1to4(SWFValue self, int dim4, String opr){

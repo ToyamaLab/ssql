@@ -6,18 +6,20 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+
+import supersql.codegenerator.DecorateList;
 import supersql.codegenerator.Grouper;
 import supersql.codegenerator.Manager;
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 
-public class HTMLG2 extends Grouper {
+public class Mobile_HTML5G2 extends Grouper {
 
     Manager manager;
 
-    HTMLEnv html_env;
-    HTMLEnv html_env2;
+    Mobile_HTML5Env html_env;
+    Mobile_HTML5Env html_env2;
     
     //20130309
     //int gridInt = 0;
@@ -55,7 +57,7 @@ public class HTMLG2 extends Grouper {
     
 
     //���󥹥ȥ饯��
-    public HTMLG2(Manager manager, HTMLEnv henv, HTMLEnv henv2) {
+    public Mobile_HTML5G2(Manager manager, Mobile_HTML5Env henv, Mobile_HTML5Env henv2) {
         this.manager = manager;
         this.html_env = henv;
         this.html_env2 = henv2;
@@ -64,12 +66,14 @@ public class HTMLG2 extends Grouper {
 
     //G2��work�᥽�å�
     @Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
+    	Mobile_HTML5.preProcess(getSymbol(), decos, html_env);	//Pre-process (前処理)
+    	
     	//20131001 tableDivHeader
-    	HTMLG2.tableDivHeader = "";	
-    	HTMLG2.tableDivHeader_codeBuf = "";
-    	HTMLG2.tableDivHeader_Count1 = 0;
-    	HTMLG2.tableDivHeader_Count2 = 0;
+    	Mobile_HTML5G2.tableDivHeader = "";	
+    	Mobile_HTML5G2.tableDivHeader_codeBuf = "";
+    	Mobile_HTML5G2.tableDivHeader_Count1 = 0;
+    	Mobile_HTML5G2.tableDivHeader_Count2 = 0;
     	
         //G2Flg = true;
         int panelFlg = 0;	//20130503  Panel
@@ -82,7 +86,7 @@ public class HTMLG2 extends Grouper {
         StringBuffer parentcss = null;
         StringBuffer parentheader = null;
         StringBuffer parentfooter = null;
-        if(decos.containsKey("row")){
+        if(decos.containsKey("row") && !Mobile_HTML5.dynamicDisplay){
         	row = Integer.parseInt(decos.getStr("row").replace("\"", ""));
         	if(row<1){	//範囲外のとき
         		Log.err("<<Warning>> row指定の範囲は、1〜です。指定された「row="+row+"」は使用できません。");
@@ -105,11 +109,11 @@ public class HTMLG2 extends Grouper {
  
         Log.out("------- G2 -------");
         this.setDataList(data_info);
-        if(HTMLEnv.getSelectFlg())
+        if(Mobile_HTML5Env.getSelectFlg())
         	data_info = (ExtList) data_info.get(0);
 
         //tk start////////////////////////////////////////////////////
-        html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
+        html_env.append_css_def_td(Mobile_HTML5Env.getClassID(this), this.decos);
         
         //20130325  table0
         if(decos.containsKey("table0"))	table0Flg = true;
@@ -117,7 +121,7 @@ public class HTMLG2 extends Grouper {
     	//20130314  table
         //if(decos.containsKey("table") || !decos.containsKey("div") || table0Flg){
 //        if(decos.containsKey("table") || table0Flg){
-        if(decos.containsKey("table") || table0Flg || HTMLC1.tableFlg || HTMLC2.tableFlg || HTMLG1.tableFlg){
+        if(decos.containsKey("table") || table0Flg || Mobile_HTML5C1.tableFlg || Mobile_HTML5C2.tableFlg || Mobile_HTML5G1.tableFlg){
     		tableFlg = true;
     	}//else	tableFlg = false;
         
@@ -128,45 +132,45 @@ public class HTMLG2 extends Grouper {
     		tableFlg = false;
     	}//else divFlg = false;
         
-        //20130529
-        if(decos.containsKey("dynamic")){
-        	if(!HTMLEnv.dynamicFlg)	HTMLEnv.staticBuf = html_env.code;
-        	HTMLEnv.dynamicFlg = true;
-        	Log.i("※G2 HTMLEnv.staticBuf: "+HTMLEnv.staticBuf);
-        }
+//        //20130529
+//        if(decos.containsKey("dynamic")){
+//        	if(!Mobile_HTML5Env.dynamicFlg)	Mobile_HTML5Env.staticBuf = html_env.code;
+//        	Mobile_HTML5Env.dynamicFlg = true;
+//        	Log.i("※G2 HTMLEnv.staticBuf: "+Mobile_HTML5Env.staticBuf);
+//        }
         
         //20130914  "text"
 //      	Log.e("	decosC2 = "+decos);
         if(decos.containsKey("text")){
 //        	Log.e("	G2 in!");
-        	HTMLFunction.textFlg2 = true;
+        	Mobile_HTML5Function.textFlg2 = true;
         }
         
         if(!GlobalEnv.isOpt()){
         	//20130503  Panel
-    	    panelFlg = HTMLC1.panelProcess1(decos, html_env);
+    	    panelFlg = Mobile_HTML5C1.panelProcess1(decos, html_env);
         	
         	//20130330 tab
         	//tab1
         	if(decos.containsKey("tab1")){
             	html_env.code.append("<div data-role=\"content\"> <div id=\"tabs\">\n<ul>\n");
-            	html_env.code.append("	<li><a href=\"#tabs-"+HTMLEnv.tabCount+"\">");
+            	html_env.code.append("	<li><a href=\"#tabs-"+Mobile_HTML5Env.tabCount+"\">");
             	if(!decos.getStr("tab1").equals(""))	html_env.code.append(decos.getStr("tab1"));
             	else          							html_env.code.append("tab1");
             	html_env.code.append("</a></li>\n");
-            	html_env.code.append("</ul>\n<div id=\"tabs-"+HTMLEnv.tabCount+"\">\n");
+            	html_env.code.append("</ul>\n<div id=\"tabs-"+Mobile_HTML5Env.tabCount+"\">\n");
 //            	HTMLEnv.tabFlg = true;
             }
         	//tab2〜tab15
 //        	else if(HTMLEnv.tabFlg){
         	else{
         		int i=2;
-        		while(i<=HTMLEnv.maxTab){		//HTMLEnv.maxTab=15
+        		while(i<=Mobile_HTML5Env.maxTab){		//HTMLEnv.maxTab=15
         			//Log.info("i="+i+" !!");
         			if(decos.containsKey("tab"+i) || (i==2 && decos.containsKey("tab"))){
     	        		//replace: </ul>の前に<li>〜</li>を付加
     	        		String a = "</ul>";
-    	        		String b = "	<li><a href=\"#tabs-"+HTMLEnv.tabCount+"\">";
+    	        		String b = "	<li><a href=\"#tabs-"+Mobile_HTML5Env.tabCount+"\">";
     	        		if(decos.containsKey("tab"+i))
 	    	        		if(!decos.getStr("tab"+i).equals(""))	b += decos.getStr("tab"+i);
 	    	            	else				            		b += "tab"+i;
@@ -174,15 +178,15 @@ public class HTMLG2 extends Grouper {
     	        			if(!decos.getStr("tab").equals(""))		b += decos.getStr("tab");
 	    	            	else				            		b += "tab";
     	            	b += "</a></li>\n";
-    	            	HTMLManager.replaceCode(html_env, a, b+a);
+    	            	Mobile_HTML5Manager.replaceCode(html_env, a, b+a);
     	            	
     	            	//replace: 最後の</div></div></div>カット
-    	        		HTMLManager.replaceCode(html_env, "</div></div></div>", "");
+    	        		Mobile_HTML5Manager.replaceCode(html_env, "</div></div></div>", "");
     	        		
     	        		//replace: 不要な「<div class=〜」をカット
-    	        		HTMLManager.replaceCode(html_env, "<div class=\""+HTMLEnv.getClassID(this)+" \">", "");
+    	        		Mobile_HTML5Manager.replaceCode(html_env, "<div class=\""+Mobile_HTML5Env.getClassID(this)+" \">", "");
     	        		
-    	            	html_env.code.append("<div id=\"tabs-"+HTMLEnv.tabCount+"\">\n");
+    	            	html_env.code.append("<div id=\"tabs-"+Mobile_HTML5Env.tabCount+"\">\n");
     	            	break;
     	        	}
         			i++;
@@ -204,22 +208,26 @@ public class HTMLG2 extends Grouper {
         	//20130309
         	//20130314  table
         	if(tableFlg){
-        		if(row>1 && tableFlg)	HTMLG2.tableStartTag = HTMLC1.getTableStartTag(html_env, decos, this);
-            	else					html_env.code.append(HTMLC1.getTableStartTag(html_env, decos, this)+"\n");
+        		if(row>1 && tableFlg)	Mobile_HTML5G2.tableStartTag = Mobile_HTML5C1.getTableStartTag(html_env, decos, this);
+            	else					html_env.code.append(Mobile_HTML5C1.getTableStartTag(html_env, decos, this)+"\n");
         	}
+        	
         }
-        //tk end/////////////////////////////////////////////////////
 //        Log.out("<TABLE class=\""+HTMLEnv.getClassID(this) + "\">");
 
         //html_env2.code.append("<tfe type=\"connect\" dimension=\"2\" >");
+        
+        Mobile_HTML5.beforeWhileProcess(getSymbol(), decos, html_env);
         int i = 0;
         while (this.hasMoreItems()) {
-        	//[重要] For [ [], ]!        	
-        	HTMLG1.jj = 0;
-        	HTMLG1.gridInt = 0;
+        	Mobile_HTML5Function.glvl = html_env.glevel;	//added by goto 20130914  "SEQ_NUM"
         	
-            if(decos.containsKey("table0") || HTMLC1.table0Flg || HTMLC2.table0Flg || HTMLG1.table0Flg)	table0Flg = true;
-            if(decos.containsKey("table") || HTMLC1.tableFlg || HTMLC2.tableFlg || HTMLG1.tableFlg || table0Flg)	tableFlg=true;
+        	//[重要] For [ [], ]!        	
+        	Mobile_HTML5G1.jj = 0;
+        	Mobile_HTML5G1.gridInt = 0;
+        	
+            if(decos.containsKey("table0") || Mobile_HTML5C1.table0Flg || Mobile_HTML5C2.table0Flg || Mobile_HTML5G1.table0Flg)	table0Flg = true;
+            if(decos.containsKey("table") || Mobile_HTML5C1.tableFlg || Mobile_HTML5C2.tableFlg || Mobile_HTML5G1.tableFlg || table0Flg)	tableFlg=true;
             //if(decos.containsKey("div") || HTMLC1.divFlg || HTMLC2.divFlg || HTMLG1.divFlg || HTMLG2.divFlg){
         	if(decos.containsKey("div")){
         		divFlg = true;
@@ -237,10 +245,10 @@ public class HTMLG2 extends Grouper {
                 html_env.setOutlineMode();
             }
             
-            Log.out("selectFlg"+HTMLEnv.getSelectFlg());
-            Log.out("selectRepeatFlg"+HTMLEnv.getSelectRepeat());
-            Log.out("formItemFlg"+HTMLEnv.getFormItemFlg());
-            if( HTMLEnv.getSelectRepeat() ){//if form_select
+            Log.out("selectFlg"+Mobile_HTML5Env.getSelectFlg());
+            Log.out("selectRepeatFlg"+Mobile_HTML5Env.getSelectRepeat());
+            Log.out("formItemFlg"+Mobile_HTML5Env.getFormItemFlg());
+            if( Mobile_HTML5Env.getSelectRepeat() ){//if form_select
             		//null
             		//in case "select" repeat : not write "<TR><TD>" between "<option>"s
             }else{
@@ -251,14 +259,14 @@ public class HTMLG2 extends Grouper {
             	//20130309
             	//gridInt %= 5;
             	//html_env.code.append("\n	<div class=\"ui-block-"+gridString[gridInt]+"\">\n");
-            	if(!tableFlg)	html_env.code.append("\n	<div class=\""+HTMLEnv.getClassID(tfe)+" \">\n");	//20130309  div
+            	if(!tableFlg)	html_env.code.append("\n	<div class=\""+Mobile_HTML5Env.getClassID(tfe)+" "+Mobile_HTML5.addShowCountClassName(decos)+" \">\n");	//20130309  div
                 //20130314  table
             	else{
-		            html_env.code.append("<TR><TD class=\"" + HTMLEnv.getClassID(tfe) + " nest\">\n");
+		            html_env.code.append("<TR><TD class=\"" + Mobile_HTML5Env.getClassID(tfe) + " "+Mobile_HTML5.addShowCountClassName(decos)+" nest\">\n");
             	}
-	            Log.out("<TR><TD class=\"" + HTMLEnv.getClassID(tfe) + " nest\">");
+	            Log.out("<TR><TD class=\"" + Mobile_HTML5Env.getClassID(tfe) + " nest\">");
             }
-            String classid = HTMLEnv.getClassID(tfe);
+            String classid = Mobile_HTML5Env.getClassID(tfe);
 
             
 //            //おそらくxml
@@ -306,53 +314,60 @@ public class HTMLG2 extends Grouper {
             //Log.info("tfe : " + this.tfeItems);
 
             
-	      	if(HTMLEnv.dynamicFlg){	//20130529 dynamic
-	      		//☆★
-	      		Log.info("★★G2-1 tfe : " + tfe);
-	    		//☆★            Log.info("G2 tfe : " + tfe);
-	            //☆★            Log.info("G2 tfes : " + this.tfes);
-	            //☆★            Log.info("G2 tfeItems : " + this.tfeItems);
-	      	}
+//	      	if(Mobile_HTML5Env.dynamicFlg){	//20130529 dynamic
+//	      		//☆★
+//	      		//Log.info("★★G2-1 tfe : " + tfe);
+//	    		//☆★            Log.info("G2 tfe : " + tfe);
+//	            //☆★            Log.info("G2 tfes : " + this.tfes);
+//	            //☆★            Log.info("G2 tfeItems : " + this.tfeItems);
+//	      	}
 
+	        Mobile_HTML5.whileProcess1(getSymbol(), decos, html_env, data, data_info, tfe, null, -1);
+	      	
             this.worknextItem();
-            if(decos.containsKey("table0") || HTMLC1.table0Flg || HTMLC2.table0Flg || HTMLG1.table0Flg)	table0Flg = true;
-            if(decos.containsKey("table") || HTMLC1.tableFlg || HTMLC2.tableFlg || HTMLG1.tableFlg || table0Flg)	tableFlg=true;
+            
+	        Mobile_HTML5.whileProcess2(getSymbol(), decos, html_env, data, data_info, tfe, null, -1);
+            
+            if(decos.containsKey("table0") || Mobile_HTML5C1.table0Flg || Mobile_HTML5C2.table0Flg || Mobile_HTML5G1.table0Flg)	table0Flg = true;
+            if(decos.containsKey("table") || Mobile_HTML5C1.tableFlg || Mobile_HTML5C2.tableFlg || Mobile_HTML5G1.tableFlg || table0Flg)	tableFlg=true;
             //if(decos.containsKey("div") || HTMLC1.divFlg || HTMLC2.divFlg || HTMLG1.divFlg || HTMLG2.divFlg){
         	if(decos.containsKey("div")){
         		divFlg = true;
         		tableFlg = false;
         	}
         	
-            //20130529
-            if(decos.containsKey("dynamic"))	HTMLEnv.dynamicFlg = true;
+//            //20130529
+//            if(decos.containsKey("dynamic"))	Mobile_HTML5Env.dynamicFlg = true;
             
             
-            if(HTMLEnv.dynamicFlg){	//20130529 dynamic
+            //if(Mobile_HTML5Env.dynamicFlg){	//20130529 dynamic
 	      		//☆★
-	      		Log.info("★★G2-2 tfe : " + tfe);
+	      		//Log.info("★★G2-2 tfe : " + tfe);
 	    		//☆★            Log.info("G2 tfe : " + tfe);
 	            //☆★            Log.info("G2 tfes : " + this.tfes);
 	            //☆★            Log.info("G2 tfeItems : " + this.tfeItems);
-	      	}
+            	//Log.e("data数: "+this.data.size());
+            //Log.e("data数: "+this.);
+//	      	}
             
             if (html_env.not_written_classid.contains(classid) && html_env.code.indexOf(classid) >= 0 ){
             	html_env.code.delete(html_env.code.indexOf(classid),html_env.code.indexOf(classid)+classid.length()+1);
             }
             
             
-            if(HTMLEnv.getSelectRepeat()){
+            if(Mobile_HTML5Env.getSelectRepeat()){
             	
             }else{	 
                 //chie
                 html_env2.code.append("</tfe>");
                 //added by goto 20130110 start
-                if(HTMLFunction.slideshowFlg==true){
+                if(Mobile_HTML5Function.slideshowFlg==true){
                 	html_env.code.append("</ul>\n</div>\n");
                 }
                 //added by goto 20130110 end
 //                if(!tableFlg)	html_env.code.append("	</div>\n");		//20130309  div
                 if(!tableFlg){
-                	if(!HTMLFunction.textFlg2){
+                	if(!Mobile_HTML5Function.textFlg2){
                 		html_env.code.append("	</div>\n");		//20130309  div	//20130914  "text"
                 	}
                 }else	html_env.code.append("</TD></TR>\n");			//20130314  table
@@ -368,12 +383,13 @@ public class HTMLG2 extends Grouper {
     	      	if(decos.containsKey("collapse"))
     	          	html_env.code.append("</p>\n");
             }
-            
+            //Log.e("data数: "+this.data.size());
+            //Log.e("html_env.glevel: "+html_env.glevel);
             
             i++;
             html_env.glevel--;
             
-            HTMLG2.tableDivHeader_Count1++;	//20131001 tableDivHeader
+            Mobile_HTML5G2.tableDivHeader_Count1++;	//20131001 tableDivHeader
             
             //added by goto 20130413  "row Prev/Next"
             if(rowFlg){
@@ -386,6 +402,7 @@ public class HTMLG2 extends Grouper {
                 rowNum++;
             }
         }	// /while
+        Mobile_HTML5.afterWhileProcess(getSymbol(), decos, html_env);
         
 ////        Log.e("HTMLG2.tableDivHeader_codeBuf = \n"+HTMLG2.tableDivHeader_codeBuf);	//20131001 tableDivHeader
 ////        Log.i("\nHTMLG2.tableDivHeader = \n"+HTMLG2.tableDivHeader);	//20131001 tableDivHeader
@@ -410,23 +427,23 @@ public class HTMLG2 extends Grouper {
             html_env.header = parentheader;
             html_env.footer = parentfooter;
             html_env.nextbackfile = parentnextbackfile;
-            Log.out("TFEId = " + HTMLEnv.getClassID(this));
-            html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
+            Log.out("TFEId = " + Mobile_HTML5Env.getClassID(this));
+            html_env.append_css_def_td(Mobile_HTML5Env.getClassID(this), this.decos);
 
             int first = 1, last = ((rowNum%row!=0)? (rowNum/row+1):(rowNum/row));
             PrevNextProcess(html_env, rowNum, row, first, last, 1);
         }
         
-        if(HTMLEnv.getSelectRepeat()){		
-	        if(HTMLEnv.getSelectRepeat()){
+        if(Mobile_HTML5Env.getSelectRepeat()){		
+	        if(Mobile_HTML5Env.getSelectRepeat()){
 	        	//chie
 	            html_env2.code.append("</select></VALUE></tfe>");
 	        	html_env.code.append("</select></TD></TR>\n");
 	        	Log.out("</TD></TR>");
-	        	HTMLEnv.setSelectRepeat(false);
-	        	HTMLEnv.incrementFormPartsNumber();
+	        	Mobile_HTML5Env.setSelectRepeat(false);
+	        	Mobile_HTML5Env.incrementFormPartsNumber();
 	        }else{
-	        	HTMLEnv.incrementFormPartsNumber();
+	        	Mobile_HTML5Env.incrementFormPartsNumber();
 	        }
 		}
 
@@ -447,11 +464,11 @@ public class HTMLG2 extends Grouper {
     	//20130330 tab
 //    	if(HTMLEnv.tabFlg){
     		int a=1;
-	    	while(a<=HTMLEnv.maxTab){
+	    	while(a<=Mobile_HTML5Env.maxTab){
 	    		//Log.info("a="+a);
 	    		if(decos.containsKey("tab"+a) || (a==1 && decos.containsKey("tab"))){
 		    		html_env.code.append("</div></div></div>\n");
-		    		HTMLEnv.tabCount++;
+		    		Mobile_HTML5Env.tabCount++;
 		    		break;
 		    	}
 		    	a++;
@@ -459,11 +476,11 @@ public class HTMLG2 extends Grouper {
 //    	}
 	    	
     	//20130503  Panel
-    	HTMLC1.panelProcess2(decos, html_env, panelFlg);
+    	Mobile_HTML5C1.panelProcess2(decos, html_env, panelFlg);
         
         if(divFlg)	divFlg = false;		//20130326  div
         
-        if(HTMLEnv.dynamicFlg)	HTMLEnv.dynamicFlg = false;		//20130529 dynamic
+//        if(Mobile_HTML5Env.dynamicFlg)	Mobile_HTML5Env.dynamicFlg = false;		//20130529 dynamic
 
         //added by goto 20130413  "row Prev/Next"
         if(rowFlg){
@@ -473,20 +490,23 @@ public class HTMLG2 extends Grouper {
         }
         
         //20130914  "text"
-        if(HTMLFunction.textFlg2){
-        	HTMLFunction.textFlg2 = false;
+        if(Mobile_HTML5Function.textFlg2){
+        	Mobile_HTML5Function.textFlg2 = false;
         }
         
-        //added by goto 20130914  "SEQ_NUM"
-        HTMLFunction.Func_seq_num_initialization();
+        Mobile_HTML5.postProcess(getSymbol(), decos, html_env);	//Post-process (後処理)
         
-        Log.out("TFEId = " + HTMLEnv.getClassID(this));
+        //added by goto 20130914  "SEQ_NUM"
+        Mobile_HTML5Function.Func_seq_num_initialization(html_env.glevel);
+        
+        Log.out("TFEId = " + Mobile_HTML5Env.getClassID(this));
         //html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
         //G2Flg = false;
+		return null;
     }
     
     //added by goto 20130413  "row Prev/Next"
-    public static void createHTMLfile_ForPrevNext(HTMLEnv html_env, StringBuffer codeBuf){
+    public static void createHTMLfile_ForPrevNext(Mobile_HTML5Env html_env, StringBuffer codeBuf){
     	html_env.getHeader(2);
         html_env.getFooter(2);
         //Log.info(html_env.filename);
@@ -507,7 +527,7 @@ public class HTMLG2 extends Grouper {
 //            	pw.println(html_env.header.delete(x,y));
 //            }else	pw.println(html_env.header);
         	pw.println(html_env.header);
-        	pw.println(HTMLG2.tableDivHeader);	//20131001 tableDivHeader
+        	pw.println(Mobile_HTML5G2.tableDivHeader);	//20131001 tableDivHeader
         	if(!tableStartTag.equals("")){
         		pw.println(tableStartTag+"\n"+codeBuf);
         		if(tableStartTag.endsWith("<TR>"))	pw.println("</TR>");
@@ -529,7 +549,7 @@ public class HTMLG2 extends Grouper {
     }
     
     //added by goto 20130413  "row Prev/Next"
-    public static void PrevNextProcess(HTMLEnv html_env, int rowNum, int row, int first, int last, int column){
+    public static void PrevNextProcess(Mobile_HTML5Env html_env, int rowNum, int row, int first, int last, int column){
         //parent HTMLへ<iframe>等を埋め込む
         String divID="rowDiv"+rowFileNum+"-";
         String iframeName ="rowIframe"+rowFileNum;
@@ -566,18 +586,18 @@ public class HTMLG2 extends Grouper {
     
     //20131001 tableDivHeader
     //for C1, C2
-    public static StringBuffer createAndCutTableDivHeader(HTMLEnv html_env) {
+    public static StringBuffer createAndCutTableDivHeader(Mobile_HTML5Env html_env) {
 //    	if(HTMLG2.tableDivHeader_Count1==1){
-		if(HTMLG2.tableDivHeader_Count1<1){
+		if(Mobile_HTML5G2.tableDivHeader_Count1<1){
     		//create tableDivHeader
-      		HTMLG2.tableDivHeader = html_env.code.toString().replace(HTMLG2.tableDivHeader_codeBuf, "");
+      		Mobile_HTML5G2.tableDivHeader = html_env.code.toString().replace(Mobile_HTML5G2.tableDivHeader_codeBuf, "");
 //      		HTMLG2.tableDivHeader = "<div>"+html_env.code.toString().replace(HTMLG2.tableDivHeader_codeBuf, "");
     	}
 //    	if(HTMLG2.tableDivHeader_Count1>1){
     	//Log.e("a="+html_env.code);
     	//Log.e("b="+HTMLG2.tableDivHeader_codeBuf);
     	//cut tableDivHeader
-  		return new StringBuffer(html_env.code.replace(HTMLG2.tableDivHeader_codeBuf.length(), 
+  		return new StringBuffer(html_env.code.replace(Mobile_HTML5G2.tableDivHeader_codeBuf.length(), 
   				html_env.code.length(), ""));
 //    	}
 //  		return new StringBuffer(html_env.code.toString());
@@ -585,7 +605,7 @@ public class HTMLG2 extends Grouper {
 
     @Override
 	public String getSymbol() {
-        return "HTMLG2";
+        return "Mobile_HTML5G2";
     }
 
 }

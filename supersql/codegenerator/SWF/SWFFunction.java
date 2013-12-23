@@ -26,7 +26,7 @@ public class SWFFunction extends Function implements SWFTFE {
 	}
 
 	@Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 		this.setDataList(data_info);
 		//    	Log.out("FuncName= " + this.getFuncName());
 		//    	Log.out("filename= " + this.getAtt("filename"));
@@ -39,6 +39,7 @@ public class SWFFunction extends Function implements SWFTFE {
 		}
 
 		swf_env.getDecos(this.decos);
+		return null;
 	}
 
 	public void Func_imagefile(){

@@ -37,12 +37,12 @@ import supersql.parser.SSQLparser;
 
 //import common.Log;
 
-public class HTMLFunction extends Function {
+public class Mobile_HTML5Function extends Function {
 
     Manager manager;
 
-    HTMLEnv html_env;
-    HTMLEnv html_env2;
+    Mobile_HTML5Env html_env;
+    Mobile_HTML5Env html_env2;
 
     boolean embedflag = false;
 
@@ -67,18 +67,18 @@ public class HTMLFunction extends Function {
     static int checkCount = 1;		//20130531	"check"
 
     static int mapFuncCount = 1;	//20130717  "map"
-    static int gpsFuncCount = 1;	//20130717  "gps"
+//    static int gpsFuncCount = 1;	//20130717  "gps"
     
 	static boolean textFlg = false;	//20130914  "text"
     
     static String updateFile;
 
-    public HTMLFunction()
+    public Mobile_HTML5Function()
     {
 
     }
     //���󥹥ȥ饯��
-    public HTMLFunction(Manager manager, HTMLEnv henv, HTMLEnv henv2) {
+    public Mobile_HTML5Function(Manager manager, Mobile_HTML5Env henv, Mobile_HTML5Env henv2) {
         super();
         this.manager = manager;
         this.html_env = henv;
@@ -86,16 +86,19 @@ public class HTMLFunction extends Function {
     }
 
     //Function��work�᥽�å�
-    public void work(ExtList data_info) {
+    public String work(ExtList<ExtList<String>> data_info) {
         this.setDataList(data_info);
         //    	Log.out("FuncName= " + this.getFuncName());
         //    	Log.out("filename= " + this.getAtt("filename"));
         //    	Log.out("condition= " + this.getAtt("condition"));
 
         String FuncName = this.getFuncName();
+        
+        String ret = "";	//20131201 nesting function
 
     	if (FuncName.equalsIgnoreCase("imagefile") || FuncName.equalsIgnoreCase("image") || FuncName.equalsIgnoreCase("img")) {
             Func_imagefile();
+            //ret = Func_imagefile(); //TODO
         } else if (FuncName.equalsIgnoreCase("invoke")) {
             Func_invoke();
         } else if (FuncName.equalsIgnoreCase("foreach")) {
@@ -111,27 +114,27 @@ public class HTMLFunction extends Function {
         }
         //added by goto 20121217
         else if(FuncName.equalsIgnoreCase("button")){
-        	Func_button();
+        	ret = Func_button();
         }
         //added by goto 20130308  "urlリンク"
         else if(FuncName.equalsIgnoreCase("url") || FuncName.equalsIgnoreCase("anchor") || FuncName.equalsIgnoreCase("a")){
-        	Func_url(false);
+        	ret = Func_url(false);
         }
         //added by goto 20130417  "mail"
         else if(FuncName.equalsIgnoreCase("mail")){
-        	Func_url(true);
+        	ret = Func_url(true);
         }
         //added by goto 20130312  "line"
         else if(FuncName.equalsIgnoreCase("line")){
-        	Func_line();
+        	ret = Func_line();
         }
         //added by goto 20130325  "dline"
         else if(FuncName.equalsIgnoreCase("dline")){
-        	Func_dline();
+        	ret = Func_dline();
         }
         //added by goto 20130502  "vline"
         else if(FuncName.equalsIgnoreCase("vline")){
-        	Func_vline();
+        	ret = Func_vline();
         }
         //added by goto 20130313  "header"
         else if(FuncName.equalsIgnoreCase("header")){
@@ -143,79 +146,83 @@ public class HTMLFunction extends Function {
         }
         //added by goto 20130313  "popup"
         else if(FuncName.equalsIgnoreCase("pop") || FuncName.equalsIgnoreCase("popup")){
-        	Func_pop();
+        	ret = Func_pop();
         }
         //added by goto 20130515  "search"
         else if(FuncName.equalsIgnoreCase("search")){
-        	Func_search();
+        	ret = Func_search();
         }
         //added by goto 20130529  "select"
         else if(FuncName.equalsIgnoreCase("select")){
-        	Func_select();
+        	ret = Func_select();
         }
         //added by goto 20130529  "insert"
         else if(FuncName.equalsIgnoreCase("insert")){
-        	Func_insert(false,false);
+        	ret = Func_insert(false,false);
         }
     	//added by goto 20130605  "update"
         else if(FuncName.equalsIgnoreCase("update")){
-        	Func_insert(true,false);
+        	ret = Func_insert(true,false);
         }
         //added by goto 20130721  "update"
         else if(FuncName.equalsIgnoreCase("insert_update") || FuncName.equalsIgnoreCase("form")){
-        	Func_insert(false,true);
+        	ret = Func_insert(false,true);
+        }
+    	//20131127 form
+        else if(FuncName.equalsIgnoreCase("result") || FuncName.equalsIgnoreCase("form_result")){
+        	ret = Func_result();
         }
         //added by goto 20130531  "check"
         else if(FuncName.equalsIgnoreCase("check")){
-        	Func_check();
+        	ret = Func_check();
         }
         //added by goto 20130519  "moveto"
         else if(FuncName.equalsIgnoreCase("moveto")){
-        	Func_moveto();
+        	ret = Func_moveto();
         }
         //added by goto 20130603  "$session"
         else if (FuncName.equalsIgnoreCase("$session")||FuncName.equalsIgnoreCase("$s")||FuncName.equalsIgnoreCase("$_session")||FuncName.equalsIgnoreCase("$_s")) {
-            Func_$session();
+        	ret = Func_$session();
         }
         //added by goto 20130607  "time,date"
         else if (FuncName.equalsIgnoreCase("time") || FuncName.equalsIgnoreCase("date")) {
-        	Func_time();
+        	ret = Func_time();
         }
     	//added by goto 20130717  "map"
         else if (FuncName.equalsIgnoreCase("map")) {
-        	Func_map(false);
+        	ret = Func_map(false);
         }
     	//added by goto 20130721  "search_map"
         else if (FuncName.equalsIgnoreCase("search_map")) {
-        	Func_map(true);
+        	ret = Func_map(true);
         }
         //added by goto 20130717  "gps,gps_map"
         else if (FuncName.equalsIgnoreCase("gps") || FuncName.equalsIgnoreCase("gps_map")) {
-        	Func_gps();
+        	ret = Func_gps();
         }
     	//added by goto 20130717  "gps_info"
         else if (FuncName.equalsIgnoreCase("gps_info")) {
-        	Func_gps_info();
+        	ret = Func_gps_info();
         }
     	//added by goto 20130914  "audio"
         else if (FuncName.equalsIgnoreCase("music") || FuncName.equalsIgnoreCase("audio")) {
-        	Func_audio();
+        	ret = Func_audio();
         }
     	//added by goto 20130914  "movie"
         else if (FuncName.equalsIgnoreCase("movie") || FuncName.equalsIgnoreCase("video")) {
-        	Func_movie();
+        	ret = Func_movie();
         }
     	//added by goto 20130914  "object"
         else if (FuncName.equalsIgnoreCase("object")) {
-        	Func_object("");
+        	ret = Func_object("");
         }
     	//added by goto 20130914  "SEQ_NUM"
-        else if (FuncName.equalsIgnoreCase("seq_num")) {
-        	Func_seq_num();
+        else if (FuncName.equalsIgnoreCase("seq_num") || FuncName.equalsIgnoreCase("row_number")) {
+        	ret = Func_seq_num();
         }
     	//added by goto 20130915  "text"
         else if (FuncName.equalsIgnoreCase("text")) {
-        	Func_text();
+        	ret = Func_text();
         }
         
         //chie
@@ -238,7 +245,7 @@ public class HTMLFunction extends Function {
             Func_textarea();
         }
         else if (FuncName.equalsIgnoreCase("hidden")) {
-            Func_hidden();
+        	Func_hidden();
         }
         else if (FuncName.equalsIgnoreCase("session")) {
             //Func_session(); not use
@@ -247,15 +254,76 @@ public class HTMLFunction extends Function {
         else if (FuncName.equalsIgnoreCase("embed")) {
         	Log.out("[enter embed]");
         	Func_embed(data_info);
+        	//ret = Func_embed(data_info);	//TODO
         }
         //tk end////////////////////////////////////
+        else if (FuncName.equalsIgnoreCase("addition") || FuncName.equalsIgnoreCase("add")) {
+        	ret = Func_addition();
+        }
+        else if (FuncName.equalsIgnoreCase("subtract") || FuncName.equalsIgnoreCase("sub")) {
+        	ret = Func_subtract();
+        }
+        else if (FuncName.equalsIgnoreCase("multiply") || FuncName.equalsIgnoreCase("mul")) {
+        	ret = Func_multiply();
+        }
+        else if (FuncName.equalsIgnoreCase("divide") || FuncName.equalsIgnoreCase("div")) {
+        	ret = Func_divide();
+        }
+        else{
+        	Log.err("[Warning] no such function name: "+FuncName+"()");
+        }
+    	
+//    	checkFuncReturnValue(ret);
+//    	Log.e(""+Args+" "+ArgHash+" "+data_info+" "+html_env+" "+aggregateFlag+" "+manager);
+    	html_env.code.append( Function.checkNestingLevel(ret) );//20131201 nesting function
 
-        Log.out("TFEId = " + HTMLEnv.getClassID(this));
-        html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
-
+        Log.out("TFEId = " + Mobile_HTML5Env.getClassID(this));
+        html_env.append_css_def_td(Mobile_HTML5Env.getClassID(this), this.decos);
+        return ret;	//20131201 nesting function
     }
 
-    private void Func_imagefile() {
+    
+    static int ArithmeticOperationCount = 1;
+    private String Func_addition() {
+    	return createArithmeticOperation("+");
+    }
+    private String Func_subtract() {
+    	return createArithmeticOperation("-");
+    }
+	private String Func_multiply() {
+    	return createArithmeticOperation("*");
+	}
+    private String Func_divide() {
+    	return createArithmeticOperation("/");
+	}
+    private String createArithmeticOperation(String operator) {
+    	String s = "";
+    	String label = "SSQL_Func_ArithmeticOperation";
+    	if(nestingLevel < 1){
+    		s += ""
+		    	+ "<div id=\""+label+ArithmeticOperationCount+"\"><!-- Computation result --></div>\n"
+		    	+ "<SCRIPT language=\"JavaScript\">\n"
+		    	+ "val = ";
+    	}
+    	s += "(";
+    	for(int i=1; !getValue(i).isEmpty(); i++){
+    		s += getValue(i)+operator;
+    	}
+    	s = s.substring(0, s.length()-1);	//cut last 'operator'
+    	s += ")";
+    	if(nestingLevel < 1){
+    		s += ""
+		    	+ ";\n"
+		    	+ "document.getElementById(\""+label+ArithmeticOperationCount+"\").innerHTML = val;\n"
+		    	+ "</SCRIPT>\n";
+    		ArithmeticOperationCount++;
+    	}
+    	return s;
+    }
+    
+    
+    
+	private void Func_imagefile() {
 
         /*
          * ImageFile function : <td> <img src="${imgpath}/"+att /> </td>
@@ -330,7 +398,7 @@ public class HTMLFunction extends Function {
 
         	if(decos.getStr("lightbox").compareTo("root") == 0 || decos.getStr("lightbox").compareTo("thumb") == 0)
         	{
-            	html_env.code.append("<img class=\"" + HTMLEnv.getClassID(this) +" ");
+            	html_env.code.append("<img class=\"" + Mobile_HTML5Env.getClassID(this) +" ");
 
                 if(decos.containsKey("class"))
                 	html_env.code.append(decos.getStr("class"));
@@ -355,9 +423,9 @@ public class HTMLFunction extends Function {
 	                //Log.info("bound!");
 	                //System.out.println("type="+type);
 	                html_env.code.append("<div id=\"bounce\" class=\"ui-widget-content ui-corner-all\">" +
-	                		"<img class=\"" + HTMLEnv.getClassID(this) +" ");
+	                		"<img class=\"" + Mobile_HTML5Env.getClassID(this) +" ");
         		}else{
-                	html_env.code.append("<img class=\"" + HTMLEnv.getClassID(this) +" ");
+                	html_env.code.append("<img class=\"" + Mobile_HTML5Env.getClassID(this) +" ");
                 }
         		
     	        //added by goto 20130312  "Default width: 100%"
@@ -385,7 +453,7 @@ public class HTMLFunction extends Function {
 //        		
 //        	}
         	
-        	html_env2.code.append("<VALUE type=\"img\" class=\"" + HTMLEnv.getClassID(this) +" ");
+        	html_env2.code.append("<VALUE type=\"img\" class=\"" + Mobile_HTML5Env.getClassID(this) +" ");
         	if(decos.containsKey("class"))
         		html_env.code.append(decos.getStr("class"));
         	
@@ -395,12 +463,22 @@ public class HTMLFunction extends Function {
         	//html_env.code.append(" \" src=\"" + path + "/" + this.getAtt("default") + "\"/>");
         	if(type.matches(".") || type.matches("normal")){					//type==null
         		
+        		
+            	//TODO 20131106
+        		String url = "";
+        		//url = this.getAtt("default"); 	//TODO
+            	try{
+            		FuncArg fa1 = (FuncArg) this.Args.get(0);
+            		url = fa1.getStr();
+            	}catch(Exception e){ return; }
+            	
+        		
         		//added 20130703  For external URLs.
         		//html_env.code.append(" \" src=\"" + path + "/" + this.getAtt("default") + "\"/>");
-            	if(this.getAtt("default").startsWith("http://") || this.getAtt("default").startsWith("https://")){
-    	        	html_env.code.append(" \" src=\"" + this.getAtt("default") + "\"/>");
+            	if(url.startsWith("http://") || url.startsWith("https://")){
+    	        	html_env.code.append(" \" src=\"" + url + "\"/>");
             	}else{
-    	        	html_env.code.append(" \" src=\"" + path + "/" + this.getAtt("default") + "\"/>");
+    	        	html_env.code.append(" \" src=\"" + path + "/" + url + "\"/>");
             	}
         		
         		//20130206
@@ -434,7 +512,7 @@ public class HTMLFunction extends Function {
     			int li_width = 100/Integer.parseInt(column);
         		html_env.code.append(
         				"<li style=\"width:"+li_width+"%;\"><a href=\""+path+"/"+this.getAtt("default")+"\" rel=\"external\">" +
-        				"<img src=\"" + path + "/" + this.getAtt("default") + "\" class=\"" + HTMLEnv.getClassID(this) +"\" alt=\""+slideshowNum+"\" /></a></li>\n");
+        				"<img src=\"" + path + "/" + this.getAtt("default") + "\" class=\"" + Mobile_HTML5Env.getClassID(this) +"\" alt=\""+slideshowNum+"\" /></a></li>\n");
         		
 //        		//column : 列数(<li>のwidthで指定)
 //                String column = this.getAtt("column", ".");
@@ -473,7 +551,7 @@ public class HTMLFunction extends Function {
     }
 
     //added by goto 20121217 start 		    // for practice 2012/02/09 を改良
-    private void Func_button() {
+    private String Func_button() {
     	String statement = "";
 //    	Hashtable ArgHash = new Hashtable();
 //    	String button_media = this.Args.get(0).toString();
@@ -538,9 +616,9 @@ public class HTMLFunction extends Function {
             }
         }
 		
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
-    	return;
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
+    	return statement;
     }
     //added by goto 20121217 end
     
@@ -552,7 +630,7 @@ public class HTMLFunction extends Function {
     /*    <type:2> a(画像URL, リンク先URL, 2)    	   	*/
     /*    <type:3> a(ボタンの名前, リンク先URL, 3)        	*/
     /*    mail()でも使用							        */
-    private void Func_url(boolean mailFncFlg) {
+    private String Func_url(boolean mailFncFlg) {
     	String statement = "";
     	FuncArg fa1 = (FuncArg) this.Args.get(0), fa2, fa3;
     	String url, name, type;
@@ -612,9 +690,9 @@ public class HTMLFunction extends Function {
     		statement = "<a href=\""+((mailFncFlg)?("mailto:"):("")) + url+"\""+transition()+prefetch()+target(url)+">"+url+"</a>";
     	}
     	
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
-    	return;
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
+    	return statement;
     }
 //    private String getTextAnchor(String url, String name) {
 //    	//[ ]で囲われた部分をハイパーリンクにする
@@ -712,16 +790,19 @@ public class HTMLFunction extends Function {
     private String target(String url) {
     	//新規ウィンドウで表示する場合(target="_blank")の処理　=> _blankはW3Cで禁止されているため、JS + rel=externalを使用
     	//「外部ページに飛ぶ場合( http(s)://で始まる場合)」のみ新規ウィンドウ表示
-    	if (url.matches("\\s*(http|https)://.*"))
-    		return "  rel=\"external\"";
-    		//return " target=\"_blank\"";
+    	try{
+	    	if (url.matches("\\s*(http|https)://.*"))
+	    		return "  rel=\"external\"";
+	    		//return " target=\"_blank\"";
+    	}catch(Exception e){}
 		return " target=\"_self\"";
+		
     }
     //added by goto 20130308 end
     
     //added by goto 20130312 start  "line"
     /*  line(color, size)  */
-    private void Func_line() {
+    private String Func_line() {
     	String statement = "\n<hr";
     	try{
     		//color
@@ -736,15 +817,15 @@ public class HTMLFunction extends Function {
     	}
     	statement += ">\n";
 		
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
-    	return;
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
+    	return statement;
     }
     //added by goto 20130312 end
 
     //added by goto 20130325 start  "dline"	dotted line(点線)
     /*  dline(color, size)  */
-    private void Func_dline() {
+    private String Func_dline() {
     	//ex. <hr style="border-top: 1px dotted black;">
     	String statement = "\n<hr style=\"border-top: ";
     	String color = "";
@@ -761,16 +842,16 @@ public class HTMLFunction extends Function {
     	}
     	statement += "px dotted "+color+"\">\n";
 		
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
-    	return;
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
+    	return statement;
     }
     //added by goto 20130325 end
     
     //added by goto 20130502 start  "vline"
     /*  vline(color, size)  */
     //&thinsp;<span style="border-left:1px solid red; line-height:1.0em;"></span>&thinsp;
-    private void Func_vline() {
+    private String Func_vline() {
     	String statement = "<span style=\"border:";
     	String color = "";
     	try{
@@ -786,57 +867,92 @@ public class HTMLFunction extends Function {
     	}
     	statement += "px solid "+color+"; line-height:1.0em;\"></span>";
 		
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
-    	return;
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
+    	return statement;
     }
     //added by goto 20130502 end
     
     //added by goto 20130313 start  "header"
-    /*	header("title")	*/
+    /*	header(Title [, Home [, Menu] ] )	*/
+    /*	ex) header("Title1", "http://localhost/index.html", "Google:'https://www.google.co.jp/' , 'http://www.yahoo.co.jp/'")	*/
     private void Func_header() {
     	//TODO: 第2引数で画像のURL,リンク先等
     	
-    	String statement = "";
-    	try{
-    		//title
-    		FuncArg fa1 = (FuncArg) this.Args.get(0);
-    		if(!fa1.getStr().equals(""))
-    			statement = fa1.getStr();
-    		else	return;
-    	}catch(Exception e){ return; }
+    	String title = getValue(1).trim();
+    	if(title.isEmpty())	return;
+    	String home = getValue(2).trim();
+    	String menus = getValue(3).trim();
+    	
+    	ArrayList<String> menuTitle = new ArrayList<String>();
+    	ArrayList<String> url = new ArrayList<String>();
+    	if(!menus.isEmpty()){
+    		//create menu list
+    		menus += ",";
+    		int i = 0;
+    		String s = "";
+    		while(menus.contains(",")){
+    			s = menus.substring(0,menus.indexOf(",")).trim();
+    			if(s.contains(":") && !s.startsWith("'")){
+    				menuTitle.add(i, s.substring(0, s.indexOf(":")));
+    				url.add(i, s.substring(s.indexOf(":")+1).replaceAll("'", ""));
+    			}else{
+	    			menuTitle.add(i, "");
+	    			url.add(i, s.replaceAll("'", ""));
+    			}
+    			menus = menus.substring(menus.indexOf(",")+1);
+    			i++;
+    		}
+    	}
     	
     	headerString += "<div data-role=\"header\" data-position=\"fixed\" style=\"padding: 11px 0px;\" id=\"header1\">\n" +
 		    	"<a href=\"\" data-rel=\"back\" data-role=\"button\" data-icon=\"back\" data-mini=\"true\">Back</a>\n" +
 		    	"\n" +
 		    	"<div class=\"ui-btn-right\">\n" +
-		    	"	<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td>\n" +
-		    	"		<a href=\"index.html\" data-role=\"button\" data-icon=\"home\" data-iconpos=\"notext\" data-mini=\"true\"></a>\n" +
-		    	"	</td><td>\n" +
+		    	"	<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr>\n";
+    	if(!home.isEmpty()){
+	    	headerString += 
+			    	"	<td>\n" +
+			    	"		<a href=\""+home+"\" data-role=\"button\" data-icon=\"home\" data-iconpos=\"notext\" data-mini=\"true\" data-ajax=\"false\"></a>\n" +
+			    	"	</td>\n";
+    	}
+    	headerString += 
+		    	"	<td>\n" +
 		    	"		<form style=\"display:inline;\">\n" +
 		    	"			<input type=\"button\" data-icon=\"forward\" data-iconpos=\"notext\" data-mini=\"true\" onClick=\"history.forward()\" >\n" +
 		    	"		</form>\n" +
-		    	"	</td><td>\n" +
-		    	"		<a href=\"#popupMenu\" data-rel=\"popup\" data-role=\"button\" data-icon=\"grid\" data-iconpos=\"notext\" data-mini=\"true\"></a>\n" +
-		    	"		<div data-role=\"popup\" id=\"popupMenu\" data-transition=\"slidedown\" style=\"width:95%;\" data-overlay-theme=\"a\">\n" +
-		    	"			<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n" +
-		    	"			<ul data-role=\"listview\" data-inset=\"true\" style=\"min-width:210px;\" data-theme=\"d\">\n" +
-		    	"				<li data-role=\"divider\" data-theme=\"a\">Menu</li>\n";
-    	//added by goto 20130508  "Login&Logout"
-        if(!SSQLparser.sessionFlag)
-        	headerString += "				<li><a href=\"login.html\">Log in</a></li>\n";
-        headerString += "				<li><a href=\"options.html\">Options</a></li>\n" +
-        		"				<li><a href=\"https://www.google.com/\">Search</a></li>\n";
-    	//added by goto 20130508  "Login&Logout"
-    	//Logoutボタン
-        if(SSQLparser.sessionFlag)
-        	headerString += "				<li><a href=\"\" data-rel=\"back\" onclick=\"document.LOGOUTpanel1.submit();return falese;\">Logout</a></li>\n";
-        headerString += "			</ul>\n" +
-		    	"		</div>\n" +
-		    	"	</td></tr></table>\n" +
+		    	"	</td>\n";
+    	if(SSQLparser.sessionFlag || url.size()>0){
+	    	headerString += 
+			    	"	<td>\n" +
+			    	"		<a href=\"#popupMenu\" data-rel=\"popup\" data-role=\"button\" data-icon=\"grid\" data-iconpos=\"notext\" data-mini=\"true\"></a>\n" +
+			    	"		<div data-role=\"popup\" id=\"popupMenu\" data-transition=\"slidedown\" style=\"width:95%;\" data-overlay-theme=\"a\">\n" +
+			    	"			<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n" +
+			    	"			<ul data-role=\"listview\" data-inset=\"true\" style=\"min-width:210px;\" data-theme=\"d\">\n" +
+			    	"				<li data-role=\"divider\" data-theme=\"a\">Menu</li>\n";
+	    	if(url.size()>0){
+	    		for(int i=0; i<url.size(); i++){
+	    			if(menuTitle.get(i).isEmpty()){
+	    				headerString += "				<li><a href=\""+url.get(i)+"\" data-ajax=\"false\">"+url.get(i)+"</a></li>\n";
+	    			}else{
+	    				headerString += "				<li><a href=\""+url.get(i)+"\" data-ajax=\"false\">"+menuTitle.get(i)+"</a></li>\n";
+	    			}
+	    		}
+	    	}
+	    	//added by goto 20130508  "Login&Logout"
+	    	//Logoutボタン
+	        if(SSQLparser.sessionFlag){
+	        	headerString += "				<li><a href=\"\" data-rel=\"back\" onclick=\"document.LOGOUTpanel1.submit();return falese;\">Logout</a></li>\n";
+	        }
+	        headerString += 
+	        		"			</ul>\n" +
+			    	"		</div>\n" +
+			    	"	</td>\n";
+    	}
+        headerString += 
+		    	"	</tr></table>\n" +
 		    	"</div>\n\n" +
-		    	
-		    	"<div>"+statement+"</div>\n" +
+		    	"<div>"+title+"</div>\n" +
 		    	"</div>\n";
         return;
     }
@@ -866,9 +982,8 @@ public class HTMLFunction extends Function {
     /*	pop("title","detail/imgURL",int type), popup()	*/
     /*	<type:1> pop("title","detail") <=> pop("title","detail",1)	*/
     /*	<type:2> pop("title","image URL",2)		*/
-    private void Func_pop() {
-        Log.i(this.Args);
-    	
+    private String Func_pop() {
+    	String statement = "";
     	FuncArg fa1 = (FuncArg) this.Args.get(0), fa2, fa3;
     	String title, detailORurl, type;
     	int type1Flg = 0; //type1(文字)フラグ
@@ -877,7 +992,7 @@ public class HTMLFunction extends Function {
     	try{					//引数2つ or 3つの場合
     		fa2 = (FuncArg) this.Args.get(1);
     		detailORurl = fa2.getStr();
-    		if(detailORurl.equals(""))	return;		//added 20130910
+    		if(detailORurl.equals(""))	return "";		//added 20130910
     		title = fa1.getStr();
         	
         	try{						//引数3つの場合
@@ -890,28 +1005,28 @@ public class HTMLFunction extends Function {
         			
         		//type=2 -> imageFile
         		}else if(type.equals("2") || type.equals("image") || type.equals("img")){
-        			html_env.code.append("	<a href=\"#popup"+popCount+"\" data-rel=\"popup\" data-role=\"button\" data-icon=\"arrow-r\" data-inline=\"true\" class=\"ui-li-inside\">"+( (!title.equals(""))? title : "Photo" )+"</a>\n");
+        			statement += "	<a href=\"#popup"+getCount(popCount)+"\" data-rel=\"popup\" data-role=\"button\" data-icon=\"arrow-r\" data-inline=\"true\" class=\"ui-li-inside\">"+( (!title.equals(""))? title : "Photo" )+"</a>\n";
         	    	//TODO: data-transition  transition()使用可能
-        			html_env.code.append("	<div data-role=\"popup\" id=\"popup"+popCount+"\" data-transition=\"pop\" style=\"width:95%;\" data-overlay-theme=\"a\">\n");
-        	    	html_env.code.append("		<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n");
-        	    	html_env.code.append("		<img src=\""+detailORurl+"\"");
+        			statement += "	<div data-role=\"popup\" id=\"popup"+getCount(popCount)+"\" data-transition=\"pop\" style=\"width:95%;\" data-overlay-theme=\"a\">\n";
+        	    	statement += "		<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n";
+        	    	statement += "		<img src=\""+detailORurl+"\"";
     		        
         			//type=2 width,height指定時の処理
             		if(decos.containsKey("width"))
-            			html_env.code.append(" width="+decos.getStr("width").replace("\"", ""));
+            			statement += " width="+decos.getStr("width").replace("\"", "");
             		else{
             	        //added by goto 20130312  "Default width: 100%"
-            			html_env.code.append(" width=\"100%\"");
+            			statement += " width=\"100%\"";
             		}
         			if(decos.containsKey("height"))
-        				html_env.code.append(" height="+decos.getStr("height").replace("\"", ""));
+        				statement += " height="+decos.getStr("height").replace("\"", "");
         			
-        			html_env.code.append(">\n");
+        			statement += ">\n";
         			
         			//画像下部にtitleを付加
-        			if(!title.equals(""))	html_env.code.append("		<p style=\"margin:0px;\">"+title+"</p>\n");
+        			if(!title.equals(""))	statement += "		<p style=\"margin:0px;\">"+title+"</p>\n";
         			
-        	    	html_env.code.append("	</div>\n");
+        	    	statement += "	</div>\n";
         		}
 
         	}catch(Exception e){		//引数2つの場合
@@ -920,27 +1035,27 @@ public class HTMLFunction extends Function {
         	
         	//type=1 -> 文字
     		if(type1Flg == 1){
-    			html_env.code.append("	<a href=\"#popup"+popCount+"\" data-rel=\"popup\" data-role=\"button\" data-icon=\"arrow-r\" data-inline=\"true\">"+( (!title.equals(""))? title : "Open" )+"</a>\n");
+    			statement += "	<a href=\"#popup"+getCount(popCount)+"\" data-rel=\"popup\" data-role=\"button\" data-icon=\"arrow-r\" data-inline=\"true\">"+( (!title.equals(""))? title : "Open" )+"</a>\n";
     	    	//TODO: data-transition  transition()使用可能
-    			html_env.code.append("	<div data-role=\"popup\" id=\"popup"+popCount+"\" data-transition=\"slideup\" style=\"width:95%;\" data-overlay-theme=\"a\">\n");
-    	    	html_env.code.append("		<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n");
-    	    	html_env.code.append("		<p>"+detailORurl+"</p>\n");
-    	    	html_env.code.append("	</div>\n");
+    			statement += "	<div data-role=\"popup\" id=\"popup"+getCount(popCount)+"\" data-transition=\"slideup\" style=\"width:95%;\" data-overlay-theme=\"a\">\n";
+    	    	statement += "		<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n";
+    	    	statement += "		<p>"+detailORurl+"</p>\n";
+    	    	statement += "	</div>\n";
     		}
 
     	}catch(Exception e){	//引数1つの場合
     		Log.info("<Warning> pop関数の引数が不足しています。 ex. pop(title, Detail/URL, typeValue)");
-    		return;
+    		return "";
     	}
     	
     	popCount++;
-    	return;
+    	return statement;
     }
     //added by goto 20130313 end
     
     //added by goto 20130515 start  "search"
     /*	search("title", "c1:column1, c2:column2, ... ", "From以下")	*/
-    private void Func_search() {
+    private String Func_search() {
     	/*  //ユーザ定義
 		    $sqlite3_DB = '/Users/goto/Desktop/SQLite_DB/sample2.db';
 		    $search_col = "w.name, pr.name, count(*), w.r_year, ko.kind";
@@ -970,11 +1085,11 @@ public class HTMLFunction extends Function {
     		after_from += fa3.getStr().trim();
     	}catch(Exception e){
     		Log.info("<Warning> serach関数の引数が不足しています。 ex. search(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
-    		return;
+    		return "";
     	}
 		if(columns.trim().equals("") || after_from.equals("")){
 			Log.info("<Warning> serach関数の引数が不足しています。 ex. search(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
-    		return;
+    		return "";
 		}
 		if(after_from.toLowerCase().startsWith("from "))	after_from = after_from.substring("from".length()).trim();
     	//Log.info(title);
@@ -1088,7 +1203,7 @@ public class HTMLFunction extends Function {
     	if(after_from.startsWith("#")){					//From以下をクエリの下(#*)から取ってくる場合
     		if(!after_from_string.contains(after_from)){
     			Log.info("<Warning> serach関数の第三引数に指定されている '"+after_from+"' が見つかりません。");
-    			return;
+    			return "";
     		}
     		query = after_from_string
     				.substring(after_from_string.indexOf(after_from)+after_from.length())
@@ -1137,7 +1252,7 @@ public class HTMLFunction extends Function {
 
     	String statement = "";
     	//sqlite3 php
-    	if(DBMS.equals("sqlite3")){
+    	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
     		statement += 
     				"<!-- Search start -->\n" +
     				"<!-- Search Panel start -->\n" +
@@ -1195,7 +1310,7 @@ public class HTMLFunction extends Function {
     				"<!-- Search Panel end -->\n" +
     				"\n";
 			
-			HTMLEnv.PHP +=
+			Mobile_HTML5Env.PHP +=
     				"<?php\n" +
     				"if($_POST['search"+searchCount+"'] || $_POST['search_words"+searchCount+"']){\n" +
     				"    echo '<script type=\"text/javascript\">window.parent.Search"+searchCount+"_refresh();</script>';    //表示をリフレッシュ\n" +
@@ -1237,7 +1352,8 @@ public class HTMLFunction extends Function {
     				"\n" +
     				"    if($searchWord"+searchCount+" != \"\"){\n" +
     				"        $db"+searchCount+" = new SQLite3($sqlite3_DB);\n" +
-    				"        $sql = \"SELECT DISTINCT \".$search_col.\" FROM \".$table;\n" +
+    				//"        $sql = \"SELECT DISTINCT \".$search_col.\" FROM \".$table;\n" +
+    				"        $sql = \"SELECT \".$search_col.\" FROM \".$table;\n" +
     				"        if($where0 != \"\")    $sql .= \" WHERE \".$where0.\" \";\n" +
     				"    \n" +
     				"    	//左辺の作成（※Java側でOK?)\n" +
@@ -1366,18 +1482,18 @@ public class HTMLFunction extends Function {
     	
     	
 
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
     	
     	searchCount++;
-    	return;
+    	return statement;
     }
     //search end
     
     
     //added by goto 20130529 start  "select"
     /*	select("title", "c1:column1, c2:column2, ... ", "From以下")	*/
-    private void Func_select() {
+    private String Func_select() {
     	/*  //ユーザ定義
 		    $sqlite3_DB = '/Users/goto/Desktop/SQLite_DB/sample2.db';
 		    $select_col = "w.name, pr.name, count(*), w.r_year, ko.kind";
@@ -1390,6 +1506,7 @@ public class HTMLFunction extends Function {
     	 *    $orderby = " ORDER BY w.name asc ";
     	 *    $limit = " LIMIT 10 ";
     	 */
+    	
     	
     	String title = "";
     	String columns = "";
@@ -1407,11 +1524,11 @@ public class HTMLFunction extends Function {
     		after_from += fa3.getStr().trim();
     	}catch(Exception e){
     		Log.info("<Warning> serach関数の引数が不足しています。 ex. select(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
-    		return;
+    		return "";
     	}
     	if(columns.trim().equals("") || after_from.equals("")){
     		Log.info("<Warning> serach関数の引数が不足しています。 ex. select(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
-    		return;
+    		return "";
     	}
     	if(after_from.toLowerCase().startsWith("from "))	after_from = after_from.substring("from".length()).trim();
     	//Log.info(title);
@@ -1512,7 +1629,7 @@ public class HTMLFunction extends Function {
     	if(after_from.startsWith("#")){					//From以下をクエリの下(#*)から取ってくる場合
     		if(!after_from_string.contains(after_from)){
     			Log.info("<Warning> select関数の第三引数に指定されている '"+after_from+"' が見つかりません。");
-    			return;
+    			return "";
     		}
     		query = after_from_string
     				.substring(after_from_string.indexOf(after_from)+after_from.length())
@@ -1562,7 +1679,7 @@ public class HTMLFunction extends Function {
     	
     	String statement = "";
     	//sqlite3 php
-    	if(DBMS.equals("sqlite3")){
+    	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
     		statement += 
     				"<!-- Select start -->\n" +
 					"<!-- Select Panel start -->\n" +
@@ -1607,7 +1724,7 @@ public class HTMLFunction extends Function {
     						"<!-- Select Panel end -->\n" +
     						"\n";
     		
-    		HTMLEnv.PHP +=
+    		Mobile_HTML5Env.PHP +=
     				"<?php\n" +
 //    						"if($_POST['select"+selectCount+"'] || $_POST['select_words"+selectCount+"']){\n" +
     						"    echo '<script type=\"text/javascript\">window.parent.Select"+selectCount+"_refresh();</script>';    //表示をリフレッシュ\n" +
@@ -1637,7 +1754,8 @@ public class HTMLFunction extends Function {
 							"\n" +
 							"    if($selectWord"+selectCount+" != \"\"){\n" +
 							"        $select_db"+selectCount+" = new SQLite3($sqlite3_DB);\n" +
-							"        $sql = \"SELECT DISTINCT \".$select_col.\" FROM \".$table;\n" +
+							//"        $sql = \"SELECT DISTINCT \".$select_col.\" FROM \".$table;\n" +
+							"        $sql = \"SELECT \".$select_col.\" FROM \".$table;\n" +
 							"        if($where0 != \"\")    $sql .= \" WHERE \".$where0.\" \";\n" +
 							"    \n" +
 							"    	//左辺の作成（※Java側でOK?)\n" +
@@ -1747,47 +1865,55 @@ public class HTMLFunction extends Function {
     		}
     		statement +=
     				"}\n" +
-    						"</script>\n" +
-    						"<!-- Select end -->\n";
+					"</script>\n" +
+					"<!-- Select end -->\n";
     		
     		
     		
     		
     		
     	}
-    	//else if(DBMS.equals("postgresql")){
-    	//	;
-    	//}
+    	else if(DBMS.equals("sqlite")){
+    		Log.e("<Warning> select() for 'sqlite' is not implemented yet.");
+    		;	//TODO
+    	}
+    	else if(DBMS.equals("postgresql")){
+    		Log.e("<Warning> select() for 'postgresql' is not implemented yet.");
+    		;	//TODO
+    	}
     	
     	
-    	
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
     	
     	selectCount++;
-    	return;
+    	return statement;
     }
     //select end
     
     
     //added by goto 20130515 start  "insert","update"
-    /* insert("title", "c1:column1, c2:column2, ... ", "From以下")	*/
-    /* update("title", "c1:column1, c2:column2, ... ", "From以下"(, "insert Flag"))	*/
-    /* insert_update("title", "c1:column1, c2:column2, ... ", "From以下")  データ無し->新規insert,データあり->update */
-    private void Func_insert(boolean update, boolean insert_update) {
+    /* insert("title", "c1:column1, c2:column2, ... ", "From以下" [,Button Name])	*/
+    /* update("title", "c1:column1, c2:column2, ... ", "From以下" [, "insert Flag" [,Button Name] ])	*/
+    /* insert_update("title", "c1:column1, c2:column2, ... ", "From以下" [,Button Name])  データ無し->新規insert,データあり->update */
+    /* Option1: @{noresult} -> not display the result */
+    /* Option2: @{noreset},@{noclear} ->  not init the input form after inserted or updated */
+    /* Option3: @{reloadafterinsert},@{reloadafterupdate} ->  reload current page after insert */
+    private String Func_insert(boolean update, boolean insert_update) {
     	
     	String title = "";
     	String columns = "";
     	String after_from = "";
     	String insertFlag = "";
+    	String buttonName = "";
     	try{
     		//title（第一引数）
     		FuncArg fa1 = (FuncArg) this.Args.get(0);
-    		if(!fa1.getStr().equals(""))	title = fa1.getStr();
-    		else{
-    			if(update || insert_update)	title = "Update";
-    			else						title = "Insert";
-    		}
+    		if(!fa1.getStr().isEmpty())	title = fa1.getStr();
+//    		else{
+//    			if(update || insert_update)	title = "Update";
+//    			else						title = "Insert";
+//    		}
     		//columns（第二引数）
     		FuncArg fa2 = (FuncArg) this.Args.get(1);
     		columns += fa2.getStr();
@@ -1799,18 +1925,41 @@ public class HTMLFunction extends Function {
 	    		FuncArg fa4 = (FuncArg) this.Args.get(3);
 	    		insertFlag += fa4.getStr().toLowerCase().trim();
 	    		if(insertFlag.equals(""))	insertFlag="false";
+	    		buttonName = getValue(5).trim();
+    		}else{
+    			buttonName = getValue(4).trim();
     		}
+    		
     	}catch(Exception e){
     		Log.info("<Warning> insert関数の引数が不足しています。 ex. insert(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
-    		return;
+    		return "";
     	}
 		if(columns.trim().equals("") || after_from.equals("")){
 			Log.info("<Warning> insert関数の引数が不足しています。 ex. insert(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
-    		return;
+    		return "";
 		}
 		if(after_from.toLowerCase().startsWith("from "))	after_from = after_from.substring("from".length()).trim();
 		if(insert_update)	insertFlag = "true";	//20130721
 		//Log.info(title);
+		
+		//Check options
+		boolean noresult = false;
+		boolean noreset = false;
+		boolean reloadAfterInsert = false;
+		int reloadAfterInsertTime = 1;	//Default = 1sec
+		if(decos.containsKey("noresult") || decos.containsKey("noclear"))	noresult = true;
+		if(decos.containsKey("noreset"))	noreset = true;
+		if(decos.containsKey("reloadafterinsert") || decos.containsKey("reloadafterupdate")){
+			reloadAfterInsert = true;
+			try{
+				if(decos.containsKey("reloadafterinsert")){
+					reloadAfterInsertTime = Integer.parseInt(decos.getStr("reloadafterinsert").replace("sec","").replace("s","").trim());
+				}else if(decos.containsKey("reloadafterupdate")){
+					reloadAfterInsertTime = Integer.parseInt(decos.getStr("reloadafterupdate").replace("sec","").replace("s","").trim());
+				}
+			}catch (Exception e) { }
+		}
+		//Log.e(buttonName+" "+noresult+" "+noreset+" "+reloadAfterInsert+" "+reloadAfterInsertTime+"  "+decos);
     	
     	
     	//置換 ( @ { , }  ->  @ { ; } )
@@ -1871,6 +2020,8 @@ public class HTMLFunction extends Function {
     	boolean[] textareaFlg = new boolean[col_num];
     	boolean[] hiddenFlg = new boolean[col_num];
     	boolean[] noinsertFlg = new boolean[col_num];
+    	String[] validationType = new String[col_num];
+    	boolean[] notnullFlg = new boolean[col_num];
     	String notnullFlg_array = "";
     	String[] $session_array = new String[col_num];
     	String[] $time_array = new String[col_num];
@@ -1969,18 +2120,21 @@ public class HTMLFunction extends Function {
     			insert_popFlg += "false\""+((i<col_num-1)?(",\""):(""));
     		
     		//Log.i(s_array[i]);
-    		//@textarea, @hidden, @noinsert, @notnullフラグチェック	//TODO:リファクタリング
+    		//Check: @textarea, @hidden, @noinsert, @notnull, @date, @date1-5, @time	//TODO:リファクタリング
     		textareaFlg[i] = false;
     		hiddenFlg[i] = false;
     		noinsertFlg[i] = false;
+    		validationType[i] = "";
+    		notnullFlg[i] = false;
     		String str = "";
     		if(s_array[i].replaceAll(" ","").contains("@{")){
     			str = s_array[i].substring(s_array[i].lastIndexOf("@")+1);	//@以下の文字列
+    			//Log.e(str);
 	    		if(str.contains("textarea"))
 	    			textareaFlg[i] = true;
 	    		if(str.contains("hidden"))
 	    			hiddenFlg[i] = true;
-	    		if(str.contains("no") || str.contains("noinsert") || str.contains("noupdate")){
+	    		if(str.contains("noinsert") || str.contains("noupdate")){
 	    			noinsertFlg[i] = true;
 	    			noinsert_count++;
 	    		}else{
@@ -1992,6 +2146,9 @@ public class HTMLFunction extends Function {
 		    			else				notnullFlg_array += "FALSE,";
 		    		}
 	    		}
+	    		if(str.contains("notnull"))	notnullFlg[i] = true;
+	    		validationType[i] = Mobile_HTML5.checkFormValidationType(str);	//form validation
+	    		
 	    		s_array[i] = s_array[i].substring(0,s_array[i].indexOf("@"));
 	    		//Log.i(s_array[i]);
     		}else{
@@ -2023,7 +2180,7 @@ public class HTMLFunction extends Function {
     	if(after_from.startsWith("#")){					//From以下をクエリの下(#*)から取ってくる場合
     		if(!after_from_string.contains(after_from)){
     			Log.info("<Warning> insert関数の第三引数に指定されている '"+after_from+"' が見つかりません。");
-    			return;
+    			return "";
     		}
     		query = after_from_string
     				.substring(after_from_string.indexOf(after_from)+after_from.length())
@@ -2048,17 +2205,24 @@ public class HTMLFunction extends Function {
 
     	String statement = "";
     	String gps_js = "";
+    	String php = "";
+    	String formPHPfileName = html_env.getFileName2()+"_SSQLform_"+insertCount+".php";
     	//sqlite3 php
-    	if(DBMS.equals("sqlite3")){
+    	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
     		statement += 
-    				"<!-- Insert start -->\n" +
-    				"<!-- Insert Panel start -->\n" +
+    				"\n" +
+    				"<!-- SSQL Insert"+insertCount+" start -->\n" +
+    				"<!-- SSQL Insert"+insertCount+" FORM start -->\n" +
     				"<br>\n" +
-    				//"<div id=\"INSERT"+insertCount+"panel\" style=\"background-color:whitesmoke; width:99%; border:0.1px gray solid;\" data-role=\"none\">\n" +
-    				//"<div style=\"padding:3px 5px;border-color:hotpink;border-width:0 0 1px 7px;border-style:solid;background:#F8F8F8; font-size:30;\" id=\"InsertTitle"+insertCount+"\">"+title+"</div>\n" +
-    				"<div id=\"INSERT"+insertCount+"panel\" style=\"\" data-role=\"none\">\n" +
-    				"<hr>\n<div style=\"font-size:30;\" id=\"InsertTitle"+insertCount+"\">"+title+"</div>\n<hr>\n" +
-    				"<br>\n" +
+    				//"<div id=\"SSQL_INSERT"+insertCount+"panel\" style=\"background-color:whitesmoke; width:99%; border:0.1px gray solid;\" data-role=\"none\">\n" +
+    				//"<div style=\"padding:3px 5px;border-color:hotpink;border-width:0 0 1px 7px;border-style:solid;background:#F8F8F8; font-size:30;\" id=\"SSQL_InsertTitle"+insertCount+"\">"+title+"</div>\n" +
+    				"<div id=\"SSQL_INSERT"+insertCount+"panel\" style=\"\" data-role=\"none\">\n";
+    		if(!title.isEmpty()){
+    			statement += 
+    				"<hr>\n<div style=\"font-size:30;\" id=\"SSQL_InsertTitle"+insertCount+"\">"+title+"</div>\n<hr>\n" +
+    				"<br>\n";
+    		}
+    		statement += 
     				"<form method=\"post\" action=\"\" target=\"dummy_ifr\">\n";
     				//"<form method=\"post\" action=\"\" target=\"insert"+insertCount+"_ifr\">\n";
     		
@@ -2082,43 +2246,53 @@ public class HTMLFunction extends Function {
 									""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
 							if(!noinsertFlg[i])
 								statement += 
-										"    <input type=\"hidden\" name=\"insert_words"+(++insertWordCount)+"\" value=\""+button_array[i]+"\">\n";
+										"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(++insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\""+button_array[i]+"\">\n";
 						
-						
-						}else if(btRcount == 2){		//ボタン ex){出席|欠席}
-							String bt1=ss.substring(0,ss.indexOf("|")).trim();
-							String bt2=ss.substring(ss.indexOf("|")+1,ss.length()-1).trim();
-							insertWordCount++;
-							statement += 
-									"	<div class=\"ui-grid-a\">\n" +
-									"		<div class=\"ui-block-a\">\n" +
-									"    		<input type=\"submit\" name=\"insert_words"+(insertWordCount)+"\" value=\""+bt1+"\" data-theme=\"a\">\n" +
-									"		</div>\n" +
-									"		<div class=\"ui-block-b\">\n" +
-									"    		<input type=\"submit\" name=\"insert_words"+(insertWordCount)+"\" value=\""+bt2+"\" data-theme=\"a\">\n" +
-									"		</div>\n" +
-									"	</div>\n";
-							buttonSubmit += " || $_POST['insert_words"+(insertWordCount)+"']";
+						//TODO 以下を「@button」時のみに変更
+//						}else if(btRcount == 2){		//ボタン ex){出席|欠席}
+//							String bt1=ss.substring(0,ss.indexOf("|")).trim();
+//							String bt2=ss.substring(ss.indexOf("|")+1,ss.length()-1).trim();
+//							insertWordCount++;
+//							statement += 
+//									"	<div class=\"ui-grid-a\">\n" +
+//									"		<div class=\"ui-block-a\">\n" +
+//									"    		<input type=\"submit\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\""+bt1+"\" data-theme=\"a\" onClick=\"SSQL_Insert"+insertCount+"()\">\n" +
+//									"		</div>\n" +
+//									"		<div class=\"ui-block-b\">\n" +
+//									"    		<input type=\"submit\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\""+bt2+"\" data-theme=\"a\" onClick=\"SSQL_Insert"+insertCount+"()\">\n" +
+//									"		</div>\n" +
+//									"	</div>\n";
+//							buttonSubmit += " || $_POST['SSQL_insert"+insertCount+"_words"+(insertWordCount)+"']";
+							
 						}else{							//ラジオボタン ex){出席|欠席|その他}
 							statement += "   <div data-role=\"controlgroup\">\n";
 							insertWordCount++;
 							for(int k=1; k<=btRcount; k++){
 								String val = ss.substring(0,ss.indexOf("|")).trim();
 								statement += 
-										"		<input type=\"radio\" name=\"insert_words"+(insertWordCount)+"\" id=\"insert_words"+(insertWordCount)+"_"+k+"\" value=\""+val+"\""+( (k>1)? (""):(" checked=\"checked\"") )+">\n" +
-										"		<label for=\"insert_words"+(insertWordCount)+"_"+k+"\">"+val+"</label>\n";
+										"		<input type=\"radio\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"_"+k+"\" value=\""+val+"\""+( (k>1)? (""):(" checked=\"checked\"") )+">\n" +
+										"		<label for=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"_"+k+"\">"+val+"</label>\n";
 								ss = ss.substring(ss.indexOf("|")+1);
 							}
 							statement += "	</div>\n";
 						}
 					}else{
-						statement += 
-								"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" name=\"insert_words"+(++insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\">" +
-								""+((!textareaFlg[i])?(""):("</textarea>"))+"\n";
-				    	//statement += "    <input type=\"text\" name=\"insert_words"+(insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\">\n";
+						if(validationType[i].isEmpty()){
+							statement += 
+									"    "+( (!textareaFlg[i])? "" : "<span>" )+"<span>" +
+									"<"+((!textareaFlg[i])?("input"):("textarea"))+"" +
+									" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\"" +
+									" id=\"SSQL_insert"+insertCount+"_words"+(++insertWordCount)+"\"" +
+									" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\"" +
+									" placeholder=\""+s_name_array[i]+"\""+Mobile_HTML5.getFormClass(notnullFlg[i], "")+">" +
+									""+((!textareaFlg[i])?(""):("</textarea>")) +
+									"</span>"+( (!textareaFlg[i])? "" : "</span>" )+"\n";
+							//statement += "    <input type=\"text\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\">\n";
+						}else{
+							statement += Mobile_HTML5.getFormValidationString(validationType[i], notnullFlg[i], "SSQL_insert"+insertCount+"_words"+(++insertWordCount), s_name_array[i]);
+						}
 					}
 				}else{
-					//statement += "    <input type=\"text\" name=\"insert_words"+(++insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\">\n";
 					String echo = "";
 					if(!$session_array[i].equals(""))	echo += "	echo $_SESSION["+$session_array[i]+"];\n";
 					else if(!$time_array[i].equals(""))	echo += "	echo "+$time_array[i]+";\n";
@@ -2140,7 +2314,7 @@ public class HTMLFunction extends Function {
 								"  	};\n" +
 								"    navigator.geolocation.getCurrentPosition(function(pos) {\n" +
 								"      	// 経度、緯度を取得 //\n" +
-								"		document.getElementsByName('insert_words"+(insertWordCount+1)+"')[0].value=pos.coords.latitude+\",\"+pos.coords.longitude;\n" +
+								"		document.getElementsByName('SSQL_insert"+insertCount+"_words"+(insertWordCount+1)+"')[0].value=pos.coords.latitude+\",\"+pos.coords.longitude;\n" +
 								"    }, function(e) {\n" +
 								"		gpsInfo = \"\";\n" +
 								"    }, geolocationOptions);\n" +
@@ -2165,82 +2339,139 @@ public class HTMLFunction extends Function {
 							""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
 					if(!noinsertFlg[i])
 						statement += 
-								"    <input type=\"hidden\" name=\"insert_words"+(++insertWordCount)+"\" value=\"\n" +
+								"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(++insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\"\n" +
 								"EOF;\n" +
 								echo +
 								"		echo <<<EOF\n" +
 								"\">\n";
 				}
-				//insertWordCount++;
     		}
-//    			}
-//    			else				statement += "    <textarea type=\"text\" name=\"insert_words"+(insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\"></textarea>\n";
-    		
-    		if(buttonSubmit.equals(""))
-    			statement += 
-    				"    <input type=\"submit\" value=\""+( (!update)? ("登録"):("更新") )+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"insert"+insertCount+"\" id=\"insert"+insertCount+"\" data-icon=\"insert\" data-mini=\"false\" data-inline=\"false\">\n";
-			
+    		if(buttonSubmit.equals("")){
+    			if(buttonName.isEmpty()){
+					statement += 
+						"    <input type=\"submit\" value=\""+( (!update)? ("登録"):("更新") )+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-icon=\"insert\" data-mini=\"false\" data-inline=\"false\">\n";
+//						"    <input type=\"submit\" value=\""+( (!update)? ("登録"):("更新") )+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-icon=\"insert\" data-mini=\"false\" data-inline=\"false\" onClick=\"SSQL_Insert"+insertCount+"()\">\n";
+    			}else{
+	    			statement += 
+	    					"    <input type=\"submit\" value=\""+buttonName+"\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-mini=\"false\" data-inline=\"false\">\n";
+//	    					"    <input type=\"submit\" value=\""+buttonName+"\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-mini=\"false\" data-inline=\"false\" onClick=\"SSQL_Insert"+insertCount+"()\">\n";
+    			}
+    		}
     		statement += 
     				//"    <input type=\"submit\" value=\"Insert&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"insert"+insertCount+"\" id=\"insert"+insertCount+"\" data-icon=\"insert\" data-mini=\"false\" data-inline=\"false\">\n" +
     				"</form>\n" +
     				//"<iframe name=\"insert"+insertCount+"_ifr\" style=\"display:none;\"></iframe>\n" +
+    				"\n";
+    		if(!noresult){
+    			statement += 
+    				"<div id=\"SSQL_Insert"+insertCount+"_result\" data-role=\"none\"><!-- SSQL Insert"+insertCount+" Result"+insertCount+" --></div>\n" +
     				"\n" +
-    				"<div id=\"Insert"+insertCount+"_text0\" data-role=\"none\"><!-- Insertコメント --></div>\n" +
-    				"\n" +
-    				"<br>\n" +
+    				"<br>\n";
+    		}
+    		statement += 
     				"</div>\n";
     		//getGPSinfo()
     		statement += gps_js;
-//    				"\n<!-- getGPSinfo() -->\n" +
-//					"<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
-//					"<script type=\"text/javascript\">\n" +
-//					"<!--\n" +
-//					"function getGPSinfo() {\n" +
-//					"\n" +
-//					"var gpsInfo = \"\";\n" +
-//					"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +
-//					"  	// Geolocation APIのオプション設定\n" +
-//					"  	var geolocationOptions = {\n" +
-//					"    	\"enableHighAccuracy\" : true, // 高精度位置情報の取得\n" +
-//					"    	\"maximumAge\" : 0, // キャッシュの無効化\n" +
-//					"    	\"timeout\" : 30000 // タイムアウトは30秒\n" +
-//					"  	};\n" +
-//					"    navigator.geolocation.getCurrentPosition(function(pos) {\n" +
-//					"      	// 経度、緯度を取得 //\n" +
-//					"		gpsInfo += pos.coords.latitude+\",\"+pos.coords.latitude;\n" +
-//					"    }, function(e) {\n" +
-//					"		gpsInfo = \"\";\n" +
-//					"    }, geolocationOptions);\n" +
-//					"});\n" +
-//					"return gpsInfo;\n" +
-//					"\n" +
-//					"}\n" +
-//					"// -->\n" +
-//					"</script>\n";
     		statement += 
-    				"<!-- Insert Panel end -->\n" +
-    				"\n";
-			
-			HTMLEnv.PHP +=
+    				"<!-- SSQL Insert"+insertCount+" FORM end -->\n" +
+    				"\n" +
+    				"<!-- SSQL Insert"+insertCount+" JS start -->\n" +
+    				"<script type=\"text/javascript\">\n" +
+    				"function SSQL_Insert"+insertCount+"_echo(str){\n";
+			if(!noresult){
+				statement += 
+	    				"	var textArea = document.getElementById(\"SSQL_Insert"+insertCount+"_result\");\n" +
+	    				"	textArea.innerHTML = str;\n";
+			}
+			if(!noreset){
+				//TODO: 他の削除方法
+				statement += 
+						"	if(str.indexOf(\"completed\") !== -1) {\n" +
+						//"		$('#SSQL_insert"+insertCount+"panel input,textarea').not('input[type=\\\"radio\\\"],input[type=\\\"checkbox\\\"],:hidden, :button, :submit,:reset').val('');\n" +
+						//"		$('#SSQL_insert"+insertCount+"panel input[type=\"radio\"], input[type=\\\"checkbox\\\"],select').removeAttr('checked').removeAttr('selected');\n" +
+						"		$(\"#SSQL_insert"+insertCount+"panel form\")[0].reset();\n" +
+						"	}\n";
+			}
+			if(reloadAfterInsert){
+				statement += 
+						"	setInterval(function(){\n" +
+						"		location.reload();\n" +
+						"	}, "+(reloadAfterInsertTime*1000)+");\n";
+			}
+			statement += 
+    				"}\n" +
+					"$(function(){\n" +
+					"	//validation\n" +
+					"	$(\"#SSQL_INSERT"+insertCount+"panel form\").validate({\n" +
+					"	 	errorPlacement: function(error, element) {\n" +
+					"        	error.appendTo(element.parent().parent().after());\n" +
+					"    	},\n" +
+					"		submitHandler: function(form) {\n" +
+					"		 	SSQL_Insert"+insertCount+"();\n" +
+					"		    return false;\n" +
+					"		}\n" +
+					"	});\n" +
+					"})\n" +
+					"function SSQL_Insert"+insertCount+"(){\n" +
+					"	//ajax: PHPへ値を渡して実行\n" +
+					"	$.ajax({\n" +
+					"		type: \"POST\",\n" +
+					"		url: \""+new File(formPHPfileName).getName()+"\",\n" +
+					"		data: $(\"#SSQL_INSERT"+insertCount+"panel form\").serializeArray(),\n" +
+//					//"		data: {insert1_words1:$('#insert1_words1').val(), insert1_words2:$('#insert1_words2').val()},\n" +
+//					"		data: {";
+//			for(int k=1; k<=insertWordCount; k++){
+//				statement += 
+//						"SSQL_insert"+insertCount+"_words"+k+":$('#SSQL_insert"+insertCount+"_words"+k+"').val()"+( (k<insertWordCount)? ", " : "" );
+////						"insert1_words2:$('#insert1_words2').val()";
+//			}
+//			statement += 
+//					"},\n" +
+					"		dataType: \"json\",\n" +
+					"        beforeSend: function(xhr, settings) {\n" +
+					"            $('#SSQL_insert"+insertCount+"').attr('disabled', true);\n" +
+					"        },\n" +
+					"        complete: function(xhr, textStatus) {\n" +
+					"            $('#SSQL_insert"+insertCount+"').attr('disabled', false);\n" +
+					"        },\n" +
+					"		success: function(data, textStatus){\n" +
+					"			if (data.result != \"\") {\n" +
+					"				SSQL_Insert"+insertCount+"_echo(data.result);\n" +
+					"			}\n" +
+					"		},\n" +
+					"		error: function(XMLHttpRequest, textStatus, errorThrown) {\n" +
+					"			SSQL_Insert"+insertCount+"_echo(textStatus+\"<br>\"+errorThrown);\n" +
+					"		}\n" +
+					"	});\n" +
+					"}\n" +
+    				"</script>\n" +
+    				"<!-- SSQL Insert"+insertCount+" JS end -->\n" +
+    				"<!-- SSQL Insert"+insertCount+" end -->\n";
+
+			//php
+			php +=
     				"<?php\n" +
-    				"if($_POST['insert"+insertCount+"'] "+buttonSubmit+"){\n" +
-    				//"if($_POST['insert"+insertCount+"'] || $_POST['insert_words"+insertCount+"']){\n" +
+//    				"if($_POST['SSQL_insert"+insertCount+"'] "+buttonSubmit+"){\n" +
+    				//"if($_POST['SSQL_insert"+insertCount+"'] || $_POST['SSQL_insert"+insertCount+"_words"+insertCount+"']){\n" +
+    				"    $ret = array();\n" +
+    				"    $ret['result'] = \"\";\n" +
+    				"    \n" +
     				"    //ユーザ定義\n" +
     				"    $sqlite3_DB = '"+DB+"';\n" +
     				"    $insert_col = \""+insert_col+"\";\n";
 			if(update){
-				HTMLEnv.PHP +=
+				php +=
 						"    $update_col_array = array("+update_col_array+");\n" +
 						"    $update_where = \""+update_where+"\";\n";
 			}
-			HTMLEnv.PHP +=
+			php +=
     				"    $notnullFlg = array("+notnullFlg_array+");\n" +
     				"    $col_num = "+(col_num - noinsert_count)+";                          //カラム数(Java側で指定)\n" +
     				"    $table = '"+from+"';\n" +
     				"\n" +
     				"	$insert_str = \"notnull\";\n" +
     				"	for($k=1; $k<=$col_num; $k++){\n" +
-    				"    	$var[$k] = checkHTMLsc($_POST['insert_words'.$k]);\n" +
+    				"    	$var[$k] = checkHTMLsc($_POST['SSQL_insert"+insertCount+"_words'.$k]);\n" +
     				"    	$var[$k] = str_replace(array(\"\\r\\n\",\"\\r\",\"\\n\"), '<br>', $var[$k]);	//改行コードを<br>へ\n" +
     				//"    	//$var[$k] = mb_convert_encoding($var[$k], 'UTF-8', 'auto');					//エンコードをUTF-8へ PHP環境によってはうまく動かない？\n" +
     				//"    	$insert_str .= trim($var[$k]);\n" +
@@ -2249,18 +2480,19 @@ public class HTMLFunction extends Function {
     				"    	}\n";
 			for(int i=0; i<col_num; i++){
 				if(!$time_array[i].equals(""))
-					HTMLEnv.PHP += "		if($k=="+i+")	$var[$k] = "+$time_array[i]+";\n";	//現在時刻
+					php += "		if($k=="+i+")	$var[$k] = "+$time_array[i]+";\n";	//現在時刻
 			}
-			HTMLEnv.PHP +=	
+			php +=	
     				"    }\n" +
     				"\n" +
+    				"	$b = \"\";\n" +
     				"	if($insert_str == \"\"){\n" +
-    				"        insert"+insertCount+"_p1('<font color=\\\"red\\\">入力内容をご確認ください。</font>');\n" +
+//    				"        insert"+insertCount+"_p1('<font color=\\\"red\\\">Please check the value.</font>', \"true\");\n" +
+    				"        $b = '<font color=\"red\">Please check the value.</font>';\n" +
     				"	}else{\n";
-			
 			if(!update){
 				//insert()
-				HTMLEnv.PHP +=
+				php +=
 	    				"		$insert_str = \"\";\n" +
 	    				"		for($k=1; $k<=$col_num; $k++){\n" +
 	    				"			if($k==1)	$insert_str .= \"'\".$var[$k].\"'\";\n" +
@@ -2273,15 +2505,18 @@ public class HTMLFunction extends Function {
 	    				"        try{\n" +
 	    				"			$result2 = $insert_db"+insertCount+"->exec($insert_sql);\n" +
 	    				"			unset($insert_db"+insertCount+");\n" +
-	    				"		 	insert"+insertCount+"_p1(\"登録しました。\");\n" +
-	    				"		 	//insert"+insertCount+"_p1($insert_sql);\n" +
+//	    				"		 	insert"+insertCount+"_p1(\"Registration completed.\", \"false\");\n" +
+	    				"		 	$b = \"Registration completed.\";\n" +
+	    				//"		 	//insert"+insertCount+"_p1($insert_sql, \"true\");\n" +
+	    				"		 	//$b = $insert_sql;\n" +
 	    				"        }catch(Exception $e){\n" +
 	    				"       		unset($insert_db"+insertCount+");\n" +
-	    				"       		insert"+insertCount+"_p1('<font color=red>Insert failed.</font>');	//登録失敗\n" +
+//	    				"       		insert"+insertCount+"_p1('<font color=red>Insert failed.</font>', \"true\");	//登録失敗\n" +
+	    				"       		$b = '<font color=red>Insert failed.</font>';	//登録失敗\n" +
 	    				"        }\n";
 			}else{
 				//update()
-				HTMLEnv.PHP +=
+				php +=
 						"		$insert_db1 = new SQLite3($sqlite3_DB);\n" +
 						"		try{\n" +
 						"			//データが存在しているかチェック\n" +
@@ -2303,14 +2538,15 @@ public class HTMLFunction extends Function {
 						"				$update_sql = \"UPDATE \".$table.\" SET \".$update_str.\" \".$update_where;\n" +
 						"				$result2 = $insert_db1->exec($update_sql);\n" +
 						"				//echo '変更された行の数: ', $db->changes();\n" +
-						"				insert1_p1(\"更新しました。\");\n" +
+//						"				insert"+insertCount+"_p1(\"Update completed.\", \"false\");\n" +
+						"				$b = \"Update completed.\";\n" +
 						"			}else{\n";
-				//Log.i("insertFlag:"+insertFlag);
 				if(!insertFlag.equals("true"))
-						HTMLEnv.PHP +=
-							"				insert1_p1('<font color=red>更新データがありません。</font>');	//更新データなし\n";
+						php +=
+//							"				insert"+insertCount+"_p1('<font color=red>No data found.</font>', \"true\");	//更新データなし\n";
+							"				$b = '<font color=red>No data found.</font>';	//更新データなし\n";
 				else
-						HTMLEnv.PHP +=
+						php +=
 							"				//新規登録(insert)\n" +
 							"				$insert_str = \"\";\n" +
 							"				for($k=1; $k<=$col_num; $k++){\n" +
@@ -2320,52 +2556,68 @@ public class HTMLFunction extends Function {
 							"				\n" +
 							"				$insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES (\".$insert_str.\")\";\n" +
 							"				$result2 = $insert_db1->exec($insert_sql);\n" +
-							"				insert1_p1(\"登録しました。\");\n";
-				HTMLEnv.PHP +=
+//							"				insert"+insertCount+"_p1(\"Registration completed.\", \"false\");\n";
+							"				$b = \"Registration completed.\";\n";
+				php +=
 						"			}\n" +
 						"        }catch(Exception $e){\n" +
 						"       		unset($insert_db1);\n" +
-						"       		insert1_p1('<font color=red>Update failed.</font>');	//更新失敗\n" +
+//						"       		insert"+insertCount+"_p1('<font color=red>Update failed.</font>', \"true\");	//更新失敗\n" +
+						"       		$b = '<font color=red>Update failed.</font>';	//更新失敗\n" +
 						"        }\n" +
 						"        unset($insert_db1);\n";
 			}
-    				
-			HTMLEnv.PHP +=
-    				"    }\n" +
-    				"}\n" +
-    				"function insert"+insertCount+"_p1($str){\n" +
-    				"    echo '<script type=\"text/javascript\">window.parent.Insert"+insertCount+"_echo1(\"'.$str.'\");</script>';\n" +
-    				"}\n" +
+			php +=
+    				"	}\n" +
+    				"	$ret['result'] = $b;\n" +
+    				"	header(\"Content-Type: application/json; charset=utf-8\");\n" +
+					"	echo json_encode($ret);\n" +
+//    				"}\n" +
+//    				"function insert"+insertCount+"_p1($str, $error){\n" +
+//    				"    echo '<script type=\"text/javascript\">window.parent.Insert"+insertCount+"_echo(\"'.$str.'\",\"'.$error.'\");</script>';\n" +
+//    				"}\n" +
+					"\n" +
+					"//XSS対策\n" +
+					"function checkHTMLsc($str){\n" +
+					"	return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');\n" +
+					"}\n" +
     				"?>\n";
     				
-			statement += 
-    				"\n" +
-    				"<script type=\"text/javascript\">\n" +
-    				"function Insert"+insertCount+"_echo1(str){\n" +
-    				"  var textArea = document.getElementById(\"Insert"+insertCount+"_text0\");\n" +
-    				"  textArea.innerHTML = str;\n" +
-    				"}\n" +
-    				"</script>\n" +
-    				"<!-- Insert end -->\n";
     	}
     	//else if(DBMS.equals("postgresql")){
     	//	;
     	//}
 
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
     	
+    	Mobile_HTML5.createFile(html_env, formPHPfileName, php);//PHPファイルの作成
     	insertCount++;
-    	return;
+    	return statement;
     }
     //insert end
+    
+    //20131127 form
+    //result start
+    private String Func_result() {
+    	int count = Mobile_HTML5.formCount;
+    	//if(!Mobile_HTML5.form)	count -= 1;
+	    String s =
+	    	"\n" +
+			"<div id=\"Form"+count+"_result\" data-role=\"none\"><!-- Form result --></div>\n" +
+			"\n";
+			//"<br>\n";
+	    //html_env.code.append(s);
+	    return s;
+    }
+    //result end
     
     
     //added by goto 20130531  "check"
     /*  1:check(type, 演算子(=,!=,<,<=,>,>=,...), answer, 正解ステートメント, 不正解ステートメント)  */
     /*  2:check(type, 識別子("yes|no"など), answer, 正解ステートメント, 不正解ステートメント)  */
     //check("form","=",answer,"正解","不正解")
-    private void Func_check() {
+    private String Func_check() {
     	String statement = "\n";
     	String type = "";
     	String operator = "";
@@ -2380,7 +2632,7 @@ public class HTMLFunction extends Function {
     		incorrect = ((FuncArg) this.Args.get(4)).getStr();
     	}catch(Exception e){
     		Log.info("<Warning> check関数の引数が不足しています。 ex. check(type, 演算子(=,!=,<,<=,>,>=,...)・識別子(\"yes|no\"など), answer, 正解ステートメント, 不正解ステートメント)");
-    		return;
+    		return "";
     	}
     	
     	if(operator.trim().equals("="))	operator = "==";
@@ -2413,7 +2665,7 @@ public class HTMLFunction extends Function {
 					"</script>\n" +
 					"<!-- Check"+checkCount+" end -->\n";
 	    	
-	    	HTMLEnv.PHP += 
+	    	Mobile_HTML5Env.PHP += 
 	    			"<?php\n" +
 					"//Check"+checkCount+"\n" +
 					//"else if($_POST['check"+checkCount+"'] || $_POST['check_word"+checkCount+"']){\n" +
@@ -2478,7 +2730,7 @@ public class HTMLFunction extends Function {
 					"</script>\n" +
 					"<!-- Check"+checkCount+" end -->\n";
 	    	
-	    	HTMLEnv.PHP += 
+	    	Mobile_HTML5Env.PHP += 
 	    			"<?php\n" +
 					"//Check"+checkCount+"\n" +
 					"if($_POST['check"+checkCount+"_yes'] || $_POST['check"+checkCount+"_no']){\n" +
@@ -2541,7 +2793,7 @@ public class HTMLFunction extends Function {
 					"</script>\n" +
 					"<!-- Check"+checkCount+" end -->\n";
 	    	
-	    	HTMLEnv.PHP += 
+	    	Mobile_HTML5Env.PHP += 
 	    			"<?php\n" +
 					"//Check"+checkCount+"\n" +
 					"if($_POST['check"+checkCount+"']){\n" +
@@ -2557,11 +2809,11 @@ public class HTMLFunction extends Function {
     	}
     	
     	
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
     	
     	checkCount++;
-    	return;
+    	return statement;
     }
     //check end
     
@@ -2569,7 +2821,7 @@ public class HTMLFunction extends Function {
     //added by goto 20130519 start  "moveto"
     /*  moveto(url, sec)  */
     /*  moveto(title, url, sec)  */
-    private void Func_moveto() {
+    private String Func_moveto() {
     	String statement = "\n";
     	String url = "";
     	String sec = "";
@@ -2586,7 +2838,7 @@ public class HTMLFunction extends Function {
         	}catch(Exception e){ }		//引数2つ
     	}catch(Exception e){
     		Log.info("<Warning> moveto関数の引数が不足しています。 ex. moveto(url, sec) or moveto(title, url, sec)");
-    		return;
+    		return "";
     	}
     	
     	//movetoFlg  下記は、header()内でappendされる
@@ -2598,9 +2850,9 @@ public class HTMLFunction extends Function {
     	statement += sec+"秒後に"+((!title.equals(""))? (title+"へ"):(""))+"移動します。<br>\n";
     	statement += "自動的に移動しない場合は、<a href=\""+url+"\" target=\"_self\">こちら</a>をクリックしてください。\n";
     	
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
-    	return;
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
+    	return statement;
     }
     //added by goto 20130519 end
     
@@ -2608,9 +2860,10 @@ public class HTMLFunction extends Function {
     //added by goto 20130603 start  "$session"
     /*  $session("SESSION関数(第3引数)でセッション変数へ格納した属性")  */
     /*  $session("name")など  */
-    private void Func_$session() {
+    private String Func_$session() {
     	if(!SSQLparser.sessionFlag){
     		Log.info("<Warning> $session関数は、SESSION()使用時のみ使用可能です。");
+    		return "";
     	}else{
 	    	String statement = "\n";
 	    	String attribute = "";
@@ -2618,21 +2871,21 @@ public class HTMLFunction extends Function {
 	    		attribute = ((FuncArg) this.Args.get(0)).getStr();
 	    	}catch(Exception e){
 	    		Log.info("<Warning> $session関数の引数が不足しています。 ex. $session(\"name\")");
-	    		return;
+	    		return "";
 	    	}
 	    	statement += "EOF;\n" +
 	    			"		echo $_SESSION["+attribute+"];\n" +
 	    			"		echo <<<EOF\n";
-	    	// 各引数毎に処理した結果をHTMLに書きこむ
-	    	html_env.code.append(statement);
+//	    	// 各引数毎に処理した結果をHTMLに書きこむ
+//	    	html_env.code.append(statement);
+	    	return statement;
     	}
-    	return;
     }
     //$session end
     
     //added by goto 20130607 start  "time,date"
     /*  time(),date(),time("Y-m-d")など  */
-    private void Func_time() {
+    private String Func_time() {
 		String statement = "\n";
 		String format = "";
 		try{
@@ -2641,9 +2894,9 @@ public class HTMLFunction extends Function {
 		statement += "EOF;\n" +
 				"		echo date(\""+( (format.equals(""))? ("Y/m/d(D) H:i:s"):(format) )+"\");\n" +		//第二引数のデフォルト値:time()		//"		echo date(\"Y/m/d(D) H:i:s\", time());\n" +
 				"		echo <<<EOF\n";
-		// 各引数毎に処理した結果をHTMLに書きこむ
-		html_env.code.append(statement);
-    	return;
+//		// 各引数毎に処理した結果をHTMLに書きこむ
+//		html_env.code.append(statement);
+    	return statement;
     }
     //time end
     
@@ -2651,7 +2904,7 @@ public class HTMLFunction extends Function {
     /*  map(geolocation, zoom, icon)  */
     /*  search_map(zoom, icon)  */
     /*  geolocation: 住所(address) or 緯度,経度(latitude,longitude)  */
-    private void Func_map(boolean searchFlg) {
+    private String Func_map(boolean searchFlg) {
     	String statement = "\n";
     	String geolocation = "";
     	String zoom = "";
@@ -2676,15 +2929,15 @@ public class HTMLFunction extends Function {
     	}catch(Exception e){
     		if(!searchFlg){
     			System.err.println("<Warning> map関数の引数が不足しています。 ex. map(geolocation, zoom, icon)");
-    			return;
+    			return "";
     		}
     	}
     	
     	if(searchFlg){
 	    	statement += 
 	    			"		<form method=\"post\" action=\"\" target=\"dummy_ifr\">\n" +
-					"    		<input type=\"search\" id=\"search_map_words"+mapFuncCount+"\" placeholder=\"住所など\">\n" +
-					"    		<input type=\"submit\" value=\"地図を表示&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" id=\"search_map"+mapFuncCount+"\" data-icon=\"search\" data-mini=\"false\" data-inline=\"false\">\n" +
+					"    		<input type=\"search\" id=\"search_map_words"+getCount(mapFuncCount)+"\" placeholder=\"住所など\">\n" +
+					"    		<input type=\"submit\" value=\"地図を表示&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" id=\"search_map"+getCount(mapFuncCount)+"\" data-icon=\"search\" data-mini=\"false\" data-inline=\"false\">\n" +
 					"		</form>\n";
     	}
     	statement += 
@@ -2692,16 +2945,16 @@ public class HTMLFunction extends Function {
 				"		<script type=\"text/javascript\">\n" +
 				"		<!--\n";
     	if(!searchFlg)	statement += "$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n";
-    	else			statement += "$(\"#search_map"+mapFuncCount+"\").click(function () {\n";
+    	else			statement += "$(\"#search_map"+getCount(mapFuncCount)+"\").click(function () {\n";
     	statement += 
 				"  	var map = null; // Google Map\n" +
-				"    $(\"#map"+mapFuncCount+"\").remove();	// 地図をクリア\n" +
-				//"    $(\"#map-wrapper"+mapFuncCount+"\").append('<div id=\"map"+mapFuncCount+"\" style=\"width: 100%; height: 250px;\"></div>'); // 地図を作成\n" +
-				"    $(\"#map-wrapper"+mapFuncCount+"\").append('<div id=\"map"+mapFuncCount+"\"" +
+				"    $(\"#map"+getCount(mapFuncCount)+"\").remove();	// 地図をクリア\n" +
+				//"    $(\"#map-wrapper"+getCount(mapFuncCount)+"\").append('<div id=\"map"+getCount(mapFuncCount)+"\" style=\"width: 100%; height: 250px;\"></div>'); // 地図を作成\n" +
+				"    $(\"#map-wrapper"+getCount(mapFuncCount)+"\").append('<div id=\"map"+getCount(mapFuncCount)+"\"" +
 						" style=\"width: 100%; height: "+( (!decos.containsKey("height"))? ("250px"):(decos.getStr("height")) )+";\"></div>'); // 地図を作成\n" +
 				"      \n";
     	if(!searchFlg)	statement += "    var sad = \""+geolocation+"\";\n";
-    	else			statement += "    var sad = $(\"#search_map_words"+mapFuncCount+"\").val();\n";
+    	else			statement += "    var sad = $(\"#search_map_words"+getCount(mapFuncCount)+"\").val();\n";
 		statement += 
 				"    var geocoder = new google.maps.Geocoder();\n" +
 				"    geocoder.geocode({'address': sad}, function(results, status) {\n" +
@@ -2712,19 +2965,19 @@ public class HTMLFunction extends Function {
 				"	        center: results[0].geometry.location,\n" +
 				"	        mapTypeId: google.maps.MapTypeId.ROADMAP // 地図の種類(市街地図)\n" +
 				"	      };\n" +
-				"	      map = new google.maps.Map(document.getElementById(\"map"+mapFuncCount+"\"),mapOptions);\n" +
+				"	      map = new google.maps.Map(document.getElementById(\"map"+getCount(mapFuncCount)+"\"),mapOptions);\n" +
 				"      	  new google.maps.Marker({map : map, position : results[0].geometry.location" + ((icon.equals(""))? (""):(", icon : '"+icon+"'")  ) + "}); //\n" +
 				//"	      new google.maps.Marker({map : map, position : results[0].geometry.location});\n" +
 				"      } else {\n" +
 				//"      	  alert('場所を特定できませんでした。入力内容をご確認ください。');\n" +
-				"      	  $(\"#map"+mapFuncCount+"\").text('場所を特定できませんでした。');\n" +
+				"      	  $(\"#map"+getCount(mapFuncCount)+"\").text('場所を特定できませんでした。');\n" +
 				"      }\n" +
 				"    });\n" +
 				"});\n" +
 				"		// -->\n" +
 				"		</script>\n" +
 				"		\n" +
-				"		<div id=\"map-wrapper"+mapFuncCount+"\"></div>";
+				"		<div id=\"map-wrapper"+getCount(mapFuncCount)+"\"></div>";
     	
     			mapFuncCount++;
 
@@ -2758,9 +3011,9 @@ public class HTMLFunction extends Function {
 //				"		\n" +
 //				"		<div id=\"map-wrapper\"></div>";
     	
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
-    	return;
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
+    	return statement;
     }
     //map end
     
@@ -2768,7 +3021,7 @@ public class HTMLFunction extends Function {
     /*  gps(type,icon) or gps_map(type,icon)  */
     /*  type:1 map  */
     /*  type:2 map + button */
-    private void Func_gps() {
+    private String Func_gps() {
 		String statement = "\n";
 		String type = "";
 		String zoom = "";
@@ -2849,14 +3102,14 @@ public class HTMLFunction extends Function {
 //				"			<li>経度:&nbsp;<span id=\"gps_longitude\"></span></li>\n" +
 //				"		</ul>";
 		
-		// 各引数毎に処理した結果をHTMLに書きこむ
-		html_env.code.append(statement);
-    	return;
+//		// 各引数毎に処理した結果をHTMLに書きこむ
+//		html_env.code.append(statement);
+    	return statement;
     }
     //gps end
     //added by goto 20130717  "gps_info"
     /*  gps_info()  */
-    private void Func_gps_info() {
+    private String Func_gps_info() {
     	String statement = "\n";
 //		String format = "";
 //		try{
@@ -2888,15 +3141,15 @@ public class HTMLFunction extends Function {
 				"			<li>経度:&nbsp;<span id=\"gps_longitude\"></span></li>\n" +
 				"		</ul>";
     	
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(statement);
-    	return;
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(statement);
+    	return statement;
     }
     //gps_info end
     
     //added by goto 20130914  "audio"
     /*  audio("HTML・画像・動画ファイル等のファイル名")  */
-    private void Func_audio() {
+    private String Func_audio() {
 //    	String classID = HTMLEnv.getClassID(this);
 //    	HTMLManager.replaceCode(html_env, classID, "");		//直前の<div>に書き込まれているclassIDを削除
     	
@@ -2905,41 +3158,42 @@ public class HTMLFunction extends Function {
     		str = ((FuncArg) this.Args.get(0)).getStr();
     	}catch(Exception e){ }
     	
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append("<audio src=\""+str+"\" controls>\n");
-    	return;
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append("<audio src=\""+str+"\" controls>\n");
+    	return "<audio src=\""+str+"\" controls>\n";
     }
     //audio end
     
     //added by goto 20130914  "movie"
     /*  movie("HTML・画像・動画ファイル等のファイル名")  */
-    private void Func_movie() {
-    	String classID = HTMLEnv.getClassID(this);
-    	HTMLManager.replaceCode(html_env, classID, "");		//直前の<div>に書き込まれているclassIDを削除
+    private String Func_movie() {
+    	String classID = Mobile_HTML5Env.getClassID(this);
+    	Mobile_HTML5Manager.replaceCode(html_env, classID, "");		//直前の<div>に書き込まれているclassIDを削除
     	
     	String str = "";
     	try{
     		str = ((FuncArg) this.Args.get(0)).getStr();
     	}catch(Exception e){ }
     	
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-//    	html_env.code.append("<video src=\""+str+"\" class=\"" + classID +"\">\n</video>\n");
-//    	html_env.code.append("<video src=\""+str+"\" class=\"" + classID +"\" controls>\n</video>\n");
-    	html_env.code.append("<video src=\""+str+"\" class=\"" + classID +"\" preload=\"none\" onclick=\"this.play()\" controls>\n</video>\n");
-//    	html_env.code.append("<video src=\""+str+"\" class=\"" + classID +"\" poster=\"XXX.jpg\" preload=\"none\" onclick=\"this.play()\" controls>\n</video>\n");
-    	return;
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+////    	html_env.code.append("<video src=\""+str+"\" class=\"" + classID +"\">\n</video>\n");
+////    	html_env.code.append("<video src=\""+str+"\" class=\"" + classID +"\" controls>\n</video>\n");
+//    	html_env.code.append("<video src=\""+str+"\" class=\"" + classID +"\" preload=\"none\" onclick=\"this.play()\" controls>\n</video>\n");
+////    	html_env.code.append("<video src=\""+str+"\" class=\"" + classID +"\" poster=\"XXX.jpg\" preload=\"none\" onclick=\"this.play()\" controls>\n</video>\n");
+    	return "<video src=\""+str+"\" class=\"" + classID +"\" preload=\"none\" onclick=\"this.play()\" controls>\n</video>\n";
     }
     //movie end
     
     //added by goto 20130914  "object"
     /*  object("file name")  */
     /*  object("HTML・PDF・FLASH・画像・動画・PHP・JSファイル等のファイル名")  */
-    private void Func_object(String path) {
-    	String classID = HTMLEnv.getClassID(this);
+    private String Func_object(String path) {
+    	String statement = "";
+    	String classID = Mobile_HTML5Env.getClassID(this);
 
     	//not @{table}
-    	if(!decos.containsKey("table") && !HTMLC1.table0Flg && !HTMLC2.tableFlg && !HTMLG1.tableFlg && !HTMLG2.tableFlg)
-    		HTMLManager.replaceCode(html_env, classID, "");		//直前の<div>に書き込まれているclassIDを削除
+    	if(!decos.containsKey("table") && !Mobile_HTML5C1.table0Flg && !Mobile_HTML5C2.tableFlg && !Mobile_HTML5G1.tableFlg && !Mobile_HTML5G2.tableFlg)
+    		Mobile_HTML5Manager.replaceCode(html_env, classID, "");		//直前の<div>に書き込まれているclassIDを削除
     	
     	if(path.equals("")){
 			try{
@@ -2956,28 +3210,32 @@ public class HTMLFunction extends Function {
 				while (true){
 					line = in.readLine();
 					if (line == null)	break;
-					else html_env.code.append(line+"\n");
+					else statement += line+"\n";
 				}
 			}catch(Exception e){
 				System.err.println("<Warning> Can't open '"+path+"'.");
 			}
 		}else if(path.endsWith(".js"))	//.js file
-			html_env.code.append("<script type=\"text/javascript\" src=\""+path+"\">\n</script>\n");
+			statement += "<script type=\"text/javascript\" src=\""+path+"\">\n</script>\n";
 		else	//.html, .pdf, .swf, .gif, .mp4, etc.
-			html_env.code.append("<object data=\""+path+"\" class=\"" + classID +"\" >\n</object>\n");
-    	return;
+			statement += "<object data=\""+path+"\" class=\"" + classID +"\" >\n</object>\n";
+    	return statement;
     }
     //object end
     
 	//added by goto 20130914  "SEQ_NUM"
 	static ArrayList<Integer> seq_num = new ArrayList<Integer>();
 	static ArrayList<String> seq_num_ClassID = new ArrayList<String>();
+	static ArrayList<Integer> seq_num_gl = new ArrayList<Integer>();
 	static ArrayList<Integer> seq_num_startNum = new ArrayList<Integer>();
 	static ArrayList<Boolean> seq_num_DESC_Flg = new ArrayList<Boolean>();
     static String classID = "";
+    static int glvl = 0;
     /*  SEQ_NUM( [Start number [, ASC or DESC] ] )  */
-    private void Func_seq_num() {
-    	classID = HTMLEnv.getClassID(this);
+    private String Func_seq_num() {
+    	String s = "";
+    	classID = Mobile_HTML5Env.getClassID(this);
+    	
     	int i;
     	for(i=0; i<seq_num_ClassID.size()+1; i++){
     		try{
@@ -2985,6 +3243,7 @@ public class HTMLFunction extends Function {
 		    		break;
     		}catch(Exception e1){
 	    		seq_num_ClassID.add(i, classID);
+	    		seq_num_gl.add(i, glvl);
 				try{
 					//第一引数 Start number
 					seq_num_startNum.add(i, Integer.parseInt(getValue(1)));
@@ -3000,31 +3259,48 @@ public class HTMLFunction extends Function {
     		}
     	}
     	
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(""+((!seq_num_DESC_Flg.get(i))? (seq_num.get(i)):(seq_num.get(i))));
+    	s = ""+((!seq_num_DESC_Flg.get(i))? (seq_num.get(i)):(seq_num.get(i)));
+    	//Log.i("s = "+s+"  "+nestingLevel+"  "+adjustValue(s));
+    	s = adjustValue(s);
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(""+((!seq_num_DESC_Flg.get(i))? (seq_num.get(i)):(seq_num.get(i))));
     	if(!seq_num_DESC_Flg.get(i))	seq_num.set(i,seq_num.get(i)+1);
-    	else					seq_num.set(i,seq_num.get(i)-1);
-    	return;
+    	else							seq_num.set(i,seq_num.get(i)-1);
+    	return s;
     }
     //seq_num end
 	//added by goto 20130914  "SEQ_NUM"
-    static void Func_seq_num_initialization() {		//initialize seq_num
+    static void Func_seq_num_initialization(int gl) {		//initialize seq_num
+    	//Log.i(" !! Func_seq_num_initialization !! ");
     	try{
-        	for(int i=0; i<seq_num_ClassID.size(); i++){
-        		if(seq_num_ClassID.get(i).equals(classID)){
-        			seq_num.set(i, seq_num_startNum.get(i));	//replace
-        			break;
-        		}
-        	}
-        }catch(Exception e){}
+    		for(int i=0; i<seq_num_ClassID.size(); i++){
+    			if(seq_num_ClassID.get(i).equals(classID) && seq_num_gl.get(i)==gl){
+    				for(int j=i; j>=0; j--){
+    					if(seq_num_gl.get(j)==gl){
+    						seq_num.set(j, seq_num_startNum.get(j));	//replace
+    					}
+    					if(seq_num_gl.get(j)!=gl)	break;
+    				}
+    				break;
+    			}
+    		}
+    	}catch(Exception e){}
     	return;
+    }
+    static String adjustValue(String s){
+    	try{
+    		if(nestingLevel > 0){
+    			s = ""+Integer.parseInt(s)/(nestingLevel*2);
+    		}
+    	}catch(Exception e){}
+		return s;
     }
 
 	//added by goto 20130914  "text"
     /*  text("#TextLabel_" + Number)  */
 //    static String text = "";
     static boolean textFlg2 = false; //for C2
-    private void Func_text() {
+    private String Func_text() {
 //    	html_env.code.delete(html_env.code.lastIndexOf("<"),html_env.code.lastIndexOf(">")+1);	//delete last <div class="">
 //    	html_env.code.delete(html_env.code.lastIndexOf("<"),html_env.code.lastIndexOf(">")+1);	//delete last <div class="">
     	//TODO: 改行コード削除
@@ -3041,10 +3317,10 @@ public class HTMLFunction extends Function {
 		}catch(Exception e){ }
     	
 		
-//		text = str;
-    	// 各引数毎に処理した結果をHTMLに書きこむ
-    	html_env.code.append(str);
-    	return;
+////		text = str;
+//    	// 各引数毎に処理した結果をHTMLに書きこむ
+//    	html_env.code.append(str);
+    	return str;
     }
     //text end
     
@@ -3059,7 +3335,7 @@ public class HTMLFunction extends Function {
     	boolean openFormInThis = false;
 
     	//submit only ----- no "@{form}"
-    	if(!HTMLEnv.getFormItemFlg() && !decos.containsKey("form")){
+    	if(!Mobile_HTML5Env.getFormItemFlg() && !decos.containsKey("form")){
     		form = createForm();
         	openFormInThis = true;
     	}else if(decos.containsKey("form")){
@@ -3068,7 +3344,7 @@ public class HTMLFunction extends Function {
     	}
 
 
-		HTMLEnv.setFormItemFlg(true,"submit");
+		Mobile_HTML5Env.setFormItemFlg(true,"submit");
 
     	String value = new String();
     	if(!this.getAtt("value").equals(null)){
@@ -3085,10 +3361,10 @@ public class HTMLFunction extends Function {
 
     	if(openFormInThis == true){
     		form += "</form>";
-    		HTMLEnv.setFormItemFlg(false,null);
+    		Mobile_HTML5Env.setFormItemFlg(false,null);
     		openFormInThis = false;
     	}else{
-    		HTMLEnv.setFormItemFlg(true,null);
+    		Mobile_HTML5Env.setFormItemFlg(true,null);
     	}
 
         html_env.code.append(form);
@@ -3111,7 +3387,7 @@ public class HTMLFunction extends Function {
 		Func_FormCommon("checkbox");
 
 		if(!this.getAtt("checked").equals("")){
-        	HTMLEnv.setChecked(this.getAtt("checked"));
+        	Mobile_HTML5Env.setChecked(this.getAtt("checked"));
         }
 
         return;
@@ -3120,7 +3396,7 @@ public class HTMLFunction extends Function {
     private void Func_radio() {
 
 		if(!this.getAtt("checked").equals("")){
-        	HTMLEnv.setChecked(this.getAtt("checked"));
+        	Mobile_HTML5Env.setChecked(this.getAtt("checked"));
         }
 
 		Func_FormCommon("radio");
@@ -3149,12 +3425,12 @@ public class HTMLFunction extends Function {
 
     	boolean openFormInThis = false;
 
-    	if(!HTMLEnv.getFormItemFlg()){
+    	if(!Mobile_HTML5Env.getFormItemFlg()){
     		form = createForm();
         	openFormInThis = true;
     	}
 
-		HTMLEnv.setFormItemFlg(true,s);
+		Mobile_HTML5Env.setFormItemFlg(true,s);
 
         String att = new String();
         Integer attNo = 1;
@@ -3171,21 +3447,21 @@ public class HTMLFunction extends Function {
         }
 
         if(!this.getAtt("name").equals("")){
-        	HTMLEnv.setFormPartsName(this.getAtt("name"));
-        	HTMLEnv.exFormName();
+        	Mobile_HTML5Env.setFormPartsName(this.getAtt("name"));
+        	Mobile_HTML5Env.exFormName();
         }else{
-        	HTMLEnv.setFormPartsName(null);
+        	Mobile_HTML5Env.setFormPartsName(null);
         }
 
         if(!this.getAtt("id").equals("")){
-        	HTMLEnv.nameId = this.getAtt("id");
+        	Mobile_HTML5Env.nameId = this.getAtt("id");
         }
 
         if(!this.getAtt("cond_name").equals("")){
-        	HTMLEnv.cond_name = this.getAtt("cond_name");
+        	Mobile_HTML5Env.cond_name = this.getAtt("cond_name");
         }
         if(!this.getAtt("cond").equals("")){
-        	HTMLEnv.cond = this.getAtt("cond");
+        	Mobile_HTML5Env.cond = this.getAtt("cond");
         }
 
 
@@ -3194,7 +3470,7 @@ public class HTMLFunction extends Function {
         if(this.Args.get(0) instanceof FuncArg)
         {
         	//HTMLEnv.setSelectFlg(true,(String)this.decos.get("select"));
-        	HTMLEnv.setFormValueString(att);
+        	Mobile_HTML5Env.setFormValueString(att);
         	Log.out("ARGS are function");
         	FuncArg fa = (FuncArg) this.Args.get(0);
         	fa.workAtt();
@@ -3205,10 +3481,10 @@ public class HTMLFunction extends Function {
 
     	if(openFormInThis == true){
     		html_env.code.append("</form>");
-    		HTMLEnv.setFormItemFlg(false,null);
+    		Mobile_HTML5Env.setFormItemFlg(false,null);
         	openFormInThis = false;
     	}else{
-    		HTMLEnv.setFormItemFlg(true,null);
+    		Mobile_HTML5Env.setFormItemFlg(true,null);
     	}
         return;
     }
@@ -3281,7 +3557,7 @@ public class HTMLFunction extends Function {
     		path = ".";
     	}
 
-    	form = "<form method=\"POST\" action=\"" + path + "/supersql.form.FormServlet\" " + "name=\""+ HTMLEnv.getFormName() + "\" " +">";
+    	form = "<form method=\"POST\" action=\"" + path + "/supersql.form.FormServlet\" " + "name=\""+ Mobile_HTML5Env.getFormName() + "\" " +">";
 
 
     	form += "<input type=\"hidden\" name=\"configfile\" value=\"" +
@@ -3310,7 +3586,7 @@ public class HTMLFunction extends Function {
         	form += "<input type=\"hidden\" name=\"linkcond\" value=\"" + decos.getStr("cond").replaceAll("\"", "")+"\" />";
         }
         Log.out(form);
-        HTMLEnv.setFormDetail(form);
+        Mobile_HTML5Env.setFormDetail(form);
         return form;
     }
 
@@ -3450,7 +3726,7 @@ public class HTMLFunction extends Function {
         	if(decos.containsKey("class"))
         		html_env.code.append(decos.getStr("class"));
         	else
-        		html_env.code.append(HTMLEnv.getClassID(this));
+        		html_env.code.append(Mobile_HTML5Env.getClassID(this));
 
         	html_env.code.append("\"");
         	html_env.code.append("><tr><td>");
@@ -3586,7 +3862,7 @@ public class HTMLFunction extends Function {
 
     	html_env.embedcount++;
 
-    	if(file.contains(".sql"))
+    	if(file.contains(".sql") || file.contains(".ssql"))
     	{
 
     		String makedfilename = file.substring(file.lastIndexOf("\\")+1, file.indexOf("."));
@@ -3656,20 +3932,27 @@ public class HTMLFunction extends Function {
 				{
 					if(!has_divid)
 					{
+						int x = 0;
+						if (file.indexOf(".sql")>0) {
+							x = file.indexOf(".sql");
+						} else if (file.indexOf(".ssql")>0) {
+							x = file.indexOf(".ssql");
+						}
+
 						//online file
 						if(file.contains("/"))
 						{
-							divname = file.substring(file.lastIndexOf("/")+1,file.indexOf(".sql"));
+							divname = file.substring(file.lastIndexOf("/")+1,x);
 						}
 						//ofline file
 						else if(file.contains("\\"))
 						{
-							divname = file.substring(file.lastIndexOf("\\")+1,file.indexOf(".sql"));
+							divname = file.substring(file.lastIndexOf("\\")+1,x);
 						}
 						//only file name
 						else
 						{
-							divname = file.substring(0,file.indexOf(".sql"));
+							divname = file.substring(0,x);
 						}
 					}
 
@@ -3907,6 +4190,8 @@ public class HTMLFunction extends Function {
 		try{
 			if(file.toLowerCase().contains(".sql")){
 				file = file.substring(0, file.indexOf(".sql"));
+			}else if(file.toLowerCase().contains(".ssql")){
+				file = file.substring(0, file.indexOf(".ssql"));
 			}else if(file.toLowerCase().contains(".html")){
 				file = file.substring(0, file.indexOf(".html"));
 			}
@@ -3948,7 +4233,7 @@ public class HTMLFunction extends Function {
         if(GlobalEnv.isAjax())
         {
         	html_env.linkurl =  file+".html";
-        	html_env.ajaxquery = file+".sql";
+        	html_env.ajaxquery = file+".ssql";
 //        	html_env.ajaxatt = this.getAtt("att");
         	html_env.ajaxcond = this.getAtt("ajaxcond")+"="+this.getAtt("att");
 
@@ -4100,4 +4385,10 @@ public class HTMLFunction extends Function {
 			return Integer.MIN_VALUE;
 		}
     }
+    
+    //20131118 dynamic
+    private String getCount(int count){
+    	return count+Mobile_HTML5.getDynamicLabel();
+    }
+    
 }

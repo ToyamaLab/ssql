@@ -5,7 +5,7 @@ import org.jsoup.parser.Tag;
 
 import supersql.codegenerator.Grouper;
 import supersql.codegenerator.Manager;
-import supersql.codegenerator.Mobile_HTML5.HTMLFunction;
+import supersql.codegenerator.Mobile_HTML5.Mobile_HTML5Function;
 import supersql.common.GlobalEnv;
 import supersql.extendclass.ExtList;
 
@@ -48,6 +48,7 @@ public class HTMLG2 extends Grouper {
 		nodeCreationPreProcess(result);
 
 		while (this.hasMoreItems()) {
+			HTMLFunction.glvl = HTMLEnv.gLevel;	//added by goto 20130914  "SEQ_NUM"
 			HTMLEnv.gLevel++;
 			HTMLUtils.propagateDeco(tfe, decos);
 			result.appendChild((Element) this.createNextItemNode());
@@ -94,7 +95,7 @@ public class HTMLG2 extends Grouper {
 			}
 		}
 		HTMLUtils.processDecos(result, decos);
-		supersql.codegenerator.HTML.HTMLFunction.Func_seq_num_initialization();	//added by goto 20130914  "SEQ_NUM"
+		HTMLFunction.Func_seq_num_initialization(HTMLEnv.gLevel);	//added by goto 20130914  "SEQ_NUM"
 	}
 
 	@Override

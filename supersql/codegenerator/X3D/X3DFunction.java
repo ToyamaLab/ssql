@@ -16,7 +16,8 @@ public class X3DFunction extends Function{
 	    }
 
 	    @Override
-		public void work(ExtList data_info) {
+		public String work(ExtList data_info) {
+			return null;
 	    }
 
 }

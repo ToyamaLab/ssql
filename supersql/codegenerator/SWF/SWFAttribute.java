@@ -65,7 +65,7 @@ public class SWFAttribute extends Attribute implements SWFTFE{
 	}
 
 	@Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 		margin = swf_env.margin;
 		fontsize = swf_env.fontSize;
 		this.value = new SWFValue("Att");
@@ -156,6 +156,7 @@ public class SWFAttribute extends Attribute implements SWFTFE{
 		}
 		swf_env.interactionNUM++;
 		swf_env.interactionImgNUM++;
+		return null;
 	}
 
 	public void setDecoration1(){

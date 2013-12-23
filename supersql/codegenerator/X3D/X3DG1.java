@@ -20,7 +20,7 @@ public class X3DG1 extends Grouper{
 
 
     @Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
         Log.out("------- G1 -------");
         this.setDataList(data_info);
 
@@ -52,13 +52,14 @@ public class X3DG1 extends Grouper{
             x3d_env.glevel--;
             X3DEnv.groupflag = 1;
             
-            /*’I‚ğ…•½•ûŒü‚É‚¸‚ç‚·*/
+            /*ï¿½Iï¿½ğ…•ï¿½ï¿½ï¿½ï¿½É‚ï¿½ï¿½ç‚·*/
             if (i%4 == 0) {
             X3DEnv.x += 4;
             X3DEnv.bx = X3DEnv.x-0.20;
             add = true;
             }
         }
+		return null;
     }
 
     @Override

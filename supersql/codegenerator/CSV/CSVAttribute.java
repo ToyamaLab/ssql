@@ -14,9 +14,10 @@ public class CSVAttribute extends Attribute {
         this.csvEnv = xenv;
     }
 
-    public void work(ExtList data_info){
+    public String work(ExtList data_info){
     	value = this.getStr(data_info);
         csvEnv.code.append(value + ", ");
+		return null;
     }
 }
 

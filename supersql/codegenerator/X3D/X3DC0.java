@@ -22,12 +22,13 @@ public class X3DC0 extends Connector{
        
        String vxs, vys, vzs;
 	@Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 
 		this.setDataList(data_info);
 		while (this.hasMoreItems()) {
 			this.worknextItem();
 		}
+		return null;
 
 	}
 

@@ -64,7 +64,9 @@ public class Grouper extends Operator {
         return "G?";
     }
 
-    public void work(ExtList data_info) {
+    public String work(ExtList data_info) {
+		return null;
+//		return aggregate;
     }
 
     public int countconnectitem() {

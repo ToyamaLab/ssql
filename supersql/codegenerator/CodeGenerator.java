@@ -1,5 +1,7 @@
 package supersql.codegenerator;
 
+import java.util.ArrayList;
+
 import supersql.codegenerator.HTML.HTMLFactory;
 import supersql.codegenerator.Mobile_HTML5.Mobile_HTML5Factory;
 import supersql.codegenerator.PDF.PDFFactory;
@@ -7,7 +9,9 @@ import supersql.codegenerator.SWF.SWFFactory;
 import supersql.codegenerator.X3D.X3DFactory;
 import supersql.codegenerator.XML.XMLFactory;
 import supersql.common.GlobalEnv;
+import supersql.common.LevenshteinDistance;
 import supersql.common.Log;
+import supersql.common.ParseXML;
 import supersql.extendclass.ExtList;
 import supersql.parser.SSQLparser;
 
@@ -67,10 +71,18 @@ public class CodeGenerator{
 		 * XMLFactory(); }
 		 */
 		else {
-			System.err.println("Error[Media]: valid medium not found");
-			GlobalEnv.addErr("Error[Media]: valid medium not found");
-			//comment out  by chie
-			//System.exit(-1);
+			String m = media.toLowerCase();
+			System.err.println("Error[Media]: valid medium '"+m+"' not found");
+			GlobalEnv.addErr("Error[Media]: valid medium '"+m+"' not found");
+			
+			//20131106
+			//Log.err("\nGENERATE >>>> "+m+" <<<<");
+			String XMLfile = GlobalEnv.MEDIA_XML;
+			ArrayList<String> medias = ParseXML.getAttributes(XMLfile, "media", "name");
+			String media_list = LevenshteinDistance.checkLevenshteinAndSuggest(m, medias);
+			if(!media_list.isEmpty())
+				Log.err("\n## Media list ##\n" + media_list);
+			System.exit(1);
 		}
 	}
 

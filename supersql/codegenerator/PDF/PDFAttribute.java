@@ -41,7 +41,7 @@ public class PDFAttribute extends Attribute implements PDFTFE {
 
 	//Attributeのworkメソッド
 	@Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 		
 //		int level = pdf_env.level;
 		
@@ -118,6 +118,7 @@ public class PDFAttribute extends Attribute implements PDFTFE {
 		//追加10.17
 		pdf_env.tmp_width = box_width;
 		pdf_env.tmp_height = box_height;
+		return null;
 		
 		//退避していた装飾情報を戻す to PDFEnv
 		

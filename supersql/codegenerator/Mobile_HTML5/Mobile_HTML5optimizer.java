@@ -22,11 +22,11 @@ import org.xml.sax.InputSource;
 
 import supersql.common.Log;
 
-public class HTMLoptimizer {
+public class Mobile_HTML5optimizer {
 	//created by chie
 	//2007-2009
 
-	public HTMLoptimizer() {
+	public Mobile_HTML5optimizer() {
 	}
 	
 	StringBuffer htmlcode = new StringBuffer();
@@ -167,9 +167,9 @@ public class HTMLoptimizer {
 			
 			//add 200909 form
 			if(xml_str.contains("<form")){
-				for(int i = 1; i < HTMLEnv.getFormNumber();i++){
+				for(int i = 1; i < Mobile_HTML5Env.getFormNumber();i++){
 					if(xml_str.contains("<form" + i + "start/>")){
-						xml_str = xml_str.replace("<form" + i + "start/>",HTMLEnv.getFormDetail(i));
+						xml_str = xml_str.replace("<form" + i + "start/>",Mobile_HTML5Env.getFormDetail(i));
 					}
 					if(xml_str.contains("<form" + i + "end/>")){
 						xml_str = xml_str.replace("<form" + i + "end/>","</form>");
@@ -1042,18 +1042,18 @@ public class HTMLoptimizer {
 					
 				}
 				
-				//add 200909
-				if(nowNode.getNodeName().contains("form")){
-					Document doc = par.getOwnerDocument();
-					Element str = doc.createElement(nowNode.getNodeName().toString());
-					Log.out(nowNode.getNodeName().toString());
-					if(nowNode.getNodeName().contains("start")){
-						h.appendChild(str);
-					}
-					if(nowNode.getNodeName().contains("end")){
-						h.getParentNode().appendChild(str);
-					}
-				}
+//				//add 200909
+//				if(nowNode.getNodeName().contains("form")){
+//					Document doc = par.getOwnerDocument();
+//					Element str = doc.createElement(nowNode.getNodeName().toString());
+//					Log.out(nowNode.getNodeName().toString());
+//					if(nowNode.getNodeName().contains("start")){
+//						h.appendChild(str);
+//					}
+//					if(nowNode.getNodeName().contains("end")){
+//						h.getParentNode().appendChild(str);
+//					}
+//				}
 				
 				
 				//saiki

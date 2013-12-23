@@ -169,7 +169,9 @@ public class Attribute extends Operand {
 		return attno;
 	}
 
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
+		return null;
+//		return aggregate;
 	}
 
 	public <T> String getStr(ExtList<T> data_info) {

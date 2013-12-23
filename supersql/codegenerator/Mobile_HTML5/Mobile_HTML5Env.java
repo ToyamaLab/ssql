@@ -19,7 +19,7 @@ import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.parser.SSQLparser;
 
-public class HTMLEnv extends LocalEnv {
+public class Mobile_HTML5Env extends LocalEnv {
     String data;
 
     String pre_operator;
@@ -51,9 +51,9 @@ public class HTMLEnv extends LocalEnv {
 //				"}\n";
 //    public static String PHPfunc = "";	//added by goto 20130531 
     
-    static boolean dynamicFlg = false;			//20130529  dynamic
-    static StringBuffer staticBuf;				//20130529  dynamic
-    static StringBuffer dynamicBuf;				//20130529  dynamic
+//    static boolean dynamicFlg = false;			//20130529  dynamic
+//    static StringBuffer staticBuf;				//20130529  dynamic
+//    static StringBuffer dynamicBuf;				//20130529  dynamic
     
     //Vector not_written_classid;
     Vector<String> not_written_classid= new Vector();
@@ -90,7 +90,7 @@ public class HTMLEnv extends LocalEnv {
 	String copyright="";					//added by goto 20130518
 	String fff = "";						//20130518  "show query"
 
-	Boolean nobarFlg = false;				//20130521  "nobar"
+	Boolean flickBarFlg = false;				//20130521  "flickbar"
 	
     //tk start///////////////////////////////////////////////////
     StringBuffer meta = new StringBuffer();
@@ -152,12 +152,14 @@ public class HTMLEnv extends LocalEnv {
     static int maxTab = 15;				//20130330  tab用
     
 	static String divWidth = "";		//20131002
+	
+	static boolean noAd = false;		//20131106
     
 
     // ��?�Ѥ�CSS CLASS����?��?
     private String KeisenMode = "";
 
-    public HTMLEnv() {
+    public Mobile_HTML5Env() {
     }
 
     public String getEncode(){
@@ -292,7 +294,9 @@ public class HTMLEnv extends LocalEnv {
 //退避	        header.append("<link rel=\"stylesheet\" href=\"js/jqm-icon-pack-2.0-original.css\"/>\n");
 	        header.append("<link rel=\"stylesheet\" href=\"jscss/jquery-ui.css\"/>\n");
             header.append("<link rel=\"stylesheet\" href=\"jscss/jquery.mobile-1.3.1.min.css\"/>\n");
+            header.append("<link rel=\"stylesheet\" href=\"jscss/jqm-datebox.min.css\"/>\n");
             header.append("<link rel=\"stylesheet\" href=\"jscss/jqm-icon-pack-2.0-original.css\"/>\n");
+            header.append("<link rel=\"stylesheet\" href=\"jscss/jquery.simplePagination.css\"/>\n");
             //header.append("<link rel=\"stylesheet\" href="css/custom.css\"/>\n");
             //20130206
             //※※　要注意　※※　 jquery.jsより先にjquerymobile.jsをインポートすると、ボタン等の表示がうまくいかなくなる!!
@@ -302,7 +306,13 @@ public class HTMLEnv extends LocalEnv {
 //退避            header.append("<script src=\"js/jquery.mobile.dynamic.popup.js\"></script>\n");
             header.append("<script src=\"jscss/jquery-1.7.1.min.js\"></script>\n");
             header.append("<script src=\"jscss/jquery-ui.min.js\"></script>\n");
+            header.append("<script src=\"jscss/showmore.js\"></script>\n");
             header.append("<script src=\"jscss/jquery.mobile-1.3.1.min.js\"></script>\n");
+            header.append("<script src=\"jscss/jqm-datebox.core.min.js\"></script>\n");
+            header.append("<script src=\"jscss/jqm-datebox.mode.calbox.min.js\"></script>\n");
+            header.append("<script src=\"jscss/jqm-datebox.mode.datebox.min.js\"></script>\n");
+            header.append("<script src=\"jscss/jqm-datebox.mode.flipbox.min.js\"></script>\n");
+            header.append("<script src=\"jscss/jquery.simplePagination.js\"></script>\n");
             header.append("<script src=\"jscss/jquery.mobile.dynamic.popup.js\"></script>\n");
             //header.append("<script src=\"js/config.js\"></script>\n");
 
@@ -324,6 +334,7 @@ public class HTMLEnv extends LocalEnv {
 //退避    		header.append("<script src=\"http://www.db.ics.keio.ac.jp/ssqljscss/jquery.iframe-auto-height.plugin.js\"></script>\n");
 //退避    		header.append("<script src=\"http://www.db.ics.keio.ac.jp/ssqljscss/script2.js\"></script>\n");
     		header.append("<script src=\"jscss/jquery.iframe-auto-height.plugin.js\"></script>\n");
+    		header.append("<script src=\"jscss/jquery.validate.min.js\"></script>\n");
     		header.append("<script src=\"jscss/script2.js\"></script>\n");
 
     		
@@ -356,6 +367,7 @@ public class HTMLEnv extends LocalEnv {
             header.append("<!-- div{ text-align:center; float:center; vertical-align:middle; } -->\n");
             //20130315	"長い文字が...と省略されるのを防ぐ (*:全てのタイプに適用) "
             header.append("<!-- * { white-space: normal; } -->\n");
+            header.append("<!-- .error{ color:red; text-align:left; display:block; } -->\n");
             header.append("<!--\n");
             header.append(".ui-grid { overflow: hidden; }\n");
             header.append(".ui-block { margin: 0; padding: 0; border: 0; float: left; min-height: 1px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; }\n");
@@ -427,7 +439,7 @@ public class HTMLEnv extends LocalEnv {
 	            //added by goto 20121222 start, changed by goto 20130110
 	            //js/script1.jsの生成・書き込み
 	            // TODO: 下記の場所を他へ変更（下記だと複数回生成・書き込みが行われる）
-	            // TODO: -outdir?時の処理（下記は、出力先が.sqlファイル格納場所に限定）
+	            // TODO: -outdir?時の処理（下記は、出力先が.ssqlファイル格納場所に限定）
 	//            System.out.println("GlobalEnv.getfilename()="+GlobalEnv.getfilename());
 	            String fileName=GlobalEnv.getfilename();
 	            String fileDir = "";
@@ -635,6 +647,26 @@ public class HTMLEnv extends LocalEnv {
 	//              			"	$( \"#tabs\" ).tabs();\n" +
 	              			"});\n");
 	              	
+	              	//form validation
+	              	pw.println("\n/** <form> validation **/\n" +
+	              			"$(document).ready(function () {\n" +
+	              			"	jQuery.validator.addMethod(\n" +
+	              			"	  \"jqValidate_TelephoneNumber\", function(value, element) {\n" +
+	              			"	     return this.optional(element) || new RegExp(\"^[0-9\\-]+$\").test(value);\n" +
+	              			"	   }, \"Please enter a valid telephone number.\"\n" +
+	              			"	);\n" +
+	              			"	jQuery.validator.addMethod(\n" +
+	              			"	  \"jqValidate_Alphabet\", function(value, element) {\n" +
+	              			"	     return this.optional(element) || new RegExp(\"^[a-zA-Z]+$\").test(value);\n" +
+	              			"	   }, \"You can enter only the alphabet.\"\n" +
+	              			"	);\n" +
+	              			"	jQuery.validator.addMethod(\n" +
+	              			"	  \"jqValidate_AlphabetNumber\", function(value, element) {\n" +
+	              			"	     return this.optional(element) || new RegExp(\"^[0-9a-zA-Z]+$\").test(value);\n" +
+	              			"	   }, \"You can enter only the alphabet and a number.\"\n" +
+	              			"	);\n" +
+	              			"});\n");
+	              	
 	//              	//added by goto 20130503
 	//              	//panel
 	//              	pw.println("$(document).on('click',\"button.open\",function(){\n" +
@@ -665,7 +697,7 @@ public class HTMLEnv extends LocalEnv {
 	        //added by goto 20130508  "Login&Logout" start
 	        //ログイン・ログアウト・新規登録
 	        if(SSQLparser.sessionFlag){
-	        	String s = SSQLparser.sessionString;
+	        	String s = SSQLparser.sessionString.trim();
 	        	//Log.i("sessionString:" + s);
 	        	
 	        	//置換 ( " , "  ->  " ; " )
@@ -684,7 +716,9 @@ public class HTMLEnv extends LocalEnv {
 	        	
 	        	String sessionVariable_UniqueName = "ssql_";		//セッション変数に使用するユニークな名前（session()の最後から取ってくる）
 	        	
-	        	String s_val = s.substring("session".length(),s.indexOf("(")).trim();
+	        	String s_val = "";
+	        	if(s.startsWith("login"))	s_val = s.substring("login".length(),s.indexOf("(")).trim();
+	        	else						s_val = s.substring("session".length(),s.indexOf("(")).trim();
 	        	if(s_val.equals(""))		s_val = "1";
 //	        	Log.i("s_val:" + s_val);
 	        	String DB = GlobalEnv.getdbname();										//DB
@@ -777,7 +811,7 @@ public class HTMLEnv extends LocalEnv {
 	        	//Log.i(c1str+c1+"   "+c2str+c2+"      "+c3+"   from:"+from+"   DB:"+DB+"	DBMS:"+DBMS);
 	        	
 	        	//sqlite3 php
-	        	if(DBMS.equals("sqlite3")){
+	        	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
 	        		if(s_val.equals("1") || s_val.equals("2")){
 		        		header.append("\n" +
 		        				"<!-- \"Login & Logout\" start -->\n" +
@@ -809,8 +843,11 @@ public class HTMLEnv extends LocalEnv {
 		        				"<!-- Login & Registration start -->\n" +
 		        				"<!-- Login Panel start -->\n" +
 		        				"<br>\n" +
-		        				"<div id=\"LOGINpanel1\" style=\"background-color:whitesmoke; border-radius:20px; border:5px gray solid;\" data-role=\"none\">\n" +
-		        				"<div style=\"color:lightgray; font-size:30; background-color:black; border-radius:15px 15px 0px 0px;\" id=\"loginTitle1\">Log in</div>\n" +
+		        				//"<div id=\"LOGINpanel1\" style=\"background-color:black; width:100%;\" data-role=\"none\">\n" +
+		        				//"<div id=\"LOGINpanel1\" style=\"background-color:whitesmoke; border-radius:20px; border:5px gray solid;\" data-role=\"none\">\n" +
+		        				"<div id=\"LOGINpanel1\" style=\"background-color:whitesmoke; border-radius:10px; border:3px gray solid;\" data-role=\"none\">\n" +
+		        				//"<div style=\"color:lightgray; font-size:30; background-color:black; border-radius:15px 15px 0px 0px;\" id=\"loginTitle1\">Log in</div>\n" +
+		        				"<div style=\"color:lightgray; font-size:30; background-color:black; border-radius:5px 5px 0px 0px;\" id=\"loginTitle1\">Log in</div>\n" +
 		        				"<br>\n" +
 		        				"<form method=\"post\" action=\"\" target=\"login_ifr1\">\n" +
 		        				"<div>\n" +
@@ -1402,7 +1439,7 @@ public class HTMLEnv extends LocalEnv {
 	        				"<iframe name=\"logout_ifr1\" style=\"display:none;\"></iframe>\n" +
 	        				"\n");
     				//通常時のみ（Prev/Nextでは行わない）&& ( header()があるとき || button("logout")があるとき )
-    				if(headerFlag==1 && ( !HTMLFunction.headerString.equals("") || HTMLFunction.logoutButtonFlg ))
+    				if(headerFlag==1 && ( !Mobile_HTML5Function.headerString.equals("") || Mobile_HTML5Function.logoutButtonFlg ))
     				header.append(
     						"<script type=\"text/javascript\">\n" +
 							"$(document).ready(function(){\n" +
@@ -1446,9 +1483,9 @@ public class HTMLEnv extends LocalEnv {
 	        //added by goto 20130508  "Login&Logout" end
 	        
 	        if(headerFlag==1){		//通常時のみ（Prev/Nextでは行わない）
-		        if(!HTMLFunction.headerString.equals("")){		//data-role="header"
+		        if(!Mobile_HTML5Function.headerString.equals("")){		//data-role="header"
 		        	header.append("\n<!-- data-role=header start -->\n"
-						+HTMLFunction.headerString+"<!-- data-role=header end -->\n\n\n");
+						+Mobile_HTML5Function.headerString+"<!-- data-role=header end -->\n\n\n");
 		        }
 	        }
 	        //data-role="content"
@@ -1546,32 +1583,35 @@ public class HTMLEnv extends LocalEnv {
 
     	if(GlobalEnv.getframeworklist() == null){
     		if(footerFlag==1){		//通常時のみ（Prev/Nextでは行わない）
-    			footer.append("<hr size=\"1\">");
-	    		if(!copyright.equals("")){	//copyrightの宣伝を付加
+    			if(!noAd || !copyright.isEmpty())
+    				footer.append("<hr size=\"1\">");
+	    		if(!copyright.equals("")){	//copyrightを付加
 	    			footer.append("<div>\n");
 	    			footer.append("Copyright &COPY; "+copyright+" All Rights Reserved.\n");
 	    			footer.append("</div>\n\n");
 	    		}
-	    		//SuperSQLの宣伝を付加
-	    		footer.append("<div style=\"font-size:11;\">\n");
-	//    		footer.append("<a href=\""+filename.substring(0,filename.lastIndexOf(".html"))+"_sql.html\" target=\"_self\">This HTML</a> was generated by <a href=\"http://ssql.db.ics.keio.ac.jp/\" target=\"_self\">SuperSQL</a>\n");
-	    		if(fff.equals(""))	footer.append("This HTML was generated by <a href=\"http://ssql.db.ics.keio.ac.jp/\" rel=\"external\">SuperSQL</a>\n");
-	    		else				footer.append("<a href=\""+ fff +"\" target=\"_self\">This HTML</a> was generated by <a href=\"http://ssql.db.ics.keio.ac.jp/\" rel=\"external\">SuperSQL</a>\n");
-				//footer.append("<a href=\""+filename+"_sql.html\" target=\"_self\">This HTML</a> was generated by <a href=\"http://ssql.db.ics.keio.ac.jp/\" target=\"_self\">SuperSQL</a>\n");
-				footer.append("</div>\n\n");
+	    		if(!noAd){
+		    		//SuperSQLの宣伝を付加
+		    		footer.append("<div style=\"font-size:11;\">\n");
+		//    		footer.append("<a href=\""+filename.substring(0,filename.lastIndexOf(".html"))+"_sql.html\" target=\"_self\">This HTML</a> was generated by <a href=\"http://ssql.db.ics.keio.ac.jp/\" target=\"_self\">SuperSQL</a>\n");
+		    		if(fff.equals(""))	footer.append("This HTML was generated by <a href=\"http://ssql.db.ics.keio.ac.jp/\" rel=\"external\">SuperSQL</a>\n");
+		    		else				footer.append("<a href=\""+ fff +"\" target=\"_self\">This HTML</a> was generated by <a href=\"http://ssql.db.ics.keio.ac.jp/\" rel=\"external\">SuperSQL</a>\n");
+					//footer.append("<a href=\""+filename+"_sql.html\" target=\"_self\">This HTML</a> was generated by <a href=\"http://ssql.db.ics.keio.ac.jp/\" target=\"_self\">SuperSQL</a>\n");
+					footer.append("</div>\n\n");
+	    		}
     		}
     		
     		footer.append("</div><!-- Close <div data-role=\"content\"> -->\n<!-- data-role=content end -->\n");		//Close <div data-role="content">
     		//data-role="footer"
     		
-    		if(footerFlag==1 && HTMLFunction.footerString.equals("") && !nobarFlg)	//通常時のみ（Prev/Nextでは行わない）
-    			HTMLFunction.footerString
+    		if(footerFlag==1 && Mobile_HTML5Function.footerString.equals("") && flickBarFlg)	//通常時のみ（Prev/Nextでは行わない）
+    			Mobile_HTML5Function.footerString
 //    			+= "<div data-role=\"footer\" data-position=\"fixed\" style=\"padding:11px 0px; border:1px solid gray; background:rgba(0,0,0,0.4);\" id=\"footer1\">\n" +
     			+= "<div data-role=\"footer\" data-position=\"fixed\" style=\"padding:11px 0px; background:gray; filter: alpha(opacity=25); -moz-opacity:0.25; opacity:0.25;\" id=\"footer1\">\n" +
-    					"<=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Flick bar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=>"+"\n" +
-    		    		"</div>\n";
-    		if(footerFlag==1 && !HTMLFunction.footerString.equals(""))	//通常時のみ（Prev/Nextでは行わない）
-    			footer.append("\n\n<!-- data-role=footer start -->\n"+HTMLFunction.footerString+"<!-- data-role=footer end -->\n\n");
+    			   "<=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Flick bar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=>"+"\n" +
+		    	   "</div>\n";
+    		if(footerFlag==1 && !Mobile_HTML5Function.footerString.equals(""))	//通常時のみ（Prev/Nextでは行わない）
+    			footer.append("\n\n<!-- data-role=footer start -->\n"+Mobile_HTML5Function.footerString+"<!-- data-role=footer end -->\n\n");
     		if(panel.length() != 0)															//20130503  Panel
     			footer.append("\n<!-- Panel start -->\n"+panel+"\n<!-- Panel end -->\n\n");	//Add panel contents.	
     		//added by goto 20130508  "Login&Logout"
@@ -1584,7 +1624,7 @@ public class HTMLEnv extends LocalEnv {
     					"?>\n");
     		}//else
     		footer.append("<iframe name=\"dummy_ifr\" style=\"display:none;\"><!-- dummy iframe for Form target --></iframe>\n");	//dummy iframe
-    		footer.append(HTMLEnv.PHP);			//PHPストリングを付加			//added by goto 20130515  "search"
+    		footer.append(Mobile_HTML5Env.PHP);			//PHPストリングを付加			//added by goto 20130515  "search"
     		//footer.append(HTMLEnv.PHPpost+"\n?>\n");		//PHPpostストリングを付加		//added by goto 20130531
     		//footer.append(HTMLEnv.PHPfunc);		//PHPfuncストリングを付加		//added by goto 20130531
     		if(footerFlag==1)		//通常時のみ（Prev/Nextでは行わない）
@@ -1716,10 +1756,10 @@ public class HTMLEnv extends LocalEnv {
 
         //20131002
 		if(!decos.containsKey("width")){
-			if(!HTMLEnv.divWidth.equals(""))
-				decos.put("width", HTMLEnv.divWidth);
+			if(!Mobile_HTML5Env.divWidth.equals(""))
+				decos.put("width", Mobile_HTML5Env.divWidth);
 	  	}
-		HTMLEnv.divWidth = "";
+		Mobile_HTML5Env.divWidth = "";
 		
 		// ��??
         if (decos.containsKey("width")) {
@@ -1906,9 +1946,9 @@ public class HTMLEnv extends LocalEnv {
         if (decos.containsKey("refresh")){
         	//<meta http-equiv="refresh" content="3; URL=http://ssql.db.ics.keio.ac.jp/mdemo/list.html">
         	metabuf.append("<meta http-equiv=\"refresh\" content=\""+decos.getStr("refresh")+"\">");
-        }else if(!HTMLFunction.movetoFlg.equals("")){
-        	metabuf.append(HTMLFunction.movetoFlg);
-        	HTMLFunction.movetoFlg = "";
+        }else if(!Mobile_HTML5Function.movetoFlg.equals("")){
+        	metabuf.append(Mobile_HTML5Function.movetoFlg);
+        	Mobile_HTML5Function.movetoFlg = "";
         }
         
 
@@ -1928,7 +1968,7 @@ public class HTMLEnv extends LocalEnv {
 			code += "<html>\n<head>\n";
 			code += "<meta name=\"GENERATOR\" content=\" SuperSQL (Generate Mobile_HTML5) \">\n" +
 					"<meta charset=\""+charset+"\">\n" +
-					"<title>"+fff.substring(fff.lastIndexOf("/")+1)+".sql</title>\n" +
+					"<title>"+fff.substring(fff.lastIndexOf("/")+1)+".ssql</title>\n" +
 					"\n" +
 					"<style type=\"text/css\">\n" +
 					"<!--\n" +
@@ -1993,7 +2033,7 @@ public class HTMLEnv extends LocalEnv {
 					"<code>\n" +
 					"\n" +
 					"<ol>\n" +
-					"<span id=\"t1\">"+fff.substring(fff.lastIndexOf("/")+1)+".sql</span>";
+					"<span id=\"t1\">"+fff.substring(fff.lastIndexOf("/")+1)+".ssql</span>";
 			//create HTML file
 			try {
 				//Log.i("create HTML file エンコードcharset:"+charset);
@@ -2009,8 +2049,8 @@ public class HTMLEnv extends LocalEnv {
 	            BufferedReader br = null;
 	            try{
 	            	  //TODO: file-encodingを取得して第二引数へ反映させる処理
-	            	  br = new BufferedReader(new InputStreamReader(new FileInputStream(fff+".sql"), "UTF-8"));		//fileを開く
-//		              br = new BufferedReader(new InputStreamReader(new FileInputStream(fff+".sql"), charset));		//fileを開く
+	            	  br = new BufferedReader(new InputStreamReader(new FileInputStream(fff+".ssql"), "UTF-8"));		//fileを開く
+//		              br = new BufferedReader(new InputStreamReader(new FileInputStream(fff+".ssql"), charset));		//fileを開く
 		              String queryString = new String();
 		              int c;
 		              while ((c = br.read()) != -1)	queryString += ((char) c);
@@ -2053,9 +2093,15 @@ public class HTMLEnv extends LocalEnv {
         	
         }
         
-        //20130521  "nobar"
-        if (decos.containsKey("nobar") || decos.containsKey("noflick") || decos.containsKey("noflickbar"))
-        	nobarFlg = true;
+        //20130521  "flickbar"
+        //if (decos.containsKey("nobar") || decos.containsKey("noflick") || decos.containsKey("noflickbar"))
+        if (decos.containsKey("flickbar"))
+        	flickBarFlg = true;
+        
+        //20131106
+        if (decos.containsKey("noad") || decos.containsKey("noAd"))
+            noAd = true;
+        
         
         if (cssbuf.length() > 0) {
         	haveClass = 1;
@@ -2112,12 +2158,12 @@ public class HTMLEnv extends LocalEnv {
 
     public static String getClassID(ITFE tfe) {
     	String result;
-        if (tfe instanceof HTMLC3) {
-            result = getClassID(((ITFE) ((HTMLC3) tfe).tfes.get(0)));
+        if (tfe instanceof Mobile_HTML5C3) {
+            result = getClassID(((ITFE) ((Mobile_HTML5C3) tfe).tfes.get(0)));
             return result;
         }
-        if (tfe instanceof HTMLG3) {
-            result = getClassID(((ITFE) ((HTMLG3) tfe).tfe));
+        if (tfe instanceof Mobile_HTML5G3) {
+            result = getClassID(((ITFE) ((Mobile_HTML5G3) tfe).tfe));
             	return result;
         }
         result =  "TFE" + tfe.getId();
@@ -2130,11 +2176,11 @@ public class HTMLEnv extends LocalEnv {
     	int DataID = 0;
     	String return_value;
 
-        if (tfe instanceof HTMLC3) {
-            return getClassID(((ITFE) ((HTMLC3) tfe).tfes.get(0)));
+        if (tfe instanceof Mobile_HTML5C3) {
+            return getClassID(((ITFE) ((Mobile_HTML5C3) tfe).tfes.get(0)));
         }
-        if (tfe instanceof HTMLG3) {
-            return getClassID(((ITFE) ((HTMLG3) tfe).tfe));
+        if (tfe instanceof Mobile_HTML5G3) {
+            return getClassID(((ITFE) ((Mobile_HTML5G3) tfe).tfe));
         }
         ClassID = String.valueOf(tfe.getId());
         DataID = Integer.valueOf((ClassID.substring(ClassID.length()-3,ClassID.length()))).intValue();
@@ -2352,6 +2398,33 @@ public class HTMLEnv extends LocalEnv {
 	}
 	public static boolean getSearch(){
 		return search;
+	}
+	
+	
+	//goto 20131123
+	public String getFileName(){
+		//absolute path filename (/home/---/XXX.html)
+		return filename;
+	}
+	public String getFileName1(){
+		//absolute path filename (/home/---/XXX.html)
+		return getFileName();
+	}
+	public String getFileName2(){
+		//absolute path filename (/home/---/XXX)
+		return getFileName().substring(0, getFileName().lastIndexOf("."));
+	}
+	public String getFileName3(){
+		//file name (XXX.html)
+		return new File(getFileName1()).getName();
+	}
+	public String getFileName4(){
+		//file name (XXX)
+		return new File(getFileName2()).getName();
+	}
+	public String getFileParent(){
+		//file path (/home/---/)
+		return new File(filename).getParent();
 	}
 
 }

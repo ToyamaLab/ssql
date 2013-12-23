@@ -1,5 +1,6 @@
 package supersql.codegenerator;
 
+import supersql.codegenerator.Mobile_HTML5.Mobile_HTML5;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 
@@ -121,6 +122,12 @@ public class Connector extends Operator{
 
 		if (tfe instanceof Connector || tfe instanceof Attribute
 				|| tfe instanceof Function || tfe instanceof IfCondition) {
+			
+//			//20131118 dynamic
+//			if(Mobile_HTML5.dynamicDisplay){
+//				subdata = Mobile_HTML5.dynamicConnectorProcess(tfe, subdata);
+//			}
+			
 			tfe.work(subdata);
 		}
 		else {
@@ -155,7 +162,10 @@ public class Connector extends Operator{
 	}
 
 	@Override
-	public void work(ExtList data_info) {}
+	public String work(ExtList data_info) {
+		return null;
+//		return aggregate;
+	}
 
 	@Override
 	public Object createNode(ExtList<ExtList<String>> data_info) {

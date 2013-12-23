@@ -31,7 +31,7 @@ public class XMLC0 extends Connector {
     }
 
     @Override
-    public void work(ExtList data_info) {
+    public String work(ExtList data_info) {
     	Log.out("------------- XMLC0 -------------");
 
     	XMLC0_passflag++;
@@ -82,6 +82,7 @@ public class XMLC0 extends Connector {
 
 	   	Log.out("C0 tag(end) : " + tag);
 	   	Log.out("TFEId = " + XMLEnv.getClassID(this));
+		return null;
     }
     
     public String getSymbol() {

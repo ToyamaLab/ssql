@@ -22,7 +22,7 @@ public class X3DAttribute extends Attribute{
     }
 
     @Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
         value = new X3DValue();
         X3DEnv.object = this.decos.getStr("object");
         
@@ -63,5 +63,6 @@ public class X3DAttribute extends Attribute{
         		}
         	}
         }
+		return null;
     }    
 }

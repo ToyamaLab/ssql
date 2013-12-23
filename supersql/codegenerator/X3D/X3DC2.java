@@ -19,7 +19,7 @@ public class X3DC2 extends Connector{
     }
     
     @Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
         Log.out("------- C2 -------");
         Log.out("tfes.contain_itemnum=" + tfes.contain_itemnum());
         Log.out("tfessize=" + tfes.size());
@@ -52,6 +52,7 @@ public class X3DC2 extends Connector{
             i++;
 
         }
+		return null;
     }
 
     @Override

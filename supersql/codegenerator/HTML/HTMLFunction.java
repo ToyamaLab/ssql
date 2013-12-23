@@ -48,9 +48,11 @@ public class HTMLFunction extends Function {
     //added by goto 20130914  "SEQ_NUM"
     static ArrayList<Integer> seq_num = new ArrayList<Integer>();
     static ArrayList<String> seq_num_ClassID = new ArrayList<String>();
+	static ArrayList<Integer> seq_num_gl = new ArrayList<Integer>();
     static ArrayList<Integer> seq_num_startNum = new ArrayList<Integer>();
     static ArrayList<Boolean> seq_num_DESC_Flg = new ArrayList<Boolean>();
     static String classID = "";
+    static int glvl = 0;
 
 
 	// 鐃緒申鐃藷ストラク鐃緒申
@@ -88,7 +90,8 @@ public class HTMLFunction extends Function {
 			return FuncUrl(true);
 		} else if (FuncName.equalsIgnoreCase("object")) {
 			return FuncObject("");
-		} else if (FuncName.equalsIgnoreCase("seq_num")) {
+		} else if (FuncName.equalsIgnoreCase("seq_num")
+				|| FuncName.equalsIgnoreCase("row_number")) {
 			return Func_seq_num();
 		} else if (FuncName.equalsIgnoreCase("submit")) {
 			return FuncSubmit();
@@ -129,12 +132,17 @@ public class HTMLFunction extends Function {
 			Log.out("[enter embed]");
 			return FuncEmbed(data_info);
 		}
+        else{
+        	Log.err("[Warning] no such function name: "+FuncName+"()");
+        }
 		// tk end////////////////////////////////////
 		Log.out("TFEId = " + HTMLEnv.getClassID(this));
 		return null;
 	}
 
 	private void checkArgsNumber(int expected) {
+		if(expected == 0 && Args.size() == 1 && getValue(1).isEmpty())
+			return;
 		if (expected != Args.size()) {
 			System.err.println("Argument number error for the function "
 					+ getFuncName() + "\n This function has " + expected
@@ -295,7 +303,7 @@ public class HTMLFunction extends Function {
 
 		HTMLEnv.embedCount++;
 
-		if (file.contains(".sql")) {
+		if (file.contains(".sql") || file.contains(".ssql")) {
 
 			String makedfilename = file.substring(file.lastIndexOf("\\") + 1,
 					file.indexOf("."));
@@ -357,20 +365,26 @@ public class HTMLFunction extends Function {
 				// tag////////////////////////////////////////////////////////////////////
 				if (GlobalEnv.isAjax()) {
 					if (!has_divid) {
+						int x = 0;
+						if (file.indexOf(".sql")>0) {
+							x = file.indexOf(".sql");
+						} else if (file.indexOf(".ssql")>0) {
+							x = file.indexOf(".ssql");
+						}
 						// online file
 						if (file.contains("/")) {
 							divname = file.substring(file.lastIndexOf("/") + 1,
-									file.indexOf(".sql"));
+									x);
 						}
 						// ofline file
 						else if (file.contains("\\")) {
 							divname = file.substring(
 									file.lastIndexOf("\\") + 1,
-									file.indexOf(".sql"));
+									x);
 						}
 						// only file name
 						else {
-							divname = file.substring(0, file.indexOf(".sql"));
+							divname = file.substring(0, x);
 						}
 					}
 
@@ -1050,6 +1064,16 @@ public class HTMLFunction extends Function {
 
     /*  SEQ_NUM( [Start number [, ASC or DESC] ] )  */
     private Node Func_seq_num() {
+    	Element result = new Element(Tag.valueOf("div"), "");
+    	result.addClass("box att seqNum");
+    	int start = 1;
+    	String order = "asc";
+    	checkArgsNumber(0);
+    	if(ArgHash.containsKey("start"))
+    		start = Integer.valueOf(getAtt("start"));
+    	if(ArgHash.containsKey("order"))
+    		order = getAtt("order");
+    	
         classID = HTMLEnv.getClassID(this);
         int i;
         for(i=0; i<seq_num_ClassID.size()+1; i++){
@@ -1058,12 +1082,13 @@ public class HTMLFunction extends Function {
                     break;
             }catch(Exception e1){
                 seq_num_ClassID.add(i, classID);
+                seq_num_gl.add(i, glvl);
                 try{
                     //第一引数 Start number
-                    seq_num_startNum.add(i, Integer.parseInt(getValue(1)));
+                    seq_num_startNum.add(i, start);
                     //第二引数 ASC or DESC
-                    if(getValue(2).toLowerCase().trim().equals("desc"))	seq_num_DESC_Flg.add(i, true);
-                    else                                               	seq_num_DESC_Flg.add(i, false);
+                    if(order.toLowerCase().trim().equals("desc"))	seq_num_DESC_Flg.add(i, true);
+                    else                                            seq_num_DESC_Flg.add(i, false);
                 }catch(Exception e2){
                     seq_num_startNum.add(i, 1);        //default: 1
                     seq_num_DESC_Flg.add(i, false);    //default: false
@@ -1073,24 +1098,28 @@ public class HTMLFunction extends Function {
             }
         }
         
-        // 各引数毎に処理した結果をHTMLに書きこむ
-//        htmlEnv.code.append(""+((!seq_num_DESC_Flg.get(i))? (seq_num.get(i)):(seq_num.get(i))));
+        result.html(""+((!seq_num_DESC_Flg.get(i))? (seq_num.get(i)):(seq_num.get(i))));
         if(!seq_num_DESC_Flg.get(i))    seq_num.set(i,seq_num.get(i)+1);
         else                    		seq_num.set(i,seq_num.get(i)-1);
-        return null;
+        return result;
     }
     //seq_num end
     //added by goto 20130914  "SEQ_NUM"
-    static void Func_seq_num_initialization() {    //initialize seq_num
-        try{
-        	for(int i=0; i<seq_num_ClassID.size(); i++){
-        		if(seq_num_ClassID.get(i).equals(classID)){
-        			seq_num.set(i, seq_num_startNum.get(i));	//replace
-        			break;
-        		}
-        	}
-        }catch(Exception e){}
-        return;
+    static void Func_seq_num_initialization(int gl) {		//initialize seq_num
+    	try{
+    		for(int i=0; i<seq_num_ClassID.size(); i++){
+    			if(seq_num_ClassID.get(i).equals(classID) && seq_num_gl.get(i)==gl){
+    				for(int j=i; j>=0; j--){
+    					if(seq_num_gl.get(j)==gl){
+    						seq_num.set(j, seq_num_startNum.get(j));	//replace
+    					}
+    					if(seq_num_gl.get(j)!=gl)	break;
+    				}
+    				break;
+    			}
+    		}
+    	}catch(Exception e){}
+    	return;
     }
 
 	// // for practice 2012/02/09

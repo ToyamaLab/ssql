@@ -8,30 +8,32 @@ import supersql.common.Log;
 import supersql.extendclass.ExtList;
 
 
-public class HTMLC2 extends Connector {
+public class Mobile_HTML5C2 extends Connector {
 
     Manager manager;
 
-    HTMLEnv html_env;
-    HTMLEnv html_env2;
+    Mobile_HTML5Env html_env;
+    Mobile_HTML5Env html_env2;
     
     static boolean tableFlg = false;		//20130314  table
     static boolean table0Flg = false;		//20130325  table0
     static boolean divFlg = false;			//20130326  div
 
     //���󥹥ȥ饯��
-    public HTMLC2(Manager manager, HTMLEnv henv, HTMLEnv henv2) {
+    public Mobile_HTML5C2(Manager manager, Mobile_HTML5Env henv, Mobile_HTML5Env henv2) {
         this.manager = manager;
         this.html_env = henv;
         this.html_env2 = henv2;
     }
 
     //C2��work�᥽�å�
-    public void work(ExtList data_info) {
+    public String work(ExtList data_info) {
+    	Mobile_HTML5.preProcess(getSymbol(), decos, html_env);	//Pre-process (前処理)
+    	
     	//20131001 tableDivHeader
-    	if(decos.containsKey("header") && HTMLG2.tableDivHeader_Count2<1){
-    		HTMLG2.tableDivHeader_codeBuf = html_env.code.toString();
-    		HTMLG2.tableDivHeader_Count2++;
+    	if(decos.containsKey("header") && Mobile_HTML5G2.tableDivHeader_Count2<1){
+    		Mobile_HTML5G2.tableDivHeader_codeBuf = html_env.code.toString();
+    		Mobile_HTML5G2.tableDivHeader_Count2++;
     	}
     	
         int panelFlg = 0;	//20130503  Panel
@@ -43,25 +45,25 @@ public class HTMLC2 extends Connector {
         
         this.setDataList(data_info);
 
-        if(decos.containsKey("form")){
-        	html_env2.code.append("<form"+HTMLEnv.getFormNumber()+"start />");
-        	if(decos.getStr("form").toLowerCase().equals("search")){
-        		HTMLEnv.setSearch(true);
-        	}
-        }	
+//        if(decos.containsKey("form")){
+//        	html_env2.code.append("<form"+Mobile_HTML5Env.getFormNumber()+"start />");
+//        	if(decos.getStr("form").toLowerCase().equals("search")){
+//        		Mobile_HTML5Env.setSearch(true);
+//        	}
+//        }	
         
         if(decos.containsKey("insert")){
-        	HTMLEnv.setIDU("insert");
+        	Mobile_HTML5Env.setIDU("insert");
         }
         if(decos.containsKey("update")){
-        	HTMLEnv.setIDU("update");
+        	Mobile_HTML5Env.setIDU("update");
         }
         if(decos.containsKey("delete")){
-        	HTMLEnv.setIDU("delete");
+        	Mobile_HTML5Env.setIDU("delete");
         }
 
         //tk start////////////////////////////////////////////////////////////////
-        html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
+        html_env.append_css_def_td(Mobile_HTML5Env.getClassID(this), this.decos);
         
     	
         //20130325  table0
@@ -69,7 +71,7 @@ public class HTMLC2 extends Connector {
         else							table0Flg = false;
         //20130314  table
         //if(decos.containsKey("table") || !decos.containsKey("div") || table0Flg || HTMLC1.tableFlg || HTMLG1.tableFlg || HTMLG2.tableFlg){
-        if(decos.containsKey("table") || table0Flg || HTMLC1.tableFlg || HTMLG1.tableFlg || HTMLG2.tableFlg){
+        if(decos.containsKey("table") || table0Flg || Mobile_HTML5C1.tableFlg || Mobile_HTML5G1.tableFlg || Mobile_HTML5G2.tableFlg){
 //        if(decos.containsKey("table") || table0Flg){
         //if(decos.containsKey("table") || table0Flg || HTMLC1.tableFlg || HTMLC2.tableFlg || HTMLG1.tableFlg || HTMLG2.tableFlg){
     	//if(decos.containsKey("table") || HTMLC1.tableFlg || HTMLG1.tableFlg){
@@ -89,12 +91,12 @@ public class HTMLC2 extends Connector {
     		tableFlg = false;
     	}//else divFlg = false;
         
-        //20130529
-        if(decos.containsKey("dynamic")){
-        	if(!HTMLEnv.dynamicFlg)	HTMLEnv.staticBuf = html_env.code;
-        	HTMLEnv.dynamicFlg = true;
-        	Log.i("※C2 HTMLEnv.staticBuf: "+HTMLEnv.staticBuf);
-        }
+//        //20130529
+//        if(decos.containsKey("dynamic")){
+//        	if(!Mobile_HTML5Env.dynamicFlg)	Mobile_HTML5Env.staticBuf = html_env.code;
+//        	Mobile_HTML5Env.dynamicFlg = true;
+//        	Log.i("※C2 HTMLEnv.staticBuf: "+Mobile_HTML5Env.staticBuf);
+//        }
         
 //        //20130914  "text"
 //        if(decos.containsKey("text")){
@@ -104,29 +106,29 @@ public class HTMLC2 extends Connector {
         
         if(!GlobalEnv.isOpt()){
         	//20130503  Panel
-    	    panelFlg = HTMLC1.panelProcess1(decos, html_env);
+    	    panelFlg = Mobile_HTML5C1.panelProcess1(decos, html_env);
         	
         	//20130330 tab
         	//tab1
         	if(decos.containsKey("tab1")){
             	html_env.code.append("<div data-role=\"content\"> <div id=\"tabs\">\n<ul>\n");
-            	html_env.code.append("	<li><a href=\"#tabs-"+HTMLEnv.tabCount+"\">");
+            	html_env.code.append("	<li><a href=\"#tabs-"+Mobile_HTML5Env.tabCount+"\">");
             	if(!decos.getStr("tab1").equals(""))	html_env.code.append(decos.getStr("tab1"));
             	else          							html_env.code.append("tab1");
             	html_env.code.append("</a></li>\n");
-            	html_env.code.append("</ul>\n<div id=\"tabs-"+HTMLEnv.tabCount+"\">\n");
+            	html_env.code.append("</ul>\n<div id=\"tabs-"+Mobile_HTML5Env.tabCount+"\">\n");
 //            	HTMLEnv.tabFlg = true;
             }
         	//tab2〜tab15
 //        	else if(HTMLEnv.tabFlg){
         	else{
         		int i=2;
-        		while(i<=HTMLEnv.maxTab){		//HTMLEnv.maxTab=15
+        		while(i<=Mobile_HTML5Env.maxTab){		//HTMLEnv.maxTab=15
         			//Log.info("i="+i+" !!");
         			if(decos.containsKey("tab"+i) || (i==2 && decos.containsKey("tab"))){
     	        		//replace: </ul>の前に<li>〜</li>を付加
     	        		String a = "</ul>";
-    	        		String b = "	<li><a href=\"#tabs-"+HTMLEnv.tabCount+"\">";
+    	        		String b = "	<li><a href=\"#tabs-"+Mobile_HTML5Env.tabCount+"\">";
     	        		if(decos.containsKey("tab"+i))
 	    	        		if(!decos.getStr("tab"+i).equals(""))	b += decos.getStr("tab"+i);
 	    	            	else				            		b += "tab"+i;
@@ -134,15 +136,15 @@ public class HTMLC2 extends Connector {
     	        			if(!decos.getStr("tab").equals(""))		b += decos.getStr("tab");
 	    	            	else				            		b += "tab";
     	            	b += "</a></li>\n";
-    	            	HTMLManager.replaceCode(html_env, a, b+a);
+    	            	Mobile_HTML5Manager.replaceCode(html_env, a, b+a);
     	            	
     	            	//replace: 最後の</div></div></div>カット
-    	        		HTMLManager.replaceCode(html_env, "</div></div></div>", "");
+    	        		Mobile_HTML5Manager.replaceCode(html_env, "</div></div></div>", "");
     	        		
     	        		//replace: 不要な「<div class=〜」をカット
-    	        		HTMLManager.replaceCode(html_env, "<div class=\""+HTMLEnv.getClassID(this)+" \">", "");
+    	        		Mobile_HTML5Manager.replaceCode(html_env, "<div class=\""+Mobile_HTML5Env.getClassID(this)+" \">", "");
     	        		
-    	            	html_env.code.append("<div id=\"tabs-"+HTMLEnv.tabCount+"\">\n");
+    	            	html_env.code.append("<div id=\"tabs-"+Mobile_HTML5Env.tabCount+"\">\n");
     	            	break;
     	        	}
         			i++;
@@ -165,76 +167,11 @@ public class HTMLC2 extends Connector {
         	//20130309
         	//20130314  table
         	if(tableFlg){
-        		html_env.code.append(HTMLC1.getTableStartTag(html_env, decos, this));
+        		html_env.code.append(Mobile_HTML5C1.getTableStartTag(html_env, decos, this));
         	}
+        	
         }
         
-//        //おそらくxml
-//        if(GlobalEnv.isOpt()){
-//            html_env2.code.append("<tfe type=\"connect\" dimension=\"2\"");
-//        	if (decos.containsKey("tablealign") )
-//        		html_env2.code.append(" align=\"" + decos.getStr("tablealign") +"\"");
-////        	else	//added 20130314
-////        		html_env2.code.append(" align=\"center\"");
-////        	if (decos.containsKey("tablevalign") )
-//        		html_env2.code.append(" valign=\"" + decos.getStr("tablevalign") +"\"");
-////        	else	//added 20130314
-////        		html_env2.code.append(" valign=\"middle\"");
-//        	if (decos.containsKey("height") )
-//        		html_env2.code.append(" height=\"" + decos.getStr("height") +"\"");
-//        	if(decos.containsKey("tabletype")){
-//        		html_env2.code.append(" tabletype=\"" + decos.getStr("tabletype") + "\"");
-//        		if(decos.containsKey("cellspacing")){
-//        			html_env2.code.append(" cellspacing=\"" + decos.getStr("cellspacing") + "\"");
-//        		}
-//        		if(decos.containsKey("cellpadding")){
-//        			html_env2.code.append(" cellpadding=\"" + decos.getStr("cellpadding") + "\"");
-//        		}
-//        		if(decos.containsKey("border")){
-//        			html_env2.code.append(" border=\"" + decos.getStr("border").replace("\"", "") + "\"");
-//        		}
-//
-//	        	if(decos.containsKey("tableborder")){
-//        			html_env2.code.append(" tableborder=\"" + decos.getStr("tableborder").replace("\"", "") + "\"");
-//        		}
-//        	}else{
-//        		if(decos.containsKey("border")){
-//        			html_env2.code.append(" border=\"" + decos.getStr("border").replace("\"", "") + "\"");
-//        		}else{
-//            		html_env2.code.append(" border=\"" + html_env.tableborder.replace("\"", "") +"\"");
-//        		}
-//	        	if(decos.containsKey("tableborder")){
-//        			html_env2.code.append(" tableborder=\"" + decos.getStr("tableborder").replace("\"", "") + "\"");
-//        		}
-//        	}
-//        	if(html_env.written_classid.contains(HTMLEnv.getClassID(this))){
-//        		html_env2.code.append(" class=\"");
-//        		html_env2.code.append(HTMLEnv.getClassID(this));
-//        	}
-//
-//        	if(decos.containsKey("class")){
-//        		if(!html_env.written_classid.contains(HTMLEnv.getClassID(this))){
-//        			html_env2.code.append(" class=\"");
-//        		}else{
-//        			html_env2.code.append(" ");
-//        		}
-//        		html_env2.code.append(decos.getStr("class"));        	
-//        	}else if(html_env.written_classid.contains(HTMLEnv.getClassID(this))){
-//        		html_env2.code.append("\" ");
-//        	}
-//        	
-//
-//	        if(decos.containsKey("form")){
-//	        	html_env2.code.append(" form=\""+ HTMLEnv.getFormNumber() +"\" ");
-//	        }	        
-//	        
-//        	html_env2.code.append(">");
-//        }
-        /*
-        if(decos.containsKey("outborder"))
-        	html_env.code.append(" noborder ");
-        	*/
-       
         
         //html_env2.code.append(">");
         
@@ -246,16 +183,17 @@ public class HTMLC2 extends Connector {
 
         int i = 0;
         
-    	if(decos.containsKey("form")){
-           	html_env.code.append(HTMLFunction.createForm(decos));
-           	HTMLEnv.setFormItemFlg(true,null);
-        }
+//    	if(decos.containsKey("form")){
+//           	html_env.code.append(Mobile_HTML5Function.createForm(decos));
+//           	Mobile_HTML5Env.setFormItemFlg(true,null);
+//        }
         
+    	Mobile_HTML5.beforeWhileProcess(getSymbol(), decos, html_env);
         while (this.hasMoreItems()) {
             //Log.info("C2-1:	"+tableFlg+"	"+decos.containsKey("table")+"	"+decos.containsKey("table0"));
-            if(decos.containsKey("table0") || HTMLC1.table0Flg || HTMLG1.table0Flg || HTMLG2.table0Flg)	table0Flg = true;
+            if(decos.containsKey("table0") || Mobile_HTML5C1.table0Flg || Mobile_HTML5G1.table0Flg || Mobile_HTML5G2.table0Flg)	table0Flg = true;
             //else	table0Flg=false;
-            if(decos.containsKey("table") || HTMLC1.tableFlg || HTMLG1.tableFlg || HTMLG2.tableFlg || table0Flg)	tableFlg=true;
+            if(decos.containsKey("table") || Mobile_HTML5C1.tableFlg || Mobile_HTML5G1.tableFlg || Mobile_HTML5G2.tableFlg || table0Flg)	tableFlg=true;
 //            if(decos.containsKey("table") || HTMLC1.tableFlg || HTMLC2.tableFlg || HTMLG1.tableFlg || HTMLG2.tableFlg || table0Flg)	tableFlg=true;
             //if(decos.containsKey("table") || table0Flg)	tableFlg=true;
 //            Log.i("C2:	decos = "+decos+"		"+HTMLC1.tableFlg+" "+HTMLC2.tableFlg+"	tableFlg = "+tableFlg+"	divFlg = "+decos.containsKey("div"));
@@ -274,10 +212,10 @@ public class HTMLC2 extends Connector {
             //20130312 collapsible
 	      	if(decos.containsKey("collapse"))
 	          	html_env.code.append("<p>\n");
-	      	else if(!tableFlg && !HTMLFunction.textFlg2) 
+	      	else if(!tableFlg && !Mobile_HTML5Function.textFlg2) 
 	            //20130309
 	            //x html_env.code.append("	<DIV Class=\"ui-grid-a\">	<div class=\"ui-block-a\">");		
-	            html_env.code.append("<div class=\""+HTMLEnv.getClassID(tfe)+" \">\n");
+	            html_env.code.append("<div class=\""+Mobile_HTML5Env.getClassID(tfe)+" \">\n");
 	      	
 	      	//20130914  "text"
 //	      	Log.e("	decosC2 = "+decos);
@@ -295,28 +233,32 @@ public class HTMLC2 extends Connector {
 	      		html_env.code.append("<TR><TD valign=\"middle\" class=\""
 	      		//html_env.code.append("<TR><TD align=\"center\" valign=\"middle\" class=\""
 //        	   	html_env.code.append("<TR><TD class=\""
-                   + HTMLEnv.getClassID(tfe) + " nest\">\n");
-	      		classid = HTMLEnv.getClassID(tfe);
+                   + Mobile_HTML5Env.getClassID(tfe) + " nest\">\n");
+	      		classid = Mobile_HTML5Env.getClassID(tfe);
 	      		Log.out("<TR><TD class=\"nest "
-                    + HTMLEnv.getClassID(tfe) + " nest\"> decos:" + decos);
+                    + Mobile_HTML5Env.getClassID(tfe) + " nest\"> decos:" + decos);
 	      	}
         	
 	      	
-	      	if(HTMLEnv.dynamicFlg){	//20130529 dynamic
-	      		//☆★
-	      		Log.info("☆★C2 tfe : " + tfe);
-	      		//☆★      		 Log.info("C2 tfe : " + tfe);
-            	//☆★            Log.info("C2 tfes : " + this.tfes);
-            	//☆★            Log.info("C2 tfeItems : " + this.tfeItems);
-	      	}
+//	      	if(Mobile_HTML5Env.dynamicFlg){	//20130529 dynamic
+//	      		//☆★
+//	      		Log.info("☆★C2 tfe : " + tfe);
+//	      		//☆★      		 Log.info("C2 tfe : " + tfe);
+//            	//☆★            Log.info("C2 tfes : " + this.tfes);
+//            	//☆★            Log.info("C2 tfeItems : " + this.tfeItems);
+//	      	}
+	      	
+	        Mobile_HTML5.whileProcess1(getSymbol(), decos, html_env, data, data_info, tfe, tfes, tfeItems);
 	      	
         	//Log.info("C2  !!");
             this.worknextItem();
             //Log.info("C2-2:	"+tableFlg+"	"+decos.containsKey("table")+"	"+decos.containsKey("table0"));
            
-            if(decos.containsKey("table0") || HTMLC1.table0Flg || HTMLG1.table0Flg || HTMLG2.table0Flg)	table0Flg = true;
+	        Mobile_HTML5.whileProcess2(getSymbol(), decos, html_env, data, data_info, tfe, tfes, tfeItems);
+            
+            if(decos.containsKey("table0") || Mobile_HTML5C1.table0Flg || Mobile_HTML5G1.table0Flg || Mobile_HTML5G2.table0Flg)	table0Flg = true;
             //else	table0Flg=false;
-            if(decos.containsKey("table") || HTMLC1.tableFlg || HTMLG1.tableFlg || HTMLG2.tableFlg || table0Flg)	tableFlg=true;
+            if(decos.containsKey("table") || Mobile_HTML5C1.tableFlg || Mobile_HTML5G1.tableFlg || Mobile_HTML5G2.tableFlg || table0Flg)	tableFlg=true;
             //if(decos.containsKey("table") || HTMLC1.tableFlg || HTMLC2.tableFlg || HTMLG1.tableFlg || HTMLG2.tableFlg || table0Flg)	tableFlg=true;
 //            if(decos.containsKey("table") || table0Flg)	tableFlg=true;
             if(decos.containsKey("div")){
@@ -330,8 +272,8 @@ public class HTMLC2 extends Connector {
         		tableFlg = false;
         	}//else divFlg = false;
             
-            //20130529
-            if(decos.containsKey("dynamic"))	HTMLEnv.dynamicFlg = true;
+//            //20130529
+//            if(decos.containsKey("dynamic"))	Mobile_HTML5Env.dynamicFlg = true;
 
             //20130306
             //20130314  table
@@ -352,13 +294,13 @@ public class HTMLC2 extends Connector {
             //20130312 collapsible
 	      	if(decos.containsKey("collapse"))
 	          	html_env.code.append("</p>\n");
-	      	else if(!tableFlg && !HTMLFunction.textFlg && !HTMLFunction.textFlg2)	//20130914  "text"
+	      	else if(!tableFlg && !Mobile_HTML5Function.textFlg && !Mobile_HTML5Function.textFlg2)	//20130914  "text"
 	        	html_env.code.append("\n</div>");
-	      	if(HTMLFunction.textFlg){					//20130914  "text"
+	      	if(Mobile_HTML5Function.textFlg){					//20130914  "text"
 //	      		Log.e("C2 text! ");
 //	      		html_env.code.append(HTMLFunction.text);
 //	      		HTMLFunction.text = "";
-	      		HTMLFunction.textFlg = false;
+	      		Mobile_HTML5Function.textFlg = false;
 	      		//HTMLFunction.textFlg2 = false;	//TODO
 	      	}
 //	      	HTMLFunction.textFlg = false;				//20130914  "text"
@@ -366,20 +308,19 @@ public class HTMLC2 extends Connector {
             html_env.code.append("\n");		//20130309
 
             i++;
-
-        }
+        }	//	/while
+        Mobile_HTML5.afterWhileProcess(getSymbol(), decos, html_env);
 
         html_env2.code.append("</tfe>");
         //Log.out("</TABLE>");
-        if(decos.containsKey("form")){
-        	html_env2.code.append("<form"+ HTMLEnv.getFormNumber() +"end />");
-        	html_env.code.append(HTMLEnv.exFormNameCreate());
-           	html_env.code.append("</form>");
-           	HTMLEnv.setFormItemFlg(false,null);
-           	HTMLEnv.incrementFormNumber();
-           	if(decos.getStr("form").toLowerCase().equals("search"))
-        		HTMLEnv.setSearch(false);
-        }
+//        if(decos.containsKey("form")){
+//        	html_env.code.append(Mobile_HTML5Env.exFormNameCreate());
+//           	html_env.code.append("</form>");
+//           	Mobile_HTML5Env.setFormItemFlg(false,null);
+//           	Mobile_HTML5Env.incrementFormNumber();
+//           	if(decos.getStr("form").toLowerCase().equals("search"))
+//        		Mobile_HTML5Env.setSearch(false);
+//        }
 
       	//20130314  table
       	if(tableFlg){
@@ -396,11 +337,11 @@ public class HTMLC2 extends Connector {
     	//20130330 tab
 //    	if(HTMLEnv.tabFlg){
     		int a=1;
-	    	while(a<=HTMLEnv.maxTab){
+	    	while(a<=Mobile_HTML5Env.maxTab){
 	    		//Log.info("a="+a);
 	    		if(decos.containsKey("tab"+a) || (a==1 && decos.containsKey("tab"))){
 		    		html_env.code.append("</div></div></div>\n");
-		    		HTMLEnv.tabCount++;
+		    		Mobile_HTML5Env.tabCount++;
 		    		break;
 		    	}
 		    	a++;
@@ -408,23 +349,26 @@ public class HTMLC2 extends Connector {
 //    	}
       	
     	//20130503  Panel
-    	HTMLC1.panelProcess2(decos, html_env, panelFlg);
+    	Mobile_HTML5C1.panelProcess2(decos, html_env, panelFlg);
 	    	
       	if(divFlg)	divFlg = false;		//20130326  div
       	
-        if(HTMLEnv.dynamicFlg)	HTMLEnv.dynamicFlg = false;		//20130529 dynamic
+//        if(Mobile_HTML5Env.dynamicFlg)	Mobile_HTML5Env.dynamicFlg = false;		//20130529 dynamic
+        
+        Mobile_HTML5.postProcess(getSymbol(), decos, html_env);	//Post-process (後処理)
 
-        Log.out("TFEId = " + HTMLEnv.getClassID(this));
+        Log.out("TFEId = " + Mobile_HTML5Env.getClassID(this));
         //html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
         //↑必要？不要？？ -> 不要
         
         //20131001 tableDivHeader
         if(decos.containsKey("header"))
-        	html_env.code = HTMLG2.createAndCutTableDivHeader(html_env);
+        	html_env.code = Mobile_HTML5G2.createAndCutTableDivHeader(html_env);
+		return null;
     }
 
     public String getSymbol() {
-        return "HTMLC2";
+        return "Mobile_HTML5C2";
     }
 
 }

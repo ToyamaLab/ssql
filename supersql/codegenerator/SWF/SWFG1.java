@@ -19,7 +19,7 @@ public class SWFG1 extends Grouper implements SWFTFE{
 	}
 
 	@Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 
 		int width = 0;
 		int height = 0;
@@ -124,6 +124,7 @@ public class SWFG1 extends Grouper implements SWFTFE{
 //			swf_env.movieHeight = value.height+20;
 			swf_env.movieHeight = value.height+40;
 		}
+		return null;
 	}
 
 	public SWFValue G1to4(SWFValue self, int dim4, String opr){

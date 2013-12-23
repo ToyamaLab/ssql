@@ -8,13 +8,13 @@ import supersql.codegenerator.Manager;
 import supersql.codegenerator.TFE;
 import supersql.extendclass.ExtList;
 
-public class HTMLIfCondition extends IfCondition {
+public class Mobile_HTML5IfCondition extends IfCondition {
 
-	public HTMLIfCondition(Manager manager, HTMLEnv html_env, HTMLEnv html_env2, Attribute condition, TFE thenTfe, TFE elseTfe) {
+	public Mobile_HTML5IfCondition(Manager manager, Mobile_HTML5Env html_env, Mobile_HTML5Env html_env2, Attribute condition, TFE thenTfe, TFE elseTfe) {
 		super(condition, thenTfe, elseTfe);
 	}
 	
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 
 		String conditionResult = (String) data_info.get(0);
 		if(conditionResult.equals("t") || conditionResult.equals("1")) {
@@ -36,6 +36,7 @@ public class HTMLIfCondition extends IfCondition {
 				elseTfe.work(data_info.ExtsubList(2, data_info.size()));
 			else
 				elseTfe.work((ExtList)data_info.get(2));
-			}		
+			}
+		return null;		
 		}
 }

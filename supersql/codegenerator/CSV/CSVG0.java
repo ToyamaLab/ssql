@@ -15,8 +15,8 @@ public class CSVG0 extends Grouper {
         this.csvEnv = xenv;
     }
 
-    //G0のworkメソ�?��
-    public void work(ExtList data_info) {
+    //G0のworkメソ�?��
+    public String work(ExtList data_info) {
         Log.out("------- G0 -------");
         this.setDataList(data_info);
 
@@ -31,6 +31,7 @@ public class CSVG0 extends Grouper {
         }
 
         Log.out("TFEId = " + CSVEnv.getClassID(this));
+		return null;
     }
 
     public String getSymbol() {

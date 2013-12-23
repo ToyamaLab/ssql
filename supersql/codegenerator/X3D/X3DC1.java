@@ -21,7 +21,7 @@ public class X3DC1 extends Connector{
     }
 
     @Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
         Vector vector_local = new Vector();
         Log.out("------- C1 -------");
         Log.out("tfes.contain_itemnum=" + tfes.contain_itemnum());
@@ -93,6 +93,7 @@ public class X3DC1 extends Connector{
 
         }
         i++;
+		return null;
     }
 
     @Override

@@ -16,18 +16,18 @@ import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 
-public class HTMLC3 extends Connector {
+public class Mobile_HTML5C3 extends Connector {
 
     Manager manager;
 
-    HTMLEnv html_env;
-    HTMLEnv html_env2;
+    Mobile_HTML5Env html_env;
+    Mobile_HTML5Env html_env2;
     
     //20130309
     //public static boolean C3Flg=false;
 
     //･ｳ･�ｹ･ﾈ･鬣ｯ･ｿ
-    public HTMLC3(Manager manager, HTMLEnv henv, HTMLEnv henv2) {
+    public Mobile_HTML5C3(Manager manager, Mobile_HTML5Env henv, Mobile_HTML5Env henv2) {
         this.manager = manager;
         this.html_env = henv;
         this.html_env2 = henv2;
@@ -35,7 +35,7 @@ public class HTMLC3 extends Connector {
 
     //C3､ﾎwork･皈ｽ･ﾃ･ﾉ
     @Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
         int i = 0;
         String parentfile = html_env.filename;
         String parentfile2 = html_env2.filename;
@@ -52,15 +52,15 @@ public class HTMLC3 extends Connector {
         int c3items = tfeItems;
         for (int j = 0; j < tfeItems - 1; j++) {
             tfe[j] = (ITFE) tfes.get(j);
-            if (j < tfeItems - 2 && tfe[j] instanceof HTMLG3) {
+            if (j < tfeItems - 2 && tfe[j] instanceof Mobile_HTML5G3) {
                 System.err.println("Error: % after []% is not allowed");
                 GlobalEnv.addErr("Error: % after []% is not allowed");
                 //comment out by chie
                 //System.exit(-1);
             }
         }
-        boolean checknexttfe = tfe[0] instanceof HTMLC1
-                || tfe[0] instanceof HTMLC2 || tfe[0] instanceof HTMLC3;
+        boolean checknexttfe = tfe[0] instanceof Mobile_HTML5C1
+                || tfe[0] instanceof Mobile_HTML5C2 || tfe[0] instanceof Mobile_HTML5C3;
         Log.out("------- C3 -------");
         //C3Flg=true; 	//20130309
      //   HTMLC1.Count=0;
@@ -87,8 +87,8 @@ public class HTMLC3 extends Connector {
             html_env2.filename = html_env.outfile
             + String.valueOf(html_env.countfile) + ".xml";
             boolean b = intfe instanceof Attribute
-                    || intfe instanceof HTMLFunction;
-            if (intfe instanceof HTMLG3) {
+                    || intfe instanceof Mobile_HTML5Function;
+            if (intfe instanceof Mobile_HTML5G3) {
                 html_env.countfile--;
                 this.worknextItem();
             } else {
@@ -167,7 +167,7 @@ public class HTMLC3 extends Connector {
 	                    pw2.println(html_env2.code);
 	                    pw2.println(html_env2.footer);
 	                    pw2.close();
-	                    HTMLoptimizer xml = new HTMLoptimizer();
+	                    Mobile_HTML5optimizer xml = new Mobile_HTML5optimizer();
 	                    String xml_str = xml.generateHtml(html_env2.filename);
 	                    pw = new PrintWriter(new BufferedWriter(new FileWriter(html_env.filename)));
 						pw.println(html_env.header);
@@ -204,18 +204,18 @@ public class HTMLC3 extends Connector {
         html_env.filename = parentfile;
         html_env2.filename = parentfile2;
 
-        Log.out("TFEId = " + HTMLEnv.getClassID(this));
-        html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
+        Log.out("TFEId = " + Mobile_HTML5Env.getClassID(this));
+        html_env.append_css_def_td(Mobile_HTML5Env.getClassID(this), this.decos);
 
         //20130309
         //C3Flg=false;
         //Log.info("	[C3    end!!!]");
-
+        return null;
     }
 
     @Override
 	public String getSymbol() {
-        return "HTMLC3";
+        return "Mobile_HTML5C3";
     }
 
 }

@@ -6,12 +6,12 @@ import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 
-public class HTMLG1 extends Grouper {
+public class Mobile_HTML5G1 extends Grouper {
 
     Manager manager;
 
-    HTMLEnv html_env;
-    HTMLEnv html_env2;
+    Mobile_HTML5Env html_env;
+    Mobile_HTML5Env html_env2;
     
     //20130309
     static int gridInt = 0;
@@ -37,7 +37,7 @@ public class HTMLG1 extends Grouper {
     static String classid = "" ;
     
     //���󥹥ȥ饯��
-    public HTMLG1(Manager manager, HTMLEnv henv, HTMLEnv henv2) {
+    public Mobile_HTML5G1(Manager manager, Mobile_HTML5Env henv, Mobile_HTML5Env henv2) {
         this.manager = manager;
         this.html_env = henv;
         this.html_env2 = henv2;
@@ -46,12 +46,14 @@ public class HTMLG1 extends Grouper {
 
     //G1��work�᥽�å�
     @Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
+    	Mobile_HTML5.preProcess(getSymbol(), decos, html_env);	//Pre-process (前処理)
+    	
     	//20131001 tableDivHeader
-    	HTMLG2.tableDivHeader = "";	
-    	HTMLG2.tableDivHeader_codeBuf = "";
-    	HTMLG2.tableDivHeader_Count1 = 0;
-    	HTMLG2.tableDivHeader_Count2 = 0;
+    	Mobile_HTML5G2.tableDivHeader = "";	
+    	Mobile_HTML5G2.tableDivHeader_codeBuf = "";
+    	Mobile_HTML5G2.tableDivHeader_Count1 = 0;
+    	Mobile_HTML5G2.tableDivHeader_Count2 = 0;
     	
         int panelFlg = 0;	//20130503  Panel
         
@@ -59,7 +61,7 @@ public class HTMLG1 extends Grouper {
         boolean columnFlg = false;
     	if(tableFlg)	numberOfColumns = -1;	//@{table}時のDefault	//20130917  [ ],10@{table}
     	else			numberOfColumns = data_info.contain_itemnum();	//div
-    	if(decos.containsKey("column")){
+    	if(decos.containsKey("column") && !Mobile_HTML5.dynamicDisplay){
         	try{
             	numberOfColumns = Integer.parseInt(decos.getStr("column").replace("\"", ""));
             	if(numberOfColumns<2){
@@ -78,7 +80,7 @@ public class HTMLG1 extends Grouper {
         StringBuffer parentcss = null;
         StringBuffer parentheader = null;
         StringBuffer parentfooter = null;
-        if(decos.containsKey("row") && columnFlg){
+        if(decos.containsKey("row") && columnFlg && !Mobile_HTML5.dynamicDisplay){
         	row = Integer.parseInt(decos.getStr("row").replace("\"", ""));
         	if(row<1){	//範囲外のとき
         		Log.err("<<Warning>> row指定の範囲は、1〜です。指定された「row="+row+"」は使用できません。");
@@ -100,7 +102,7 @@ public class HTMLG1 extends Grouper {
         this.setDataList(data_info);
         
         //tk start///////////////////////////////////////////////////
-        html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
+        html_env.append_css_def_td(Mobile_HTML5Env.getClassID(this), this.decos);
         
         //20130309
         G1Flg=true;
@@ -116,7 +118,7 @@ public class HTMLG1 extends Grouper {
     	//20130314  table
         //if(decos.containsKey("table") || !decos.containsKey("div") || table0Flg){
 //        if(decos.containsKey("table") || table0Flg){
-        if(decos.containsKey("table") || table0Flg || HTMLC1.tableFlg || HTMLC2.tableFlg || HTMLG2.tableFlg){
+        if(decos.containsKey("table") || table0Flg || Mobile_HTML5C1.tableFlg || Mobile_HTML5C2.tableFlg || Mobile_HTML5G2.tableFlg){
     	//if(decos.containsKey("table") || HTMLC1.tableFlg || HTMLC2.tableFlg){
 //    		Log.info("C1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 //    		Log.info("C1 tableFlg = true !!");
@@ -130,23 +132,23 @@ public class HTMLG1 extends Grouper {
     		tableFlg = false;
     	}//else divFlg = false;
         
-        //20130529
-        if(decos.containsKey("dynamic")){
-        	if(!HTMLEnv.dynamicFlg)	HTMLEnv.staticBuf = html_env.code;
-        	HTMLEnv.dynamicFlg = true;
-        	Log.i("※G1 HTMLEnv.staticBuf: "+HTMLEnv.staticBuf);
-        }
+//        //20130529
+//        if(decos.containsKey("dynamic")){
+//        	if(!Mobile_HTML5Env.dynamicFlg)	Mobile_HTML5Env.staticBuf = html_env.code;
+//        	Mobile_HTML5Env.dynamicFlg = true;
+//        	Log.i("※G1 HTMLEnv.staticBuf: "+Mobile_HTML5Env.staticBuf);
+//        }
         
         //20130914  "text"
 //      	Log.e("	decosC2 = "+decos);
         if(decos.containsKey("text")){
 //        	Log.e("	G2in!");
-        	HTMLFunction.textFlg2 = true;
+        	Mobile_HTML5Function.textFlg2 = true;
         }
         
         if(!GlobalEnv.isOpt()){
         	//20130503  Panel
-    	    panelFlg = HTMLC1.panelProcess1(decos, html_env);
+    	    panelFlg = Mobile_HTML5C1.panelProcess1(decos, html_env);
         	
 //        	//20130205
 //        	html_env.code.append("<div id=\"fisheye\" class=\"fisheye\">\n" +
@@ -165,23 +167,23 @@ public class HTMLG1 extends Grouper {
 //    			}
         		
             	html_env.code.append("<div data-role=\"content\"> <div id=\"tabs\">\n<ul>\n");
-            	html_env.code.append("	<li><a href=\"#tabs-"+HTMLEnv.tabCount+"\">");
+            	html_env.code.append("	<li><a href=\"#tabs-"+Mobile_HTML5Env.tabCount+"\">");
             	if(!decos.getStr("tab1").equals(""))	html_env.code.append(decos.getStr("tab1"));
             	else          							html_env.code.append("tab1");
             	html_env.code.append("</a></li>\n");
-            	html_env.code.append("</ul>\n<div id=\"tabs-"+HTMLEnv.tabCount+"\">\n");
+            	html_env.code.append("</ul>\n<div id=\"tabs-"+Mobile_HTML5Env.tabCount+"\">\n");
 //            	HTMLEnv.tabFlg = true;
             }
         	//tab2〜tab15
 //        	else if(HTMLEnv.tabFlg){
         	else{
         		int i=2;
-        		while(i<=HTMLEnv.maxTab){		//HTMLEnv.maxTab=15
+        		while(i<=Mobile_HTML5Env.maxTab){		//HTMLEnv.maxTab=15
         			//Log.info("i="+i+" !!");
         			if(decos.containsKey("tab"+i) || (i==2 && decos.containsKey("tab"))){
     	        		//replace: </ul>の前に<li>〜</li>を付加
     	        		String a = "</ul>";
-    	        		String b = "	<li><a href=\"#tabs-"+HTMLEnv.tabCount+"\">";
+    	        		String b = "	<li><a href=\"#tabs-"+Mobile_HTML5Env.tabCount+"\">";
     	        		if(decos.containsKey("tab"+i))
 	    	        		if(!decos.getStr("tab"+i).equals(""))	b += decos.getStr("tab"+i);
 	    	            	else				            		b += "tab"+i;
@@ -189,13 +191,13 @@ public class HTMLG1 extends Grouper {
     	        			if(!decos.getStr("tab").equals(""))		b += decos.getStr("tab");
 	    	            	else				            		b += "tab";
     	            	b += "</a></li>\n";
-    	            	HTMLManager.replaceCode(html_env, a, b+a);
+    	            	Mobile_HTML5Manager.replaceCode(html_env, a, b+a);
     	            	
     	            	//replace: 最後の</div></div></div>カット
-    	        		HTMLManager.replaceCode(html_env, "</div></div></div>", "");
+    	        		Mobile_HTML5Manager.replaceCode(html_env, "</div></div></div>", "");
     	        		
     	        		//replace: 不要な「<div class=〜」をカット
-    	        		HTMLManager.replaceCode(html_env, "<div class=\""+HTMLEnv.getClassID(this)+" \">", "");
+    	        		Mobile_HTML5Manager.replaceCode(html_env, "<div class=\""+Mobile_HTML5Env.getClassID(this)+" \">", "");
     	        		//String cutClass="class=\""+HTMLEnv.getClassID(this)+" \"";
     	        		//if(!HTMLManager.replaceCode(html_env, "<div "+cutClass+">", ""))	cutClass="";
 //    	        		if(!HTMLManager.replaceCode(html_env, "<div class=\""+HTMLEnv.getClassID(this)+" \">", "")){
@@ -209,7 +211,7 @@ public class HTMLG1 extends Grouper {
 //    	        			}
 //    	        		}
     	            	
-    	        		html_env.code.append("<div id=\"tabs-"+HTMLEnv.tabCount+"\">\n");
+    	        		html_env.code.append("<div id=\"tabs-"+Mobile_HTML5Env.tabCount+"\">\n");
     	        		////上記でカットしたcutClassをappend
     	            	//html_env.code.append("<div id=\"tabs-"+HTMLEnv.tabCount+"\" "+cutClass+">\n");
     	            	break;
@@ -234,14 +236,14 @@ public class HTMLG1 extends Grouper {
 //        	//uncommented
         	//if(!tableFlg) 	html_env.code.append("	<DIV Class=\"ui-grid-a\">");
         	if(!tableFlg){
-        		if(html_env.written_classid.contains(HTMLEnv.getClassID(this)))
-        			html_env.code.append("\n<DIV Class=\"ui-grid ##"+HTMLEnv.uiGridCount2+" "+HTMLEnv.getClassID(this)+"\"");
+        		if(html_env.written_classid.contains(Mobile_HTML5Env.getClassID(this)))
+        			html_env.code.append("\n<DIV Class=\"ui-grid ##"+Mobile_HTML5Env.uiGridCount2+" "+Mobile_HTML5Env.getClassID(this)+"\"");
 //	        		html_env.code.append("\n<DIV Class=\"ui-grid-a ##"+HTMLEnv.uiGridCount2+" "+HTMLEnv.getClassID(this)+"\"");
         		else
-        			html_env.code.append("\n<DIV Class=\"ui-grid ##"+HTMLEnv.uiGridCount2+"\"");
+        			html_env.code.append("\n<DIV Class=\"ui-grid ##"+Mobile_HTML5Env.uiGridCount2+"\"");
 //        			html_env.code.append("\n<DIV Class=\"ui-grid-a ##"+HTMLEnv.uiGridCount2+"\"");
         		html_env.code.append(">\n");
-        		HTMLEnv.uiGridCount2++;
+        		Mobile_HTML5Env.uiGridCount2++;
         	}
             
             //20130314  table
@@ -250,18 +252,22 @@ public class HTMLG1 extends Grouper {
             	if(numberOfColumns < 0)	html_env.code.append("<div style=\"overflow:auto;\">\n");	//20130917  [ ],10@{table}
             	//html_env.code.append("<div style=\"height:60px; width:0px; overflow:auto;\">\n");
             	
-            	if(row>1 && tableFlg)	HTMLG2.tableStartTag = HTMLC1.getTableStartTag(html_env, decos, this)+"<TR>";
-            	else					html_env.code.append(HTMLC1.getTableStartTag(html_env, decos, this)+"<TR>");
+            	if(row>1 && tableFlg)	Mobile_HTML5G2.tableStartTag = Mobile_HTML5C1.getTableStartTag(html_env, decos, this)+"<TR>";
+            	else					html_env.code.append(Mobile_HTML5C1.getTableStartTag(html_env, decos, this)+"<TR>");
             }
+            
         }
-        //tk end//////////////////////////////////////////////////////
 //        Log.out("<TABLE class=\""+HTMLEnv.getClassID(this) + "\"><TR>");
 
         //html_env2.code.append("<tfe type=\"connect\" dimension=\"1\" >");
+        
+        Mobile_HTML5.beforeWhileProcess(getSymbol(), decos, html_env);
         int i = 0;
         while (this.hasMoreItems()) {
-            if(decos.containsKey("table0") || HTMLC1.table0Flg || HTMLC2.table0Flg || HTMLG2.table0Flg)	table0Flg = true;
-            if(decos.containsKey("table") || HTMLC1.tableFlg || HTMLC2.tableFlg || HTMLG2.tableFlg || table0Flg)	tableFlg=true;
+        	Mobile_HTML5Function.glvl = html_env.glevel;	//added by goto 20130914  "SEQ_NUM"
+        	
+            if(decos.containsKey("table0") || Mobile_HTML5C1.table0Flg || Mobile_HTML5C2.table0Flg || Mobile_HTML5G2.table0Flg)	table0Flg = true;
+            if(decos.containsKey("table") || Mobile_HTML5C1.tableFlg || Mobile_HTML5C2.tableFlg || Mobile_HTML5G2.tableFlg || table0Flg)	tableFlg=true;
             //if(decos.containsKey("div") || HTMLC1.divFlg || HTMLC2.divFlg || HTMLG1.divFlg || HTMLG2.divFlg){
             if(decos.containsKey("div")){
         		divFlg = true;
@@ -274,8 +280,8 @@ public class HTMLG1 extends Grouper {
             if(rowFlg){
             	html_env.code = new StringBuffer();
             	html_env.countfile++;
-                html_env.filename = html_env.outfile + "_row" + HTMLG2.rowFileNum + "_" + j + ".html";
-                html_env.nextbackfile = html_env.linkoutfile + "_row" + HTMLG2.rowFileNum + "_" + j + ".html";
+                html_env.filename = html_env.outfile + "_row" + Mobile_HTML5G2.rowFileNum + "_" + j + ".html";
+                html_env.nextbackfile = html_env.linkoutfile + "_row" + Mobile_HTML5G2.rowFileNum + "_" + j + ".html";
                 html_env.setOutlineMode();
             }
             
@@ -321,7 +327,7 @@ public class HTMLG1 extends Grouper {
             
             //20130309
 //            Count = ( ((gridInt>=jj)&&(!HTMLG1.G1Flg))? jj:gridInt );
-            Count = ( ((gridInt>=jj)&&(HTMLG1.G1Flg))? jj:gridInt );
+            Count = ( ((gridInt>=jj)&&(Mobile_HTML5G1.G1Flg))? jj:gridInt );
             
 //            //20130312 collapsible
 //        	if(decos.containsKey("collapse")){
@@ -368,15 +374,15 @@ public class HTMLG1 extends Grouper {
     	    if(!tableFlg){
     	    	//20131002
             	if(decos.containsKey("width")){
-            		HTMLEnv.divWidth = decos.getStr("width");
+            		Mobile_HTML5Env.divWidth = decos.getStr("width");
     	    	}else{
         	    	float divWidth = (float)Math.floor((double)(100.0/numberOfColumns)* 1000) / 1000;
-                	HTMLEnv.divWidth = divWidth+"%";
+                	Mobile_HTML5Env.divWidth = divWidth+"%";
     	    	}
             	//tfe.addDeco("width", divWidth);	//☆HTMLEnvで行うように変更した
             	
-            	if(Count!=0)	html_env.code.append("\n	<div class=\"ui-block"+" "+HTMLEnv.getClassID(tfe)+"\">\n");
-    	    	else			html_env.code.append("\n	<div class=\"ui-block"+" "+HTMLEnv.getClassID(tfe)+"\" style=\"clear:left;\">\n");
+            	if(Count!=0)	html_env.code.append("\n	<div class=\"ui-block"+" "+Mobile_HTML5Env.getClassID(tfe)+"\">\n");
+    	    	else			html_env.code.append("\n	<div class=\"ui-block"+" "+Mobile_HTML5Env.getClassID(tfe)+"\" style=\"clear:left;\">\n");
             	
 //    	    	float divWidth = (float)Math.floor((double)(100.0/numberOfColumns)* 1000) / 1000;
 //    	    	if(Count!=0)	html_env.code.append("\n	<div class=\"ui-block"+" "+HTMLEnv.getClassID(tfe)+"\" style=\"width:"+divWidth+"%;\">\n");
@@ -385,10 +391,10 @@ public class HTMLG1 extends Grouper {
 //    	    if(!tableFlg)   html_env.code.append("\n	<div class=\"ui-block-"+gridString[Count]+" "+HTMLEnv.getClassID(tfe)+"\">\n");
     	    //20130314  table
     	    else{
-	            html_env.code.append("<TD class=\"" + HTMLEnv.getClassID(tfe) + " nest\">\n");       
+	            html_env.code.append("<TD class=\"" + Mobile_HTML5Env.getClassID(tfe) + " nest\">\n");       
     	    }
     	    //String classid = HTMLEnv.getClassID(tfe);
-    	    classid = HTMLEnv.getClassID(tfe);
+    	    classid = Mobile_HTML5Env.getClassID(tfe);
             //classid0 = HTMLEnv.getClassID(tfe);
             	
             //Log.out("<TD class=\"" + HTMLEnv.getClassID(tfe) + " nest\">");
@@ -397,34 +403,39 @@ public class HTMLG1 extends Grouper {
             //Log.info("tfe : " + this.tfeItems);
     	    
 	      	
-    	    if(HTMLEnv.dynamicFlg){	//20130529 dynamic
-	      		//☆★
-	      		Log.info("★★G1-1 tfe : " + tfe);
-	    		//☆★            Log.info("G1 tfe : " + tfe);
-	            //☆★            Log.info("G1 tfes : " + this.tfes);
-	            //☆★            Log.info("G1 tfeItems : " + this.tfeItems);
-	      	}
+//    	    if(Mobile_HTML5Env.dynamicFlg){	//20130529 dynamic
+//	      		//☆★
+//	      		Log.info("★★G1-1 tfe : " + tfe);
+//	    		//☆★            Log.info("G1 tfe : " + tfe);
+//	            //☆★            Log.info("G1 tfes : " + this.tfes);
+//	            //☆★            Log.info("G1 tfeItems : " + this.tfeItems);
+//	      	}
             
+	        Mobile_HTML5.whileProcess1(getSymbol(), decos, html_env, data, data_info, tfe, null, -1);
+    	    
             this.worknextItem();
-            if(decos.containsKey("table0") || HTMLC1.table0Flg || HTMLC2.table0Flg || HTMLG2.table0Flg)	table0Flg = true;
-            if(decos.containsKey("table") || HTMLC1.tableFlg || HTMLC2.tableFlg || HTMLG2.tableFlg || table0Flg)	tableFlg=true;
+            
+	        Mobile_HTML5.whileProcess2(getSymbol(), decos, html_env, data, data_info, tfe, null, -1);
+	        
+            if(decos.containsKey("table0") || Mobile_HTML5C1.table0Flg || Mobile_HTML5C2.table0Flg || Mobile_HTML5G2.table0Flg)	table0Flg = true;
+            if(decos.containsKey("table") || Mobile_HTML5C1.tableFlg || Mobile_HTML5C2.tableFlg || Mobile_HTML5G2.tableFlg || table0Flg)	tableFlg=true;
             //if(decos.containsKey("div") || HTMLC1.divFlg || HTMLC2.divFlg || HTMLG1.divFlg || HTMLG2.divFlg){
             if(decos.containsKey("div")){
         		divFlg = true;
         		tableFlg = false;
         	}
             
-            //20130529
-            if(decos.containsKey("dynamic"))	HTMLEnv.dynamicFlg = true;
+//            //20130529
+//            if(decos.containsKey("dynamic"))	Mobile_HTML5Env.dynamicFlg = true;
             
 	      	
-    	    if(HTMLEnv.dynamicFlg){	//20130529 dynamic
-	      		//☆★
-	      		Log.info("★★G1-2 tfe : " + tfe);
-	    		//☆★            Log.info("G1 tfe : " + tfe);
-	            //☆★            Log.info("G1 tfes : " + this.tfes);
-	            //☆★            Log.info("G1 tfeItems : " + this.tfeItems);
-	      	}
+//    	    if(Mobile_HTML5Env.dynamicFlg){	//20130529 dynamic
+//	      		//☆★
+//	      		Log.info("★★G1-2 tfe : " + tfe);
+//	    		//☆★            Log.info("G1 tfe : " + tfe);
+//	            //☆★            Log.info("G1 tfes : " + this.tfes);
+//	            //☆★            Log.info("G1 tfeItems : " + this.tfeItems);
+//	      	}
             //20130309
             //20130314  table
         	if(tableFlg){
@@ -484,24 +495,25 @@ public class HTMLG1 extends Grouper {
 //            }
             html_env.glevel--;
 
-            HTMLG2.tableDivHeader_Count1++;	//20131001 tableDivHeader
+            Mobile_HTML5G2.tableDivHeader_Count1++;	//20131001 tableDivHeader
             
             //added by goto 20130413  "row Prev/Next"
             if(rowFlg){
             	codeBuf.append(html_env.code);
             	if((rowNum+1)%(row*numberOfColumns)==0){
-	                HTMLG2.createHTMLfile_ForPrevNext(html_env, codeBuf);
+	                Mobile_HTML5G2.createHTMLfile_ForPrevNext(html_env, codeBuf);
 	                j++;
 	                codeBuf = new StringBuffer();
                 }
                 rowNum++;
             }
         }	// /while
+        Mobile_HTML5.afterWhileProcess(getSymbol(), decos, html_env);
         
         //added by goto 20130413  "row Prev/Next"
         if(rowFlg){
         	if(rowNum%(row*numberOfColumns)!=0){	//最後の child HTML を create
-        		HTMLG2.createHTMLfile_ForPrevNext(html_env, codeBuf);
+        		Mobile_HTML5G2.createHTMLfile_ForPrevNext(html_env, codeBuf);
         	}
         	//ファイル名・コード等をparent HTMLのものへ戻す
         	html_env.filename = parentfile;
@@ -510,12 +522,13 @@ public class HTMLG1 extends Grouper {
             html_env.header = parentheader;
             html_env.footer = parentfooter;
             html_env.nextbackfile = parentnextbackfile;
-            Log.out("TFEId = " + HTMLEnv.getClassID(this));
-            html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
+            Log.out("TFEId = " + Mobile_HTML5Env.getClassID(this));
+            html_env.append_css_def_td(Mobile_HTML5Env.getClassID(this), this.decos);
             
             int first = 1, last = ((rowNum%(row*numberOfColumns)!=0)? (rowNum/(row*numberOfColumns)+1):(rowNum/(row*numberOfColumns)));	//for G1
-            HTMLG2.PrevNextProcess(html_env, rowNum, row, first, last, numberOfColumns);
+            Mobile_HTML5G2.PrevNextProcess(html_env, rowNum, row, first, last, numberOfColumns);
         }
+        
         
 ////        //TOOD 必要？不要？　→　不要のような気がするけど？？？　→　あると余計な部分が消されることがあるので無い方が良い(2013.09.26)
 ////        //[重要] For [ [], ]! || [],
@@ -542,8 +555,8 @@ public class HTMLG1 extends Grouper {
 //			}
     	 */
         
-        if(HTMLEnv.getFormItemFlg()){		
-	        HTMLEnv.incrementFormPartsNumber();
+        if(Mobile_HTML5Env.getFormItemFlg()){		
+	        Mobile_HTML5Env.incrementFormPartsNumber();
 		}
 
         //html_env2.code.append("</tfe>");
@@ -558,7 +571,7 @@ public class HTMLG1 extends Grouper {
         
         if(divFlg)	divFlg = false;		//20130326  div
         
-        if(HTMLEnv.dynamicFlg)	HTMLEnv.dynamicFlg = false;		//20130529 dynamic
+//        if(Mobile_HTML5Env.dynamicFlg)	Mobile_HTML5Env.dynamicFlg = false;		//20130529 dynamic
         
         
         G1Flg=false;
@@ -572,11 +585,11 @@ public class HTMLG1 extends Grouper {
     	//20130330 tab
 //    	if(HTMLEnv.tabFlg){
     		int a=1;
-	    	while(a<=HTMLEnv.maxTab){
+	    	while(a<=Mobile_HTML5Env.maxTab){
 	    		//Log.info("a="+a);
 	    		if(decos.containsKey("tab"+a) || (a==1 && decos.containsKey("tab"))){
 		    		html_env.code.append("</div></div></div>\n");
-		    		HTMLEnv.tabCount++;
+		    		Mobile_HTML5Env.tabCount++;
 		    		break;
 		    	}
 		    	a++;
@@ -584,25 +597,28 @@ public class HTMLG1 extends Grouper {
 //    	}
 	    
     	//20130503  Panel
-    	HTMLC1.panelProcess2(decos, html_env, panelFlg);
+    	Mobile_HTML5C1.panelProcess2(decos, html_env, panelFlg);
     	
     	//added by goto 20130413  "row Prev/Next"
         if(rowFlg){
-        	HTMLG2.rowFileNum++;
+        	Mobile_HTML5G2.rowFileNum++;
         	rowFlg = false;
-        	HTMLG2.tableStartTag = "";
+        	Mobile_HTML5G2.tableStartTag = "";
         }
         
+        Mobile_HTML5.postProcess(getSymbol(), decos, html_env);	//Post-process (後処理)
+        
         //added by goto 20130914  "SEQ_NUM"
-        HTMLFunction.Func_seq_num_initialization();
+        Mobile_HTML5Function.Func_seq_num_initialization(html_env.glevel);
 
-        Log.out("TFEId = " + HTMLEnv.getClassID(this));
+        Log.out("TFEId = " + Mobile_HTML5Env.getClassID(this));
         //html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
+		return null;
     }
 
     @Override
 	public String getSymbol() {
-        return "HTMLG1";
+        return "Mobile_HTML5G1";
     }
 
 }

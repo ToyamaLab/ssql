@@ -22,7 +22,7 @@ public class X3DG3 extends Grouper{
 	    }
 
 	    @Override
-		public void work(ExtList data_info) {
+		public String work(ExtList data_info) {
 	        Log.out("------- G3 -------");
 	        this.setDataList(data_info);
 	        
@@ -52,7 +52,7 @@ public class X3DG3 extends Grouper{
 	            X3DEnv.groupflag = 1;
 	            X3DEnv.bookcount = 1;
 	            
-	            /*’I‚ðyŽ²•ûŒü‚É’Ç‰Á*/
+	            /*ï¿½Iï¿½ï¿½yï¿½ï¿½ï¿½ï¿½ï¿½É’Ç‰ï¿½*/
 	            X3DEnv.z += value.z;
 	            X3DEnv.x = X3DEnv.xi;
 	            X3DEnv.bz = X3DEnv.z-0.2;
@@ -84,6 +84,7 @@ public class X3DG3 extends Grouper{
 	        	X3DEnv.x3d_add = 0;
 	        	X3DEnv.xmax = 0;
 	        	x3d_env.append_css_def_td(X3DEnv.getClassID(this), this.decos);
+				return null;
 	   
 	    }
 

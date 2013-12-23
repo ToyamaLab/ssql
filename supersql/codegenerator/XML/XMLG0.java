@@ -20,7 +20,7 @@ public class XMLG0 extends Grouper {
     }
 
     @Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
         Log.out("************* XMLG0 *************");
         this.setDataList(data_info);
 
@@ -114,6 +114,7 @@ public class XMLG0 extends Grouper {
         Log.out("G0 tag(end) : " + tag);
 
         Log.out("TFEId = " + XMLEnv.getClassID(this));
+		return null;
 
     }
 

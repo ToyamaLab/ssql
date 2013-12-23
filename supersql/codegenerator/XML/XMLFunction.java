@@ -32,7 +32,7 @@ public class XMLFunction extends Function {
     }
 
 
-    public void work(ExtList data_info) {
+    public String work(ExtList data_info) {
         this.setDataList(data_info);
 
         String FuncName = this.getFuncName();
@@ -165,6 +165,7 @@ public class XMLFunction extends Function {
         }
 
         Log.out("TFEId = " + XMLEnv.getClassID(this));
+		return null;
     }
 
 

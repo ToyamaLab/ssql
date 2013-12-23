@@ -18,6 +18,7 @@ public class GetFromDB {
         String dbms = GlobalEnv.getdbms();
         String url = GlobalEnv.geturl();
         String password = GlobalEnv.getpassword();
+        
 
         Log.out("[hostname : " + hostname + "]");
         Log.out("[dbname   : " + dbname + "]");

@@ -25,7 +25,7 @@ public interface ITFE {
 
 	ExtList makele0();
 
-	void work(ExtList<ExtList<String>> data_info);
+	String work(ExtList<ExtList<String>> data_info);
 	Object createNode(ExtList<ExtList<String>> data_info);
 
 	int countconnectitem();

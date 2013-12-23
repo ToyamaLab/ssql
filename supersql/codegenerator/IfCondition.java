@@ -46,7 +46,9 @@ public class IfCondition extends Operator {
 		return le0;
 	}
 
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
+		return null;
+//		return aggregate;
 	}
 
 	public int countconnectitem() {

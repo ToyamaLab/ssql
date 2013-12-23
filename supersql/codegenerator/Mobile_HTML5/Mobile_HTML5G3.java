@@ -18,19 +18,19 @@ import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 
-public class HTMLG3 extends Grouper {
+public class Mobile_HTML5G3 extends Grouper {
 
     Manager manager;
 
-    HTMLEnv html_env;
-    HTMLEnv html_env2;
+    Mobile_HTML5Env html_env;
+    Mobile_HTML5Env html_env2;
 
     private String backfile = new String();
 
     private int countinstance = 0;
 
     //���󥹥ȥ饯��
-    public HTMLG3(Manager manager, HTMLEnv henv, HTMLEnv henv2) {
+    public Mobile_HTML5G3(Manager manager, Mobile_HTML5Env henv, Mobile_HTML5Env henv2) {
         this.manager = manager;
         this.html_env = henv;
         this.html_env2 = henv2;
@@ -38,7 +38,7 @@ public class HTMLG3 extends Grouper {
 
     //G3��work�᥽�å�
     @Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
         String parentfile = html_env.filename;
         String parentnextbackfile = html_env.nextbackfile;
         StringBuffer parentcode = html_env.code;
@@ -133,7 +133,7 @@ public class HTMLG3 extends Grouper {
 	                pw2.println(html_env2.code);
 	                pw2.println(html_env2.footer);
 	                pw2.close();
-	                HTMLoptimizer xml = new HTMLoptimizer();
+	                Mobile_HTML5optimizer xml = new Mobile_HTML5optimizer();
 	                String xml_str = xml.generateHtml(html_env2.filename);
 	                pw = new PrintWriter(new BufferedWriter(new FileWriter(html_env.filename)));
 					pw.println(html_env.header);
@@ -175,9 +175,10 @@ public class HTMLG3 extends Grouper {
         html_env2.footer = parentfooter2;
         html_env2.nextbackfile = parentnextbackfile2;
 
-        Log.out("TFEId = " + HTMLEnv.getClassID(this));
-        html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
-
+        Log.out("TFEId = " + Mobile_HTML5Env.getClassID(this));
+        html_env.append_css_def_td(Mobile_HTML5Env.getClassID(this), this.decos);
+		
+        return null;
     }
 
     private void setLinkButton() {
@@ -187,7 +188,7 @@ public class HTMLG3 extends Grouper {
         nextfile = html_env.linkoutfile.substring(html_env.linkoutfile.lastIndexOf("/")+1)
         		+ String.valueOf(html_env.countfile + 1) + ".html";
         html_env.code.append("<DIV class=\"linkbutton "
-                + HTMLEnv.getClassID(tfe) + "\">\n");
+                + Mobile_HTML5Env.getClassID(tfe) + "\">\n");
         if (countinstance > 1) {
 //            html_env.code.append("<A href=\"" + backfile + "\">");
             html_env.code.append("<A href=\"" + backfile.substring(html_env.linkoutfile.lastIndexOf("/")+1) + "\">");
@@ -207,7 +208,7 @@ public class HTMLG3 extends Grouper {
 
     @Override
 	public String getSymbol() {
-        return "HTMLG3";
+        return "Mobile_HTML5G3";
     }
 
 }

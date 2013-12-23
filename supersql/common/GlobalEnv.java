@@ -14,7 +14,24 @@ import java.util.Hashtable;
 //added by goto 20120624
 
 public class GlobalEnv {
+	
+	public static final char COMMENT_OUT_LETTER = '-';	//コメントアウトに使用する文字(ex: -- )
+	
+    /* [重要] getPropertyメソッドによって、システムプロパティの値(OS、ファイル区切り文字、ホーム、言語など)を取得 */
+    /* システムプロパティ値一覧の取得: System.getProperties().list(System.out); */
+    public final static String USER_HOME = System.getProperty("user.home");				//ユーザのホームディレクトリ
+    public final static String OS = System.getProperty("os.name");						//OSの名前("Mac OS X" 等)
+    public final static String OS_LS = System.getProperty("line.separator");			//OSごとの改行コード(Windows:"\r\n",Mac:"\r",UNIX:"\n" 等)
+    public final static String OS_FS = System.getProperty("file.separator");			//OSごとのファイル区切り文字(Windows:"\" , MacとLinux:"/" 等)
+    public final static String OS_PS = System.getProperty("path.separator");			//OSごとのパス区切り文字(Windows";" , MacとLinux":" 等)
+    public final static String EXE_FILE_PATH = System.getProperty("java.class.path");	//実行ファイルのパス(実行jarファイル等がどこにあるか)を取得 (※注意:相対パスで返ってくる場合あり)
+    public final static String USER_LANGUAGE = System.getProperty("user.language");		//ユーザの言語(日本語:ja)  日本語・英語切り替え機能を付けるときに使用？
+    public final static String USER_COUNTRY = System.getProperty("user.country");		//ユーザの国名(日本:JP)   日本語・英語切り替え機能を付けるときに使用？
 
+    public final static String MEDIA_XML = System.getProperty("user.dir")+OS_FS+"XML"+OS_FS+"ssql_medias.xml";
+    
+    public static String query = "";
+    
 	private static Hashtable<String, String> envs;
 
 	//設定ファイルの情報

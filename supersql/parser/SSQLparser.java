@@ -24,6 +24,8 @@ import supersql.db.SQLManager;
 import supersql.extendclass.ExtList;
 
 public class SSQLparser {
+
+	private String commentOutLetters = ""+GlobalEnv.COMMENT_OUT_LETTER+GlobalEnv.COMMENT_OUT_LETTER;	//="--"
     
     //added by goto 20130508  "Login&Logout"
 	public static boolean sessionFlag = false;
@@ -134,7 +136,7 @@ public class SSQLparser {
 			return "";
 		}
 
-		Log.info("[Paser:Parser] filename = " + filename);
+		Log.info("[Parser:Parser] filename = " + filename);
 		BufferedReader in;
 		StringBuffer tmp = new StringBuffer();
 		try{
@@ -153,6 +155,13 @@ public class SSQLparser {
 				line = in.readLine();
 				if (line == null)	break;
 				
+				if (line.contains("/*")){
+					String line1 = line.substring(0, line.indexOf("/*"));
+					while (!line.contains("*/"))
+						line = in.readLine();
+					line = line1 + line.substring(line.indexOf("*/") + 2);
+				}
+				
 				//goto 20130915  "<?  ?>", "<$  $>"
 				if (line.startsWith("<?")){
 					String line1 = line.substring(0, line.indexOf("<?"));
@@ -167,28 +176,11 @@ public class SSQLparser {
 					//Log.i("textString.get("+textNum+") = \n"+textString.get(textNum));
 					textNum++;
 				} 
-//				else if (line.startsWith("<$")){
-//					String line1 = line.substring(0, line.indexOf("<$"));
-//					String buf = "";
-//					while (!line.startsWith("$>")){
-//						line = in.readLine();
-//						buf += line+"\n";
-//					}
-//					buf = buf.substring(0,buf.lastIndexOf("$>"));	//substring last '?>'
-//					textString.add(textNum, buf);
-//					line = line1 + "text(\"#TextLabel_"+textNum+"\")!" + line.substring(line.indexOf("$>") + 2);	//add label
-//					//Log.i("textString.get("+textNum+") = \n"+textString.get(textNum));
-//					textNum++;
-//				}
-
-				if (line.contains("/*")){
-					String line1 = line.substring(0, line.indexOf("/*"));
-					while (!line.contains("*/"))
-						line = in.readLine();
-					line = line1 + line.substring(line.indexOf("*/") + 2);
-				}
 				
-				if (line.contains("//") || line.contains("\\\"") || line.contains("\"\"")){
+				// #import  by goto 201312
+				line = Import.checkImportString(in, line);
+				
+				if (line.contains(commentOutLetters) || line.contains("\\\"") || line.contains("\"\"")){	//commentOutLetters = "--"
 					boolean dqFlg = false;
 					int i = 0;
 					for (i=0; i < line.length(); i++){
@@ -205,7 +197,7 @@ public class SSQLparser {
 //							line = line.substring(0,i-1)+"&quot;"+line.substring(i+1,line.length());
 						
 						}
-						else if (!dqFlg && i < line.length()-1 && line.charAt(i)=='/' && line.charAt(i+1)=='/')
+						else if (!dqFlg && i < line.length()-1 && line.charAt(i)==GlobalEnv.COMMENT_OUT_LETTER && line.charAt(i+1)==GlobalEnv.COMMENT_OUT_LETTER)
 							break;
 					}
 					line = line.substring(0, i);
@@ -353,7 +345,10 @@ public class SSQLparser {
 			query = query.substring(0, query.length() - 1).trim();
 		}
 
-		Log.info("[Paser:Parser] ssql statement = " + query);
+		Log.info("[Parser:Parser] ssql statement = " + query);
+		
+		// #import  by goto 201312
+		query = Import.importProcess(query);
 
 		//goto
 		media = getGenereteMedia(query);
@@ -365,12 +360,11 @@ public class SSQLparser {
 		media = media.toLowerCase();
 		if(media.equals("html") || media.equals("mobile_html5")){
 			query = replaceQuery_For_HTML_and_MobileHTML5(query);
-//			Log.i(query);
 			while(query.contains(") ] }@{text}"))						//TODO
 				query = query.replace(") ] }@{text}", ") ]! }@{text}");	//TODO
 			
 		}
-
+		//Log.e("query = "+query);
 		return query;
 	}
 
@@ -510,7 +504,7 @@ public class SSQLparser {
 
 		String filename = GlobalEnv.getfilename();
 		if (filename != null) {
-			Log.info("[Paser:Parser] filename = " + filename);
+			Log.info("[Parser:Parser] filename = " + filename);
 			StringBuffer tmp = new StringBuffer();
 			String line = new String();
 			BufferedReader dis;
@@ -548,7 +542,7 @@ public class SSQLparser {
 						line = line1 + line.substring(t + 2);
 					}
 					// added by goto 20130412
-					if (line != null && line.contains("//")) {
+					if (line != null && line.contains(commentOutLetters)) {	//commentOutLetters = "--"
 						boolean dqFlg = false;
 						int i = 0;
 
@@ -560,8 +554,8 @@ public class SSQLparser {
 
 							if (!dqFlg
 									&& i < line.length() - 1
-									&& (line.charAt(i) == '/' && line
-									.charAt(i + 1) == '/'))
+									&& (line.charAt(i) == GlobalEnv.COMMENT_OUT_LETTER && line
+									.charAt(i + 1) == GlobalEnv.COMMENT_OUT_LETTER))
 								break;
 						}
 						line = line.substring(0, i);
@@ -586,7 +580,7 @@ public class SSQLparser {
 			query = query.substring(0, query.length() - 1).trim();
 		}
 
-		Log.info("[Paser:Parser] ssql statement = " + query);
+		Log.info("[Parser:Parser] ssql statement = " + query);
 		return query;
 	}
 
@@ -859,7 +853,7 @@ public class SSQLparser {
 			else {
 				buffer.append(nt + " ");
 			}
-			supersql.codegenerator.Mobile_HTML5.HTMLFunction.after_from_string += nt+" ";	//added by goto 20130515  "search"
+			supersql.codegenerator.Mobile_HTML5.Mobile_HTML5Function.after_from_string += nt+" ";	//added by goto 20130515  "search"
 		}
 	}
 
@@ -951,7 +945,7 @@ public class SSQLparser {
 			if (foreachFlag) {
 				tfe.append("]%");
 			}
-
+			
 			// changed by goto 20130122 For "slideshow"
 			if (!tfe.toString().contains("type=\"slideshow\""))
 				System.out.println("[Parser:tfe] tfe = " + tfe);
@@ -979,6 +973,7 @@ public class SSQLparser {
 	}
 
 	private void preProcess(StringTokenizer st, String nt) {
+		
 		// FOREACH
 		if (nt.equalsIgnoreCase("FOREACH")) {
 			foreachFlag = true;
@@ -1010,7 +1005,7 @@ public class SSQLparser {
 		}
 		
 		//SESSION  //added by goto 20130508  "Login&Logout"
-        if (nt.matches("SESSION.*")) {
+        if (nt.toUpperCase().matches("SESSION.*") || nt.toUpperCase().matches("LOGIN.*")) {
             while (st.hasMoreTokens()) {
             	sessionString += nt+" ";
                 nt = st.nextToken().toString();
@@ -1341,7 +1336,7 @@ public class SSQLparser {
     			filename = ArgValue[position];
         }
 
-    	if(!filename.contains(".sql"))
+    	if(!filename.contains(".sql") || !filename.contains(".ssql"))
     	{
     		query.append(tmp);
     		return query;
@@ -1369,7 +1364,7 @@ public class SSQLparser {
                 	int t = line.indexOf("*/");
                 	line = line1+line.substring(t+2);
                 }
-                if(line!=null && line.contains("--")){
+                if(line!=null && line.contains(commentOutLetters)){	//commentOutLetters = "--"
                 	boolean dqFlg=false;
                 	int i=0;
                 	
@@ -1377,7 +1372,7 @@ public class SSQLparser {
                 		if(line.charAt(i)=='"' && !dqFlg)		dqFlg=true;
                 		else if(line.charAt(i)=='"' && dqFlg)	dqFlg=false;
                 		
-                		if(!dqFlg && i<line.length()-1 && (line.charAt(i)=='/' && line.charAt(i+1)=='/'))
+                		if(!dqFlg && i<line.length()-1 && (line.charAt(i)==GlobalEnv.COMMENT_OUT_LETTER && line.charAt(i+1)==GlobalEnv.COMMENT_OUT_LETTER))
                 			break;
                 	}
                 	line = line.substring(0,i);

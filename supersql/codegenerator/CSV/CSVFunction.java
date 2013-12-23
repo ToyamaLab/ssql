@@ -17,10 +17,11 @@ public class CSVFunction extends Function {
         super();
     }
 
-    public void work(ExtList data_info) {
+    public String work(ExtList data_info) {
         this.setDataList(data_info);
 
         Log.out("TFEId = " + CSVEnv.getClassID(this));
+		return null;
     }
 
     public static String Func_replace(String s){

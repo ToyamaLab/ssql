@@ -30,7 +30,7 @@ public class PDFFunction extends Function implements PDFTFE {
 
 	//Functionのworkメソッド
 	@Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 
 		this.setDataList(data_info);
 		//    	Log.out("FuncName= " + this.getFuncName());
@@ -42,6 +42,7 @@ public class PDFFunction extends Function implements PDFTFE {
 		if(FuncName.equalsIgnoreCase("imagefile")){
 			Func_imagefile();
 		}
+		return null;
 	}
 
 

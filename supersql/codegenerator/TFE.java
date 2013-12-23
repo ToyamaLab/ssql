@@ -37,7 +37,9 @@ public class TFE implements ITFE {
 
 	@Override
 	@Deprecated
-	public void work(ExtList<ExtList<String>> data_info) {
+	public String work(ExtList<ExtList<String>> data_info) {
+		return null;
+//		return aggregate;
 		// TODO Auto-generated method stub
 		
 	}

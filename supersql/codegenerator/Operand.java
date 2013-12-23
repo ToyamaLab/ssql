@@ -9,5 +9,5 @@ public abstract class Operand extends TFE implements IOperand {
 	}
 
 	@Override
-	public abstract void work(ExtList<ExtList<String>> data_info);
+	public abstract String work(ExtList<ExtList<String>> data_info);
 }

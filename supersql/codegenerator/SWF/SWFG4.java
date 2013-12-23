@@ -31,7 +31,7 @@ public class SWFG4 extends Grouper implements SWFTFE{
 		this.swf_env = swf_env;
 	}
 
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 
 		System.out.println("------- G4 -------");
 		System.out.println("[SWFG4:work]tfe_info = " + makele0());
@@ -108,6 +108,7 @@ public class SWFG4 extends Grouper implements SWFTFE{
 
 
 		if(swf_env.level==0) swf_env.final_value = value;
+		return null;
 	}
 
 

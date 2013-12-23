@@ -14,15 +14,15 @@ public class X3DG2 extends Grouper{
     
     X3DValue value;
 
-    //¥³¥ó¥¹¥È¥é¥¯¥¿
+    //ï¿½ï¿½ï¿½ó¥¹¥È¥é¥¯ï¿½ï¿½
     public X3DG2(Manager manager, X3DEnv lenv) {
         this.manager = manager;
         this.x3d_env = lenv;
     }
 
-    //G2¤Îwork¥á¥½¥Ã¥É
+    //G2ï¿½ï¿½workï¿½á¥½ï¿½Ã¥ï¿½
     @Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 
         Vector vector_local = new Vector();
 
@@ -46,7 +46,7 @@ public class X3DG2 extends Grouper{
         while (this.hasMoreItems()) {
             x3d_env.glevel++;
 
-            /*’I‚ğ‚’¼•ûŒü‚É’Ç‰Á*/
+            /*ï¿½Iï¿½ğ‚’ï¿½ï¿½ï¿½ï¿½É’Ç‰ï¿½*/
             /*if (add == true){
             	x3d_env.code.append("Shelf2 {position " + xs + " " + ys + " " + zs + " }\n");
             	Log.out("Shelf2 {position " + xs + " " + ys + " " + zs + " }");
@@ -77,6 +77,7 @@ public class X3DG2 extends Grouper{
             }
             */
         }
+		return null;
     }
 
     @Override

@@ -13,7 +13,7 @@ public class CSVC0 extends Connector {
         this.csvEnv = xenv;
     }
 
-    public void work(ExtList data_info) {
+    public String work(ExtList data_info) {
 
     	Log.out("------- C0 -------");
         Log.out("tfes.contain_itemnum=" + tfes.contain_itemnum());
@@ -35,6 +35,7 @@ public class CSVC0 extends Connector {
 
 	     csvEnv.code.append("\n");
 	   	 Log.out("TFEId = " + CSVEnv.getClassID(this));
+		return null;
 	}
 
     public String getSymbol() {

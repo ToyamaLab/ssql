@@ -495,7 +495,7 @@ public class FormServlet extends HttpServlet {
 		              		if(line.charAt(i)=='"' && !dqFlg)		dqFlg=true;
 		              		else if(line.charAt(i)=='"' && dqFlg)	dqFlg=false;
 		              		
-		              		if(!dqFlg && i<line.length()-1 && (line.charAt(i)=='/' && line.charAt(i+1)=='/'))
+		              		if(!dqFlg && i<line.length()-1 && (line.charAt(i)==GlobalEnv.COMMENT_OUT_LETTER && line.charAt(i+1)==GlobalEnv.COMMENT_OUT_LETTER))
 		              			break;
 		              	}
 		              	line = line.substring(0,i);

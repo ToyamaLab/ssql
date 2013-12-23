@@ -2,6 +2,8 @@ package supersql.codegenerator;
 
 import java.util.Hashtable;
 
+import supersql.codegenerator.HTML.HTMLEnv;
+import supersql.codegenerator.Mobile_HTML5.Mobile_HTML5Env;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 
@@ -70,8 +72,10 @@ public class Function extends Operand {
 		return le0;
 	}
 
-	public void work(ExtList<ExtList<String>> data_info) {
+	public String work(ExtList<ExtList<String>> data_info) {
 		Log.out("*Function");
+		return null;
+//		return aggregate;
 	}
 
 	public int countconnectitem() {
@@ -113,7 +117,7 @@ public class Function extends Operand {
 
 	public String getAtt(String key, String default_str) {
 		FuncArg fa = (FuncArg) ArgHash.get(key);
-		ArgHash.remove(key);
+//		ArgHash.remove(key);
 		if (fa == null) {
 			return default_str;
 		}
@@ -182,5 +186,19 @@ public class Function extends Operand {
 	public Object createNode(ExtList<ExtList<String>> data_info) {
 		return null;
 	}
+	
+	
+    //20131201 nesting function
+    //[Important] Check whether it is 'nesting Function' or not.
+	public static int nestingLevel = 0;	//20131201 nesting function
+    public static String checkNestingLevel(String ret){
+    	//Log.e(nestingLevel+" "+ret);
+    	if(nestingLevel < 1){
+    		return ret;
+    	}else{
+    		nestingLevel--;
+    		return "";
+    	}
+    }
 	
 }

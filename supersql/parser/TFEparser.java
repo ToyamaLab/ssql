@@ -551,7 +551,8 @@ public class TFEparser {
 		TFE read_tfe = connector(")");
 
 		Log.out("[func*TFE]=" + read_tfe.makele0());
-		if(read_tfe instanceof Connector && ((Connector) read_tfe).getDimension() == 1){
+		if (read_tfe instanceof Connector) {
+//		if(read_tfe instanceof Connector && ((Connector) read_tfe).getDimension() == 1){
 			for(TFE tfe: ((Connector)read_tfe).tfes){
 				fnc.addArg(makeFuncArg(tfe));
 			}

@@ -19,7 +19,7 @@ public class X3DC3 extends Connector{
 	    }
 
 	    @Override
-		public void work(ExtList data_info) {
+		public String work(ExtList data_info) {
 	        int i = 0;
 	        this.setDataList(data_info);
 	        value = new X3DValue();
@@ -42,6 +42,7 @@ public class X3DC3 extends Connector{
 	            i++;
 
 	        }
+			return null;
 	    }
 
 	    @Override

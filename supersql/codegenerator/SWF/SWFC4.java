@@ -21,7 +21,7 @@ public class SWFC4 extends Connector implements SWFTFE{
 	}
 
 	@Override
-	public void work(ExtList data_info) {
+	public String work(ExtList data_info) {
 
 		int width = 0;
 		int height = 0;
@@ -55,7 +55,7 @@ public class SWFC4 extends Connector implements SWFTFE{
 
 			SWFValue myvalue = ((SWFTFE)tfe).getInstance();	
 
-			System.out.println("[SWFC4:work]++++ C4¤ÇAtt¤òset¤·¤Þ¤¹");
+			System.out.println("[SWFC4:work]++++ C4ï¿½ï¿½Attï¿½ï¿½setï¿½ï¿½ï¿½Þ¤ï¿½");
 			value.inList.add(myvalue);
 
 			tmp_height = swf_env.tmp_height;
@@ -87,6 +87,7 @@ public class SWFC4 extends Connector implements SWFTFE{
 		Log.out("value.inList.size()= " + value.inList.size());		
 		Log.out("C4: value.width = "+value.width);
 		Log.out("C4: value.height = "+value.height);
+		return null;
 
 	}
 
