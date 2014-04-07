@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 
+import com.sun.org.apache.regexp.internal.recompile;
+
 import supersql.codegenerator.CodeGenerator;
 import supersql.codegenerator.DecorateList;
 import supersql.codegenerator.FuncArg;
@@ -45,6 +47,7 @@ public class Mobile_HTML5Function extends Function {
     Mobile_HTML5Env html_env2;
 
     boolean embedflag = false;
+    public static int func_null_count = 0;
 
     static boolean slideshowFlg = false;	//added by goto 20130110
     int slideshowNum = 0;					//added by goto 20130110
@@ -114,7 +117,11 @@ public class Mobile_HTML5Function extends Function {
         }
         //added by goto 20121217
         else if(FuncName.equalsIgnoreCase("button")){
-        	ret = Func_button();
+        	ret = Func_button("");
+        }
+    	//added by goto 20130508  "Login&Logout"
+        else if(FuncName.equalsIgnoreCase("logout")){
+        	ret = Func_button("logout");
         }
         //added by goto 20130308  "urlリンク"
         else if(FuncName.equalsIgnoreCase("url") || FuncName.equalsIgnoreCase("anchor") || FuncName.equalsIgnoreCase("a")){
@@ -145,8 +152,27 @@ public class Mobile_HTML5Function extends Function {
         	Func_footer();
         }
         //added by goto 20130313  "popup"
-        else if(FuncName.equalsIgnoreCase("pop") || FuncName.equalsIgnoreCase("popup")){
-        	ret = Func_pop();
+        else if(FuncName.equalsIgnoreCase("pop")
+        		|| FuncName.equalsIgnoreCase("pop_anchor")
+        		|| FuncName.equalsIgnoreCase("pop_a")
+        		|| FuncName.equalsIgnoreCase("popup")
+        		|| FuncName.equalsIgnoreCase("popup_anchor")
+        		|| FuncName.equalsIgnoreCase("popup_a")){
+        	ret = Func_pop(1);
+        }
+    	//added by goto 20140120  "popup_button"
+        else if(FuncName.equalsIgnoreCase("pop_button")
+        		|| FuncName.equalsIgnoreCase("pop_bt")
+        		|| FuncName.equalsIgnoreCase("popup_button")
+        		|| FuncName.equalsIgnoreCase("popup_bt")){
+        	ret = Func_pop(2);
+        }
+    	//added by goto 20140120  "popup_image"
+        else if(FuncName.equalsIgnoreCase("pop_image")
+        		|| FuncName.equalsIgnoreCase("pop_img")
+        		|| FuncName.equalsIgnoreCase("popup_image")
+        		|| FuncName.equalsIgnoreCase("popup_img")){
+        	ret = Func_pop(3);
         }
         //added by goto 20130515  "search"
         else if(FuncName.equalsIgnoreCase("search")){
@@ -164,7 +190,7 @@ public class Mobile_HTML5Function extends Function {
         else if(FuncName.equalsIgnoreCase("update")){
         	ret = Func_insert(true,false);
         }
-        //added by goto 20130721  "update"
+        //added by goto 20130721  "insert_update", "form"
         else if(FuncName.equalsIgnoreCase("insert_update") || FuncName.equalsIgnoreCase("form")){
         	ret = Func_insert(false,true);
         }
@@ -359,9 +385,9 @@ public class Mobile_HTML5Function extends Function {
 			if(fileDir.length() < html_env.linkurl.length()
 			&& fileDir.equals(html_env.linkurl.substring(0,fileDir.length()))){
 				String relative_path = html_env.linkurl.substring(fileDir.length()+1);
-				html_env.code.append("<A href=\"" + relative_path + "\" target=\"_self\" ");
+				html_env.code.append("<A href=\"" + relative_path + "\" ");
 			}else
-				html_env.code.append("<A href=\"" + html_env.linkurl + "\" target=\"_self\" ");
+				html_env.code.append("<A href=\"" + html_env.linkurl + "\" ");
 			
             //html_env.code.append("<A href=\"" + html_env.linkurl + "\" ");
 			//added by goto 20121222 end
@@ -551,7 +577,7 @@ public class Mobile_HTML5Function extends Function {
     }
 
     //added by goto 20121217 start 		    // for practice 2012/02/09 を改良
-    private String Func_button() {
+    private String Func_button(String key) {
     	String statement = "";
 //    	Hashtable ArgHash = new Hashtable();
 //    	String button_media = this.Args.get(0).toString();
@@ -601,13 +627,13 @@ public class Mobile_HTML5Function extends Function {
 
     		statement += "</div>\n<div class=\"ui-block-c\">\n";
     		statement += "<table><tr><td>" +
-    				"<script type=\"text/javascript\" src=\"https://apis.google.com/js/plusone.js\">" +
-    				"  {lang: 'ja'}" +
-    				"</script>" +
-    				"<g:plusone size=\"medium\"></g:plusone>" +
-    				"</td></tr></table>\n";
+	    				"<script type=\"text/javascript\" src=\"https://apis.google.com/js/plusone.js\">" +
+	    				"  {lang: \"ja\"}" +
+	    				"</script>" +
+	    				"<g:plusone size=\"medium\"></g:plusone>" +
+	    				"</td></tr></table>\n";
     		statement += "</div>\n</DIV>\n";
-    	}else if(button_media.equals("logout")){		//ex. button("logout")
+    	}else if(button_media.equals("logout") || key.contains("logout")){		//ex. button("logout") || logout()
     		//added by goto 20130508  "Login&Logout"
     		//Logoutボタンを設置
             if(SSQLparser.sessionFlag){
@@ -978,78 +1004,157 @@ public class Mobile_HTML5Function extends Function {
     //added by goto 20130313 end
     
     
+//    //added by goto 20130313 start  "popup"
+//    /*	pop("title","detail/imgURL",int type), popup()	*/
+//    /*	<type:1> pop("title","detail") <=> pop("title","detail",1)	*/
+//    /*	<type:2> pop("title","image URL",2)		*/
+//    private String Func_pop(int popupType) {	//popupType: 1=anchor, 2=button, 3=image
+//    	String btHTML = "";
+//    	if(popupType==2){	//popup button
+//    		btHTML = " data-role=\"button\" data-icon=\"arrow-r\"";
+//    	}
+//    	
+//    	String statement = "";
+//    	FuncArg fa1 = (FuncArg) this.Args.get(0), fa2, fa3;
+//    	String title, detailORurl, type;
+//    	int type1Flg = 0; //type1(文字)フラグ
+//    	
+////    	Log.info("popCount = "+popCount);
+//    	try{					//引数2つ or 3つの場合
+//    		fa2 = (FuncArg) this.Args.get(1);
+//    		detailORurl = fa2.getStr();
+//    		if(detailORurl.equals(""))	return "";		//added 20130910
+//    		title = fa1.getStr();
+//    		
+//    		try{						//引数3つの場合
+//    			fa3 = (FuncArg) this.Args.get(2);
+//    			type = fa3.getStr();
+//    			
+//    			//type=1 -> 文字
+//    			if(type.equals("1") || type.equals("text") || type.equals("")){
+//    				type1Flg = 1;
+//    				
+//    				//type=2 -> imageFile
+//    			}else if(type.equals("2") || type.equals("image") || type.equals("img")){
+//    				statement += "	<a href=\"#popup"+getCount(popCount)+"\" data-rel=\"popup\""+btHTML+" data-inline=\"true\" class=\"ui-li-inside\">"+getPopupTitle(title, "Photo", popupType)+"</a>\n" +
+//    						//TODO: data-transition  transition()使用可能
+//    						"	<div data-role=\"popup\" id=\"popup"+getCount(popCount)+"\" data-transition=\"pop\" style=\"width:95%;\" data-overlay-theme=\"a\">\n" +
+//    						"		<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n" +
+//    						"		<img src=\""+detailORurl+"\"";
+//    				
+////        			//type=2 width,height指定時の処理
+////            		if(decos.containsKey("width"))
+////            			statement += " width="+decos.getStr("width").replace("\"", "");
+////            		else{
+////            	        //added by goto 20130312  "Default width: 100%"
+////            			statement += " width=\"100%\"";
+////            		}
+////        			if(decos.containsKey("height"))
+////        				statement += " height="+decos.getStr("height").replace("\"", "");
+//    				
+//    				statement += ">\n";
+//    				
+//    				////画像下部にtitleを付加
+//    				//if(!title.equals(""))	statement += "		<p style=\"margin:0px;\">"+title+"</p>\n";
+//    				
+//    				statement += "	</div>\n";
+//    			}
+//    			
+//    		}catch(Exception e){		//引数2つの場合
+//    			type1Flg = 1;	//type=1 -> 文字
+//    		}
+//    		
+//    		//type=1 -> 文字
+//    		if(type1Flg == 1){
+//    			statement += "	<a href=\"#popup"+getCount(popCount)+"\" data-rel=\"popup\""+btHTML+" data-inline=\"true\">"+getPopupTitle(title, "Open", popupType)+"</a>\n";
+//    			//TODO: data-transition  transition()使用可能
+//    			statement += "	<div data-role=\"popup\" id=\"popup"+getCount(popCount)+"\" data-transition=\"slideup\" style=\"width:95%;\" data-overlay-theme=\"a\">\n";
+//    			statement += "		<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n";
+//    			statement += "		<p>"+detailORurl+"</p>\n";
+//    			statement += "	</div>\n";
+//    		}
+//    		
+//    	}catch(Exception e){	//引数1つの場合
+//    		Log.info("<Warning> pop関数の引数が不足しています。 ex. pop(title, Detail/URL[, typeValue])");
+//    		return "";
+//    	}
+//    	
+//    	popCount++;
+//    	return statement;
+//    }
     //added by goto 20130313 start  "popup"
-    /*	pop("title","detail/imgURL",int type), popup()	*/
-    /*	<type:1> pop("title","detail") <=> pop("title","detail",1)	*/
-    /*	<type:2> pop("title","image URL",2)		*/
-    private String Func_pop() {
-    	String statement = "";
-    	FuncArg fa1 = (FuncArg) this.Args.get(0), fa2, fa3;
-    	String title, detailORurl, type;
-    	int type1Flg = 0; //type1(文字)フラグ
-    	
-//    	Log.info("popCount = "+popCount);
-    	try{					//引数2つ or 3つの場合
-    		fa2 = (FuncArg) this.Args.get(1);
-    		detailORurl = fa2.getStr();
-    		if(detailORurl.equals(""))	return "";		//added 20130910
-    		title = fa1.getStr();
-        	
-        	try{						//引数3つの場合
-        		fa3 = (FuncArg) this.Args.get(2);
-        		type = fa3.getStr();
-        		
-        		//type=1 -> 文字
-        		if(type.equals("1") || type.equals("text") || type.equals("")){
-        			type1Flg = 1;
-        			
-        		//type=2 -> imageFile
-        		}else if(type.equals("2") || type.equals("image") || type.equals("img")){
-        			statement += "	<a href=\"#popup"+getCount(popCount)+"\" data-rel=\"popup\" data-role=\"button\" data-icon=\"arrow-r\" data-inline=\"true\" class=\"ui-li-inside\">"+( (!title.equals(""))? title : "Photo" )+"</a>\n";
-        	    	//TODO: data-transition  transition()使用可能
-        			statement += "	<div data-role=\"popup\" id=\"popup"+getCount(popCount)+"\" data-transition=\"pop\" style=\"width:95%;\" data-overlay-theme=\"a\">\n";
-        	    	statement += "		<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n";
-        	    	statement += "		<img src=\""+detailORurl+"\"";
-    		        
-        			//type=2 width,height指定時の処理
-            		if(decos.containsKey("width"))
-            			statement += " width="+decos.getStr("width").replace("\"", "");
-            		else{
-            	        //added by goto 20130312  "Default width: 100%"
-            			statement += " width=\"100%\"";
-            		}
-        			if(decos.containsKey("height"))
-        				statement += " height="+decos.getStr("height").replace("\"", "");
-        			
-        			statement += ">\n";
-        			
-        			//画像下部にtitleを付加
-        			if(!title.equals(""))	statement += "		<p style=\"margin:0px;\">"+title+"</p>\n";
-        			
-        	    	statement += "	</div>\n";
-        		}
-
-        	}catch(Exception e){		//引数2つの場合
-        		type1Flg = 1;	//type=1 -> 文字
-        	}
-        	
-        	//type=1 -> 文字
-    		if(type1Flg == 1){
-    			statement += "	<a href=\"#popup"+getCount(popCount)+"\" data-rel=\"popup\" data-role=\"button\" data-icon=\"arrow-r\" data-inline=\"true\">"+( (!title.equals(""))? title : "Open" )+"</a>\n";
-    	    	//TODO: data-transition  transition()使用可能
-    			statement += "	<div data-role=\"popup\" id=\"popup"+getCount(popCount)+"\" data-transition=\"slideup\" style=\"width:95%;\" data-overlay-theme=\"a\">\n";
-    	    	statement += "		<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n";
-    	    	statement += "		<p>"+detailORurl+"</p>\n";
-    	    	statement += "	</div>\n";
-    		}
-
-    	}catch(Exception e){	//引数1つの場合
-    		Log.info("<Warning> pop関数の引数が不足しています。 ex. pop(title, Detail/URL, typeValue)");
-    		return "";
+    /*	popup("title", "Detail / Image URL")	*/
+    private String Func_pop(int popupType) {	//popupType: 1=anchor, 2=button, 3=image
+    	String btHTML = "";
+    	if(popupType==2){	//popup button
+    		btHTML = " data-role=\"button\" data-icon=\"arrow-r\"";
     	}
     	
+    	String statement = "";
+    	String title = getValue(1);
+		String detailORurl = getValue(2);
+		if(detailORurl.equals("")){
+			if(title.isEmpty()){
+				Log.info("<Warning> popup関数の引数が不足しています。 ex. popup(title, Detail/URL)");
+				return "";
+			}else{
+				detailORurl = title;
+			}
+		}
+
+		if(!isImage(detailORurl)){
+			//string
+			statement += "	<a href=\"#popup"+getCount(popCount)+"\" data-rel=\"popup\""+btHTML+" data-inline=\"true\">"+getPopupTitle(title, "Open", popupType)+"</a>\n" +
+						 //TODO: data-transition  transition()使用可能
+						 "	<div data-role=\"popup\" id=\"popup"+getCount(popCount)+"\" data-transition=\"slideup\" style=\"width:95%;\" data-overlay-theme=\"a\">\n" +
+				    	 "		<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n" +
+				    	 "		<p>"+detailORurl+"</p>\n" +
+				    	 "	</div>\n";
+
+		}else{
+			//imageFile
+			statement += "	<a href=\"#popup"+getCount(popCount)+"\" data-rel=\"popup\""+btHTML+" data-inline=\"true\" class=\"ui-li-inside\">"+getPopupTitle(title, "Photo", popupType)+"</a>\n" +
+						 //TODO: data-transition  transition()使用可能
+						 "	<div data-role=\"popup\" id=\"popup"+getCount(popCount)+"\" data-transition=\"pop\" style=\"width:95%;\" data-overlay-theme=\"a\">\n" +
+						 "		<a href=\"#\" data-rel=\"back\" data-role=\"button\" data-theme=\"a\" data-icon=\"delete\" data-iconpos=\"notext\" class=\"ui-btn-right\">Close</a>\n" +
+						 "		<img src=\""+detailORurl+"\"";
+//        			//type=2 width,height指定時の処理
+//            		if(decos.containsKey("width"))
+//            			statement += " width="+decos.getStr("width").replace("\"", "");
+//            		else{
+//            	        //added by goto 20130312  "Default width: 100%"
+//            			statement += " width=\"100%\"";
+//            		}
+//        			if(decos.containsKey("height"))
+//        				statement += " height="+decos.getStr("height").replace("\"", "");
+			statement += ">\n";
+			////画像下部にtitleを付加
+			//if(!title.equals(""))	statement += "		<p style=\"margin:0px;\">"+title+"</p>\n";
+	    	statement += "	</div>\n";
+		}
+
     	popCount++;
     	return statement;
+    }
+	private String getPopupTitle(String title, String defaultTitle, int popupType) {
+    	title = (!title.equals(""))? title : defaultTitle ;
+    	if(popupType==3){	//popup image
+			//title = "<img src=\""+title+"\" alt=\""+title+"\">";
+			title = "<img src=\""+title+"\"";
+			title += getWidthHeight();
+//    		if(decos.containsKey("width"))	title += " width="+decos.getStr("width").replace("\"", "");
+//    		else			    			title += " width=\"100%\"";
+//			if(decos.containsKey("height"))	title += " height="+decos.getStr("height").replace("\"", "");
+			title += ">";
+		}
+		return title;
+	}
+    private String getWidthHeight() {
+    	String s = "";
+    	if(decos.containsKey("width"))	s += " width="+decos.getStr("width").replace("\"", "");
+		else			    			s += " width=\"100%\"";
+    	if(decos.containsKey("height"))	s += " height="+decos.getStr("height").replace("\"", "");
+    	return s;
     }
     //added by goto 20130313 end
     
@@ -1507,7 +1612,6 @@ public class Mobile_HTML5Function extends Function {
     	 *    $limit = " LIMIT 10 ";
     	 */
     	
-    	
     	String title = "";
     	String columns = "";
     	String after_from = "";
@@ -1892,19 +1996,31 @@ public class Mobile_HTML5Function extends Function {
     //select end
     
     
-    //added by goto 20130515 start  "insert","update"
+    //added by goto 20130515 start  "insert","form = insert_update","update"
     /* insert("title", "c1:column1, c2:column2, ... ", "From以下" [,Button Name])	*/
-    /* update("title", "c1:column1, c2:column2, ... ", "From以下" [, "insert Flag" [,Button Name] ])	*/
-    /* insert_update("title", "c1:column1, c2:column2, ... ", "From以下" [,Button Name])  データ無し->新規insert,データあり->update */
+    /* form("title", "c1:column1, c2:column2, ... ", "From以下" [,Button Name]) = insert_update()  データ無し->新規insert,データあり->update (※ from内のwhereを基にしてupdate) */
+    /* insert_update("title", "c1:column1, c2:column2, ... ", "From以下" [,Button Name]) = form()  データ無し->新規insert,データあり->update (※ from内のwhereを基にしてupdate) */
+    /* update("title", "c1:column1, c2:column2, ... ", "From以下", "pKey" [,Button Name] ])	*/
     /* Option1: @{noresult} -> not display the result */
     /* Option2: @{noreset},@{noclear} ->  not init the input form after inserted or updated */
     /* Option3: @{reloadafterinsert},@{reloadafterupdate} ->  reload current page after insert */
+    static boolean G2_form = false;
+    static int G2_form_count = 0;
+    static boolean formFileUpload = false;
     private String Func_insert(boolean update, boolean insert_update) {
+    	
+    	if(Mobile_HTML5.G2){
+    		//for [ form() ]!
+    		G2_form = true;
+    		G2_form_count++;
+    		//Log.e(Mobile_HTML5.G2_dataQuantity+"  "+G2_form_count);
+    	}
     	
     	String title = "";
     	String columns = "";
     	String after_from = "";
-    	String insertFlag = "";
+//    	String insertFlag = "false";
+    	String pKey = "";	//primary key
     	String buttonName = "";
     	try{
     		//title（第一引数）
@@ -1923,23 +2039,28 @@ public class Mobile_HTML5Function extends Function {
     		if(update){
 	    		//（第四引数）
 	    		FuncArg fa4 = (FuncArg) this.Args.get(3);
-	    		insertFlag += fa4.getStr().toLowerCase().trim();
-	    		if(insertFlag.equals(""))	insertFlag="false";
+	    		pKey += fa4.getStr().toLowerCase().trim();	//TODO nullの場合のエラーチェック
 	    		buttonName = getValue(5).trim();
     		}else{
     			buttonName = getValue(4).trim();
     		}
     		
     	}catch(Exception e){
-    		Log.info("<Warning> insert関数の引数が不足しています。 ex. insert(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
+    		if(update){
+    			Log.err("<Warning> update関数の引数が不足しています。 ex. update(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\", \"pKey\")");
+    		}else if(insert_update){
+    			Log.err("<Warning> form関数 or insert_update関数の引数が不足しています。 ex. insert_update(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
+    		}else{
+    			Log.err("<Warning> insert関数の引数が不足しています。 ex. (\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
+    		}
     		return "";
     	}
 		if(columns.trim().equals("") || after_from.equals("")){
-			Log.info("<Warning> insert関数の引数が不足しています。 ex. insert(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
+			Log.err("<Warning> insert関数の引数が不足しています。 ex. insert(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
     		return "";
 		}
 		if(after_from.toLowerCase().startsWith("from "))	after_from = after_from.substring("from".length()).trim();
-		if(insert_update)	insertFlag = "true";	//20130721
+//		if(insert_update)	insertFlag = "true";	//20130721
 		//Log.info(title);
 		
 		//Check options
@@ -2022,6 +2143,7 @@ public class Mobile_HTML5Function extends Function {
     	boolean[] noinsertFlg = new boolean[col_num];
     	String[] validationType = new String[col_num];
     	boolean[] notnullFlg = new boolean[col_num];
+    	String[] uploadFile = new String[col_num];
     	String notnullFlg_array = "";
     	String[] $session_array = new String[col_num];
     	String[] $time_array = new String[col_num];
@@ -2033,9 +2155,58 @@ public class Mobile_HTML5Function extends Function {
     	int noinsert_count = 0;
     	int a_pop_count = 0;
     	for(int i=0; i<col_num; i++){
+    		
+    		//Log.i(s_array[i]);
+    		//Check: @textarea, @hidden, @noinsert, @notnull, @date, @date1-5, @time	//TODO:リファクタリング
+    		textareaFlg[i] = false;
+    		hiddenFlg[i] = false;
+    		noinsertFlg[i] = false;
+    		validationType[i] = "";
+    		notnullFlg[i] = false;
+    		uploadFile[i] = "";
+    		String str = "";
+    		if(s_array[i].replaceAll(" ","").contains("@{")){
+    			str = s_array[i].substring(s_array[i].lastIndexOf("@")+1);	//@以下の文字列
+    			//Log.e(str);
+	    		if(str.contains("='")){
+	    			//image='', file=''
+	    			String l = str.substring(str.indexOf("='")+2);
+	    			uploadFile[i] = l.substring(0,l.indexOf("'"));
+	    			str = str.substring(0,str.indexOf("='"));
+	    			if(l.contains(";")){
+	    				str += l.substring(l.indexOf(";"));
+	    			}
+	    			formFileUpload = true;
+	    			//Log.e(str+" "+uploadFile[i]);
+	    		}
+	    		if(str.contains("textarea"))
+	    			textareaFlg[i] = true;
+	    		if(str.contains("hidden"))
+	    			hiddenFlg[i] = true;
+	    		if(str.contains("noinsert") || str.contains("noupdate")){
+	    			noinsertFlg[i] = true;
+	    			noinsert_count++;
+	    		}else{
+		    		if(str.contains("notnull")){
+		    			if(i==(col_num-1))	notnullFlg_array += "TRUE";
+		    			else				notnullFlg_array += "TRUE,";
+		    		}else{
+		    			if(i==(col_num-1))	notnullFlg_array += "FALSE";
+		    			else				notnullFlg_array += "FALSE,";
+		    		}
+	    		}
+	    		if(str.contains("notnull"))	notnullFlg[i] = true;
+	    		validationType[i] = Mobile_HTML5.checkFormValidationType(str);	//form validation
+	    		
+	    		s_array[i] = s_array[i].substring(0,s_array[i].indexOf("@"));
+	    		//Log.i(s_array[i]);
+    		}else{
+    			if(i==(col_num-1))	notnullFlg_array += "FALSE";
+    			else				notnullFlg_array += "FALSE,";
+    		}
+    		
     		a = s_array[i].replaceAll(" ","");
     		//Log.i(a);
-    		
     		//$session()あり
     		if(a.contains("=")){
     			String a_right = a.substring(a.indexOf("=")+1).trim();
@@ -2119,46 +2290,10 @@ public class Mobile_HTML5Function extends Function {
     		}else
     			insert_popFlg += "false\""+((i<col_num-1)?(",\""):(""));
     		
-    		//Log.i(s_array[i]);
-    		//Check: @textarea, @hidden, @noinsert, @notnull, @date, @date1-5, @time	//TODO:リファクタリング
-    		textareaFlg[i] = false;
-    		hiddenFlg[i] = false;
-    		noinsertFlg[i] = false;
-    		validationType[i] = "";
-    		notnullFlg[i] = false;
-    		String str = "";
-    		if(s_array[i].replaceAll(" ","").contains("@{")){
-    			str = s_array[i].substring(s_array[i].lastIndexOf("@")+1);	//@以下の文字列
-    			//Log.e(str);
-	    		if(str.contains("textarea"))
-	    			textareaFlg[i] = true;
-	    		if(str.contains("hidden"))
-	    			hiddenFlg[i] = true;
-	    		if(str.contains("noinsert") || str.contains("noupdate")){
-	    			noinsertFlg[i] = true;
-	    			noinsert_count++;
-	    		}else{
-		    		if(str.contains("notnull")){
-		    			if(i==(col_num-1))	notnullFlg_array += "TRUE";
-		    			else				notnullFlg_array += "TRUE,";
-		    		}else{
-		    			if(i==(col_num-1))	notnullFlg_array += "FALSE";
-		    			else				notnullFlg_array += "FALSE,";
-		    		}
-	    		}
-	    		if(str.contains("notnull"))	notnullFlg[i] = true;
-	    		validationType[i] = Mobile_HTML5.checkFormValidationType(str);	//form validation
-	    		
-	    		s_array[i] = s_array[i].substring(0,s_array[i].indexOf("@"));
-	    		//Log.i(s_array[i]);
-    		}else{
-    			if(i==(col_num-1))	notnullFlg_array += "FALSE";
-    			else				notnullFlg_array += "FALSE,";
-    		}
     		
     		if(!noinsertFlg[i]){
     			insert_col += s_array[i] +((i<col_num-1)?(","):(""));
-    			if(update)	update_col_array += s_array[i] +"'"+((i<col_num-1)?(",'"):(""));
+    			if(update || insert_update)	update_col_array += s_array[i] +"'"+((i<col_num-1)?(",'"):(""));
     		}
     	}
     	col_num -= a_pop_count;
@@ -2191,22 +2326,55 @@ public class Mobile_HTML5Function extends Function {
     	//Log.i("\n	Query: "+query);
     	String from = "";
     	from = query.toLowerCase().trim();
-    	if(update){
-    		update_where = from.substring(from.indexOf(" where ")).trim();
-    		if(update_where.contains("$session"))
+    	if(update || insert_update){
+    		if(after_from.startsWith("#")){
+    			update_where = from.substring(from.indexOf(" where ")).trim();
+    		}else{
+    			update_where = after_from;
+    			if(update_where.indexOf(" where ") > 1){
+    				update_where = update_where.substring(update_where.indexOf(" where ")).trim();
+    			}else{
+    				update_where = "";
+    			}
+    		}
+    		if(update_where.contains("$session")){
     			update_where = update_where.replaceAll("\\$session","'\".\\$_SESSION").replaceAll("\\(","[").replaceAll("\\)","].\"'");
-    		from = from.substring(0,from.indexOf(" where ")).trim();
+    		}
+    		if(from.indexOf(" where ") > 1){
+    			from = from.substring(0,from.indexOf(" where ")).trim();
+    		}
     	}
     	//Log.i("	FROM:"+from+"	update_where:"+update_where);
     	//Log.i("	FROM: "+from+"\n	WHERE: "+where+"\n	GROUP: "+groupby+"\n	HAVING: "+having);
     	//Log.i("	ORDER: "+orderby+"\n	LIMIT: "+limit+"\n	Query: "+query);
     	
+    	String[] cols = new String[col_num];
+    	if(update){
+    		String s = insert_col+",";
+    		try {
+        		for(int i=0;i<col_num;i++){
+        			cols[i] = s.substring(0,s.indexOf(","));
+        			s = s.substring(s.indexOf(",")+1);
+        			//Log.e(cols[i]);
+        		}
+			} catch (Exception e) {	}
+    	}
     	
 
     	String statement = "";
+    	String update_statement = "";
     	String gps_js = "";
     	String php = "";
-    	String formPHPfileName = html_env.getFileName2()+"_SSQLform_"+insertCount+".php";
+    	String formPHPfileName = "";
+    	if(update){
+    		//update()
+    		formPHPfileName = html_env.getFileName2()+"_SSQLupdateform_"+insertCount+".php";
+//    	}else if(insert_update){
+//			formPHPfileName = html_env.getFileName2()+"_SSQLinsertupdate_"+insertCount+".php";
+    	}else{
+    		//insert(), form()=insert_update()
+    		formPHPfileName = html_env.getFileName2()+"_SSQLform_"+insertCount+".php";
+    	}
     	//sqlite3 php
     	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
     		statement += 
@@ -2222,13 +2390,15 @@ public class Mobile_HTML5Function extends Function {
     				"<hr>\n<div style=\"font-size:30;\" id=\"SSQL_InsertTitle"+insertCount+"\">"+title+"</div>\n<hr>\n" +
     				"<br>\n";
     		}
-    		statement += 
-    				"<form method=\"post\" action=\"\" target=\"dummy_ifr\">\n";
-    				//"<form method=\"post\" action=\"\" target=\"insert"+insertCount+"_ifr\">\n";
+			statement += "<form method=\"post\" action=\"\" target=\"dummy_ifr\""+getFormFileUploadHTML1()+">\n";
     		
     		int insertWordCount = 0;
     		for(int i=0; i<col_num; i++){
 //    			if(!textareaFlg[i]){
+    			String updateFromValue = "";
+    			if(update){
+    				updateFromValue = "'.$row['"+cols[i]+"'].'";
+    			}
 				if($session_array[i].equals("") && $time_array[i].equals("") && $gps_array[i].equals("")){
 					if(!button_array[i].equals("")){
 						//Log.i("bt_array:"+button_array[i]);
@@ -2244,10 +2414,17 @@ public class Mobile_HTML5Function extends Function {
 									"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
 									""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+button_array[i]+"" +
 									""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
-							if(!noinsertFlg[i])
+							update_statement += 	//TODO: button
+									"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" " +
+											"value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
+									""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+button_array[i]+"" +
+									""+((!textareaFlg[i])?("\">"):(updateFromValue+"</textarea>"))+"\n";
+							if(!noinsertFlg[i]){
 								statement += 
 										"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(++insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\""+button_array[i]+"\">\n";
-						
+								update_statement += //TODO: button
+										"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\""+button_array[i]+"\">\n";
+							}
 						//TODO 以下を「@button」時のみに変更
 //						}else if(btRcount == 2){		//ボタン ex){出席|欠席}
 //							String bt1=ss.substring(0,ss.indexOf("|")).trim();
@@ -2265,16 +2442,23 @@ public class Mobile_HTML5Function extends Function {
 //							buttonSubmit += " || $_POST['SSQL_insert"+insertCount+"_words"+(insertWordCount)+"']";
 							
 						}else{							//ラジオボタン ex){出席|欠席|その他}
-							statement += "   <div data-role=\"controlgroup\">\n";
+							statement += "   <div data-role=\"controlgroup\">\n" + 
+										 "		<div style=\"text-align:left; font-size:16.5px\">"+s_name_array[i]+"</div>\n";
+							update_statement += "   <div data-role=\"controlgroup\">\n" + 
+										 "		<div style=\"text-align:left; font-size:16.5px\">"+s_name_array[i]+"</div>\n";
 							insertWordCount++;
 							for(int k=1; k<=btRcount; k++){
 								String val = ss.substring(0,ss.indexOf("|")).trim();
 								statement += 
 										"		<input type=\"radio\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"_"+k+"\" value=\""+val+"\""+( (k>1)? (""):(" checked=\"checked\"") )+">\n" +
 										"		<label for=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"_"+k+"\">"+val+"</label>\n";
+								update_statement += //TODO radio button
+										"		<input type=\"radio\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"_"+k+"\" value=\""+val+"\""+( (k>1)? (""):(" checked=\"checked\"") )+">\n" +
+										"		<label for=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"_"+k+"\">"+val+"</label>\n";
 								ss = ss.substring(ss.indexOf("|")+1);
 							}
-							statement += "	</div>\n";
+							statement += "   </div>\n";
+							update_statement += "   </div>\n";
 						}
 					}else{
 						if(validationType[i].isEmpty()){
@@ -2287,25 +2471,46 @@ public class Mobile_HTML5Function extends Function {
 									" placeholder=\""+s_name_array[i]+"\""+Mobile_HTML5.getFormClass(notnullFlg[i], "")+">" +
 									""+((!textareaFlg[i])?(""):("</textarea>")) +
 									"</span>"+( (!textareaFlg[i])? "" : "</span>" )+"\n";
+							update_statement += 
+									"    "+( (!textareaFlg[i])? "" : "<span>" )+"<span>" +
+									"<"+((!textareaFlg[i])?("input"):("textarea"))+"" +
+									" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\"" +
+									" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\"" +
+									" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\"" +
+									" "+((!textareaFlg[i])?("value=\""+updateFromValue+"\""):(""))+
+									" placeholder=\""+s_name_array[i]+"\""+Mobile_HTML5.getFormClass(notnullFlg[i], "")+">" +
+									""+((!textareaFlg[i])?(""):(updateFromValue+"</textarea>")) +
+									"</span>"+( (!textareaFlg[i])? "" : "</span>" )+"\n";
 							//statement += "    <input type=\"text\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\">\n";
 						}else{
-							statement += Mobile_HTML5.getFormValidationString(validationType[i], notnullFlg[i], "SSQL_insert"+insertCount+"_words"+(++insertWordCount), s_name_array[i]);
+							statement += Mobile_HTML5.getFormValidationString(validationType[i], notnullFlg[i], "SSQL_insert"+insertCount+"_words"+(++insertWordCount), s_name_array[i], updateFromValue);
+							update_statement
+							          += Mobile_HTML5.getFormValidationString(validationType[i], notnullFlg[i], "SSQL_insert"+insertCount+"_words"+(insertWordCount), s_name_array[i], updateFromValue);
 						}
 					}
 				}else{
-					String echo = "";
-					if(!$session_array[i].equals(""))	echo += "	echo $_SESSION["+$session_array[i]+"];\n";
-					else if(!$time_array[i].equals(""))	echo += "	echo "+$time_array[i]+";\n";
+					String echo = "", echo2 = "";
+					if(!$session_array[i].equals("")){
+						echo += "	echo $_SESSION["+$session_array[i]+"];\n";
+						echo2 += "'.$_SESSION["+$session_array[i]+"].'";
+					}
+					else if(!$time_array[i].equals("")){
+						echo += "	echo "+$time_array[i]+";\n";
+						echo2 += "'."+$time_array[i]+".'";
+					}
 					//else if(!$gps_array[i].equals(""))	echo += "	echo \"<script> getGPSinfo(); </script>\";\n";
 					//else if(!$gps_array[i].equals(""))	echo += "	echo\"<script> getGPSinfo(); </script>\";\n";
 					else if(!$gps_array[i].equals("")){
+						Mobile_HTML5Env.addJsCss("jscss/googleMap.js");
 						echo += "	echo \"位置情報(緯度・経度)\";\n";
 						gps_js +=
 								"\n<!-- getGPSinfo() -->\n" +
-								"<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
+//								"<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
+								//"<script src=\"jscss/googleMap.js\"></script>\n" +
 								"<script type=\"text/javascript\">\n" +
 								"<!--\n" +
-								"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +
+								//"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +	//←　$(function(){の方が良いかも
+								"$(function(){\n" +
 								"  	// Geolocation APIのオプション設定\n" +
 								"  	var geolocationOptions = {\n" +
 								"    	\"enableHighAccuracy\" : true, // 高精度位置情報の取得\n" +
@@ -2325,42 +2530,41 @@ public class Mobile_HTML5Function extends Function {
 					
 					statement += 
 							"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
-							""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+"\n";
-					//if($gps_array[i].equals(""))
-						statement += 
-								"EOF;\n" +
-								echo +
-								"		echo <<<EOF\n";
-//					else{
-//						statement += "";
-//					}
-						
-					statement += 
+							""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+"\n" +
+							"EOF;\n" +
+							echo +
+							"		echo <<<EOF\n" +
 							""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
-					if(!noinsertFlg[i])
+					update_statement += 
+							"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
+							""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+"" +
+							echo2 +
+							""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
+					if(!noinsertFlg[i]){
 						statement += 
 								"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(++insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\"\n" +
 								"EOF;\n" +
 								echo +
 								"		echo <<<EOF\n" +
 								"\">\n";
+						update_statement += 
+								"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\"" +
+								echo2 +
+								"\">\n";
+					}
 				}
     		}
     		if(buttonSubmit.equals("")){
     			if(buttonName.isEmpty()){
 					statement += 
 						"    <input type=\"submit\" value=\""+( (!update)? ("登録"):("更新") )+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-icon=\"insert\" data-mini=\"false\" data-inline=\"false\">\n";
-//						"    <input type=\"submit\" value=\""+( (!update)? ("登録"):("更新") )+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-icon=\"insert\" data-mini=\"false\" data-inline=\"false\" onClick=\"SSQL_Insert"+insertCount+"()\">\n";
     			}else{
 	    			statement += 
-	    					"    <input type=\"submit\" value=\""+buttonName+"\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-mini=\"false\" data-inline=\"false\">\n";
-//	    					"    <input type=\"submit\" value=\""+buttonName+"\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-mini=\"false\" data-inline=\"false\" onClick=\"SSQL_Insert"+insertCount+"()\">\n";
+	    				"    <input type=\"submit\" value=\""+buttonName+"\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-mini=\"false\" data-inline=\"false\">\n";
     			}
     		}
     		statement += 
-    				//"    <input type=\"submit\" value=\"Insert&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"insert"+insertCount+"\" id=\"insert"+insertCount+"\" data-icon=\"insert\" data-mini=\"false\" data-inline=\"false\">\n" +
     				"</form>\n" +
-    				//"<iframe name=\"insert"+insertCount+"_ifr\" style=\"display:none;\"></iframe>\n" +
     				"\n";
     		if(!noresult){
     			statement += 
@@ -2384,11 +2588,8 @@ public class Mobile_HTML5Function extends Function {
 	    				"	textArea.innerHTML = str;\n";
 			}
 			if(!noreset){
-				//TODO: 他の削除方法
 				statement += 
 						"	if(str.indexOf(\"completed\") !== -1) {\n" +
-						//"		$('#SSQL_insert"+insertCount+"panel input,textarea').not('input[type=\\\"radio\\\"],input[type=\\\"checkbox\\\"],:hidden, :button, :submit,:reset').val('');\n" +
-						//"		$('#SSQL_insert"+insertCount+"panel input[type=\"radio\"], input[type=\\\"checkbox\\\"],select').removeAttr('checked').removeAttr('selected');\n" +
 						"		$(\"#SSQL_insert"+insertCount+"panel form\")[0].reset();\n" +
 						"	}\n";
 			}
@@ -2397,6 +2598,14 @@ public class Mobile_HTML5Function extends Function {
 						"	setInterval(function(){\n" +
 						"		location.reload();\n" +
 						"	}, "+(reloadAfterInsertTime*1000)+");\n";
+			}else{
+				//3秒後に結果をクリア
+				statement += 
+		    			"	$(function(){\n" +
+    	    			"		setTimeout(function(){\n" +
+    	    			"			document.getElementById(\"SSQL_Insert"+insertCount+"_result\").innerHTML = '';\n" +
+    	    			"		},3000);\n" +
+    	    			"	});\n";
 			}
 			statement += 
     				"}\n" +
@@ -2413,27 +2622,18 @@ public class Mobile_HTML5Function extends Function {
 					"	});\n" +
 					"})\n" +
 					"function SSQL_Insert"+insertCount+"(){\n" +
-					"	//ajax: PHPへ値を渡して実行\n" +
+					//"	//ajax: PHPへ値を渡して実行\n" +
 					"	$.ajax({\n" +
 					"		type: \"POST\",\n" +
 					"		url: \""+new File(formPHPfileName).getName()+"\",\n" +
-					"		data: $(\"#SSQL_INSERT"+insertCount+"panel form\").serializeArray(),\n" +
-//					//"		data: {insert1_words1:$('#insert1_words1').val(), insert1_words2:$('#insert1_words2').val()},\n" +
-//					"		data: {";
-//			for(int k=1; k<=insertWordCount; k++){
-//				statement += 
-//						"SSQL_insert"+insertCount+"_words"+k+":$('#SSQL_insert"+insertCount+"_words"+k+"').val()"+( (k<insertWordCount)? ", " : "" );
-////						"insert1_words2:$('#insert1_words2').val()";
-//			}
-//			statement += 
-//					"},\n" +
+					getFormFileUploadHTML2("#SSQL_INSERT"+insertCount) +
 					"		dataType: \"json\",\n" +
-					"        beforeSend: function(xhr, settings) {\n" +
-					"            $('#SSQL_insert"+insertCount+"').attr('disabled', true);\n" +
-					"        },\n" +
-					"        complete: function(xhr, textStatus) {\n" +
-					"            $('#SSQL_insert"+insertCount+"').attr('disabled', false);\n" +
-					"        },\n" +
+					"		beforeSend: function(xhr, settings) {\n" +
+					"			$('#SSQL_insert"+insertCount+"').attr('disabled', true);\n" +
+					"		},\n" +
+					"		complete: function(xhr, textStatus) {\n" +
+					"			$('#SSQL_insert"+insertCount+"').attr('disabled', false);\n" +
+					"		},\n" +
 					"		success: function(data, textStatus){\n" +
 					"			if (data.result != \"\") {\n" +
 					"				SSQL_Insert"+insertCount+"_echo(data.result);\n" +
@@ -2449,20 +2649,28 @@ public class Mobile_HTML5Function extends Function {
     				"<!-- SSQL Insert"+insertCount+" end -->\n";
 
 			//php
-			php +=
+			String pKeyWhere = "";
+			if(update){
+				if(!update_where.isEmpty()){
+					pKeyWhere += " and ";
+				}else{
+					pKeyWhere += " WHERE ";
+				}
+				pKeyWhere += pKey+"='\".$_POST['SSQL_insert"+insertCount+"_pkey'].\"'";	//New";
+			}
+			php +=	Mobile_HTML5.getSessionStartString() +
     				"<?php\n" +
-//    				"if($_POST['SSQL_insert"+insertCount+"'] "+buttonSubmit+"){\n" +
-    				//"if($_POST['SSQL_insert"+insertCount+"'] || $_POST['SSQL_insert"+insertCount+"_words"+insertCount+"']){\n" +
     				"    $ret = array();\n" +
     				"    $ret['result'] = \"\";\n" +
     				"    \n" +
     				"    //ユーザ定義\n" +
     				"    $sqlite3_DB = '"+DB+"';\n" +
-    				"    $insert_col = \""+insert_col+"\";\n";
-			if(update){
-				php +=
-						"    $update_col_array = array("+update_col_array+");\n" +
-						"    $update_where = \""+update_where+"\";\n";
+    				"    $insert_col = \""+insert_col+"\";\n" +
+    				getFormFileUploadPHP0(uploadFile);
+			if(update || (insert_update && !update_where.isEmpty()) ){
+				//form()=insert_update() with where, update()
+				php += "    $update_col_array = array("+update_col_array+");\n" +
+					   "    $update_where = \""+ update_where + pKeyWhere +"\";\n";
 			}
 			php +=
     				"    $notnullFlg = array("+notnullFlg_array+");\n" +
@@ -2471,10 +2679,10 @@ public class Mobile_HTML5Function extends Function {
     				"\n" +
     				"	$insert_str = \"notnull\";\n" +
     				"	for($k=1; $k<=$col_num; $k++){\n" +
-    				"    	$var[$k] = checkHTMLsc($_POST['SSQL_insert"+insertCount+"_words'.$k]);\n" +
+    				getFormFileUploadPHP1() +
+    				//"    	$var[$k] = checkHTMLsc($_POST['SSQL_insert"+insertCount+"_words'.$k]);\n" +
     				"    	$var[$k] = str_replace(array(\"\\r\\n\",\"\\r\",\"\\n\"), '<br>', $var[$k]);	//改行コードを<br>へ\n" +
     				//"    	//$var[$k] = mb_convert_encoding($var[$k], 'UTF-8', 'auto');					//エンコードをUTF-8へ PHP環境によってはうまく動かない？\n" +
-    				//"    	$insert_str .= trim($var[$k]);\n" +
     				"    	if($notnullFlg[$k-1]){\n" +
     				"    		if(trim($var[$k]) == \"\")	$insert_str = \"\";\n" +
     				"    	}\n";
@@ -2487,11 +2695,10 @@ public class Mobile_HTML5Function extends Function {
     				"\n" +
     				"	$b = \"\";\n" +
     				"	if($insert_str == \"\"){\n" +
-//    				"        insert"+insertCount+"_p1('<font color=\\\"red\\\">Please check the value.</font>', \"true\");\n" +
     				"        $b = '<font color=\"red\">Please check the value.</font>';\n" +
     				"	}else{\n";
-			if(!update){
-				//insert()
+			if(!update && (insert_update && update_where.isEmpty())){
+				//insert(), form()=insert_update() with no where
 				php +=
 	    				"		$insert_str = \"\";\n" +
 	    				"		for($k=1; $k<=$col_num; $k++){\n" +
@@ -2505,17 +2712,14 @@ public class Mobile_HTML5Function extends Function {
 	    				"        try{\n" +
 	    				"			$result2 = $insert_db"+insertCount+"->exec($insert_sql);\n" +
 	    				"			unset($insert_db"+insertCount+");\n" +
-//	    				"		 	insert"+insertCount+"_p1(\"Registration completed.\", \"false\");\n" +
 	    				"		 	$b = \"Registration completed.\";\n" +
-	    				//"		 	//insert"+insertCount+"_p1($insert_sql, \"true\");\n" +
 	    				"		 	//$b = $insert_sql;\n" +
 	    				"        }catch(Exception $e){\n" +
 	    				"       		unset($insert_db"+insertCount+");\n" +
-//	    				"       		insert"+insertCount+"_p1('<font color=red>Insert failed.</font>', \"true\");	//登録失敗\n" +
 	    				"       		$b = '<font color=red>Insert failed.</font>';	//登録失敗\n" +
 	    				"        }\n";
 			}else{
-				//update()
+				//form()=insert_update() with where, update()
 				php +=
 						"		$insert_db1 = new SQLite3($sqlite3_DB);\n" +
 						"		try{\n" +
@@ -2538,31 +2742,21 @@ public class Mobile_HTML5Function extends Function {
 						"				$update_sql = \"UPDATE \".$table.\" SET \".$update_str.\" \".$update_where;\n" +
 						"				$result2 = $insert_db1->exec($update_sql);\n" +
 						"				//echo '変更された行の数: ', $db->changes();\n" +
-//						"				insert"+insertCount+"_p1(\"Update completed.\", \"false\");\n" +
 						"				$b = \"Update completed.\";\n" +
-						"			}else{\n";
-				if(!insertFlag.equals("true"))
-						php +=
-//							"				insert"+insertCount+"_p1('<font color=red>No data found.</font>', \"true\");	//更新データなし\n";
-							"				$b = '<font color=red>No data found.</font>';	//更新データなし\n";
-				else
-						php +=
-							"				//新規登録(insert)\n" +
-							"				$insert_str = \"\";\n" +
-							"				for($k=1; $k<=$col_num; $k++){\n" +
-							"					if($k==1)	$insert_str .= \"'\".$var[$k].\"'\";\n" +
-							"					else		$insert_str .= \",'\".$var[$k].\"'\";\n" +
-							"				}\n" +
-							"				\n" +
-							"				$insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES (\".$insert_str.\")\";\n" +
-							"				$result2 = $insert_db1->exec($insert_sql);\n" +
-//							"				insert"+insertCount+"_p1(\"Registration completed.\", \"false\");\n";
-							"				$b = \"Registration completed.\";\n";
-				php +=
+						"			}else{\n" +
+						"				//新規登録(insert)\n" +
+						"				$insert_str = \"\";\n" +
+						"				for($k=1; $k<=$col_num; $k++){\n" +
+						"					if($k==1)	$insert_str .= \"'\".$var[$k].\"'\";\n" +
+						"					else		$insert_str .= \",'\".$var[$k].\"'\";\n" +
+						"				}\n" +
+						"				\n" +
+						"				$insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES (\".$insert_str.\")\";\n" +
+						"				$result2 = $insert_db1->exec($insert_sql);\n" +
+						"				$b = \"Registration completed.\";\n" +
 						"			}\n" +
 						"        }catch(Exception $e){\n" +
 						"       		unset($insert_db1);\n" +
-//						"       		insert"+insertCount+"_p1('<font color=red>Update failed.</font>', \"true\");	//更新失敗\n" +
 						"       		$b = '<font color=red>Update failed.</font>';	//更新失敗\n" +
 						"        }\n" +
 						"        unset($insert_db1);\n";
@@ -2572,11 +2766,8 @@ public class Mobile_HTML5Function extends Function {
     				"	$ret['result'] = $b;\n" +
     				"	header(\"Content-Type: application/json; charset=utf-8\");\n" +
 					"	echo json_encode($ret);\n" +
-//    				"}\n" +
-//    				"function insert"+insertCount+"_p1($str, $error){\n" +
-//    				"    echo '<script type=\"text/javascript\">window.parent.Insert"+insertCount+"_echo(\"'.$str.'\",\"'.$error.'\");</script>';\n" +
-//    				"}\n" +
 					"\n" +
+					getFormFileUploadPHP2() +
 					"//XSS対策\n" +
 					"function checkHTMLsc($str){\n" +
 					"	return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');\n" +
@@ -2588,14 +2779,258 @@ public class Mobile_HTML5Function extends Function {
     	//	;
     	//}
 
-//    	// 各引数毎に処理した結果をHTMLに書きこむ
-//    	html_env.code.append(statement);
+    	
+    	if(update){
+    		String getUpdateFormPJPFileName = html_env.getFileName2()+"_SSQLgetUpdateForm_"+insertCount+".php";
+	    	String getUpdateFormPHP = getSSQLgetUpdateformPHP("sqlite", insertCount, DB, insert_col, update_where, from, pKey, buttonName, update_statement);
+	    	Mobile_HTML5.createFile(html_env, getUpdateFormPJPFileName, getUpdateFormPHP);//PHPファイルの作成
+	    	
+	    	statement = getSSQLgetUpdateformJS(insertCount, getUpdateFormPJPFileName)+"\n";
+	    	statement += getSSQLUpdateformHTML(insertCount, formPHPfileName, title);
+    	}
     	
     	Mobile_HTML5.createFile(html_env, formPHPfileName, php);//PHPファイルの作成
     	insertCount++;
+    	formFileUpload = false;
     	return statement;
     }
     //insert end
+    
+    //getFormFileUploadHTML1
+    private String getFormFileUploadHTML1(){
+    	if(formFileUpload){
+    		return " enctype=\"multipart/form-data\" data-ajax=\"false\"";
+    	}
+    	return "";
+    }
+    //getFormFileUploadHTML2
+    private String getFormFileUploadHTML2(String label){
+    	if(formFileUpload){
+			return  "		contentType: false,\n" +
+					"		processData: false,\n" +
+					"		data: new FormData($(\""+label+"panel form\")[0]),\n";
+		}
+		return "		data: $(\""+label+"panel form\").serializeArray(),\n";
+    }
+    //getFormFileUploadPHP1
+    private String getFormFileUploadPHP0(String[] dirS){
+    	if(formFileUpload){
+    		String dir = "";
+    		for(int i=0; i<dirS.length; i++){
+    			if(dirS[i].isEmpty()){
+    				dir += "'',";
+    			}else{
+    				dir += "'"+dirS[i]+"',";
+    			}
+    		}
+    		dir = dir.substring(0,dir.length()-1);
+    		//Log.e(dir);
+    		return "    $fileDir = array("+dir+");\n";
+    	}
+    	return "";
+    }
+    //getFormFileUploadPHP1
+    private String getFormFileUploadPHP1(){
+    	if(formFileUpload){
+    		//return  "		if(!$fileFlg[$k-1]){\n" +
+    		return  "		if(empty($fileDir[$k-1])){\n" +
+    				"			$var[$k] = checkHTMLsc($_POST['SSQL_insert"+insertCount+"_words'.$k]);\n" +
+    				//"	    	$t .= $var[$k];\n" +
+    				"    	}else{\n" +
+    				"    		//file\n" +
+    				"    		$dir = $fileDir[$k-1];\n" +
+    				"    		$file1 = $_FILES['SSQL_insert"+insertCount+"_words'.$k]['tmp_name'];\n" +
+    				"    		$file2 = $_FILES['SSQL_insert"+insertCount+"_words'.$k]['name'];\n" +
+    				"    		$filename = $dir.$file2;\n" +
+    				"    		$var[$k] = fileUpload($dir, $file1, $file2, $filename);\n" +
+    				"    		$var[$k] = checkHTMLsc($var[$k]);\n" +
+    				//"    		$t .= $filename;\n" +
+    				"    	}\n\n";
+    	}
+    	return "		$var[$k] = checkHTMLsc($_POST['SSQL_insert"+insertCount+"_words'.$k]);\n";
+    }
+    //getFormFileUploadPHP2
+    private String getFormFileUploadPHP2(){
+    	if(formFileUpload){
+    		return  "//file upload\n" +
+    				"function fileUpload($dir, $file1, $file2, $filename){\n" +
+    				"  if(is_uploaded_file($file1)){\n" +
+    				//"    //if(exif_imagetype($file1)){   //image file or not\n" +
+    				"	  while(file_exists($filename)){\n" +
+    				"	    //change filename\n" +
+    				"	    $filename = $dir.date('YmdHis').'_'.mt_rand().'_'.$file2;\n" +
+    				"	  }\n" +
+    				"\n" +
+    				//"	  //$filename = mb_convert_encoding($filename, \"UTF-8\", \"AUTO\");	<- サーバでエラーが出る\n" +
+    				"	  if(move_uploaded_file($file1, $filename)){\n" +
+    				"	    chmod($filename, 0644);\n" +
+    				"	    return $filename;\n" +
+    				"	  }\n" +
+    				//"    //}\n" +
+    				"  }\n" +
+    				"  return \"\";\n" +
+					"}\n\n";
+    	}
+    	return "";
+    }
+    
+    /* */
+    public static String updateFormJS = "";	//not use?
+    private String getSSQLgetUpdateformPHP(String dbType, int num, String DB, String insert_col, String update_where, String from, String pKey, String buttonName, String update_statement) {
+    	String s = "";
+    	//update_statement = update_statement.replace("'", "\\\'");//.replace("\n", "");
+    	if(dbType.contains("sqlite")){
+	    	s += 	Mobile_HTML5.getSessionStartString() +
+	    			"<?php\n" +
+	    			"    $ret = array();\n" +
+	    			"    $ret['result'] = \"\";\n" +
+	    			"    \n" +
+	    			"    //ユーザ定義\n" +
+	    			"    $sqlite3_DB = '"+DB+"';\n" +
+	    			"    $insert_col = \""+pKey+","+insert_col+"\";\n" +
+	    			"    $update_where = \""+update_where+"\";\n" +
+	    			"    $table = '"+from+"';\n" +
+	    			"\n" +
+	    			"	$b = \"\";\n" +
+	    			"	$insert_db"+num+" = new SQLite3($sqlite3_DB);\n" +
+	    			"	try{\n" +
+	    			"		$select_sql = \"SELECT \".$insert_col.\" FROM \".$table.\" \".$update_where;\n" +
+	    			"		$result2 = $insert_db"+num+"->query($select_sql);\n" +
+	    			"		$j = 0;\n" +
+	    			"		while($row = $result2->fetchArray()){\n" +
+	    			"			$b .= '<div id=\"SSQL_INSERT"+num+"_'.$j.'panel\" style=\"\" data-role=\"none\">';\n" +
+	    			"			$b .= '<form method=\"post\" action=\"\" target=\"dummy_ifr\">';\n" +
+	    			"			\n" +
+	    			"			$b .= '<input type=\"hidden\" disabled=\"disabled\" value=\"'.$row['"+pKey+"'].'\">';	//New\n" +
+	    			"			$b .= '<input type=\"hidden\" id=\"SSQL_insert"+num+"_pkey\" name=\"SSQL_insert"+num+"_pkey\" value=\"'.$row['"+pKey+"'].'\">';	//New\n" +
+	    			"			\n" +
+	    			
+	    			"			$b .= '"+update_statement+"';\n" +
+//	    			"			$b .= '<input type=\"hidden\" disabled=\"disabled\" value=\"'.$_SESSION[id].'\">';\n" +
+//	    			"			$b .= '<input type=\"hidden\" id=\"SSQL_insert"+num+"_words1\" name=\"SSQL_insert"+num+"_words1\" value=\"'.$_SESSION[id].'\">';\n" +
+//	    			"			$b .= '<input type=\"hidden\" disabled=\"disabled\" value=\"2013\">';\n" +
+//	    			"			$b .= '<input type=\"hidden\" id=\"SSQL_insert"+num+"_words2\" name=\"SSQL_insert"+num+"_words2\" value=\"2013\">';\n" +
+//	    			"			$b .= '<span><input type=\"date\" id=\"SSQL_insert"+num+"_words3\" name=\"SSQL_insert"+num+"_words3\" placeholder=\"日付\" value=\"'.$row['date'].'\"  class=\"required \" data-role=\"datebox\" min=\"2016-01-01\" max=\"2016-12-31\" data-options=\\'{\"mode\":\"datebox\", \"useFocus\":true, \"useNewStyle\":true, \"overrideHeaderFormat\": \"%m / %d\",  \"overrideDateFormat\": \"%m/%d\", \"overrideDateFieldOrder\":[\"m\",\"d\"] }\\'></span>';\n" +
+//	    			"			$b .= '<span><input type=\"time\" id=\"SSQL_insert"+num+"_words4\" name=\"SSQL_insert"+num+"_words4\" placeholder=\"開始\" value=\"'.$row['start_time'].'\"  class=\"required \" data-role=\"datebox\" data-options=\\'{\"mode\":\"timebox\", \"useFocus\":true, \"overrideTimeFormat\":24, \"useNewStyle\":true }\\'></span>';\n" +
+//	    			"			$b .= '<span><input type=\"time\" id=\"SSQL_insert"+num+"_words5\" name=\"SSQL_insert"+num+"_words5\" placeholder=\"終了\" value=\"'.$row['end_time'].'\"  class=\"required \" data-role=\"datebox\" data-options=\\'{\"mode\":\"timebox\", \"useFocus\":true, \"overrideTimeFormat\":24, \"useNewStyle\":true }\\'></span>';\n" +
+//	    			"			$b .= '<span><span><textarea type=\"text\" id=\"SSQL_insert"+num+"_words6\" name=\"SSQL_insert"+num+"_words6\" placeholder=\"内容\" class=\"required \" >'.$row['text'].'</textarea></span></span>' ;\n" +
+	    			
+	    			"			\n" +
+	    			"			$b .= '<input type=\"submit\" value=\""+((buttonName.isEmpty())? "更新":buttonName )+"\" name=\"SSQL_insert"+num+"_'.$j.'\" id=\"SSQL_insert"+num+"_'.$j.'\" onclick=\"SSQL_Update"+num+"_vali(\\'SSQL_insert"+num+"_'.$j.'\\');\" data-mini=\"false\" data-inline=\"false\">';\n" +
+	    			"			\n" +
+	    			
+	    			"			$b .= '</form>';\n" +
+	    			"			$b .= '</div>';\n" +
+	    			"			$b .= '<div id=\"SSQL_insert"+num+"_'.$j.'_result\"></div>';\n" +
+	    			"			$b .= '<hr size=\"1\" color=\"silver\" width=\"99%\">';\n" +
+	    			"		    $j++;\n" +
+	    			"		}\n" +
+	    			"    }catch(Exception $e){\n" +
+	    			"   		$b = '<font color=red>Get Update Form failed.</font>';\n" +
+	    			"    }\n" +
+	    			"    unset($insert_db"+num+");\n" +
+	    			"	\n" +
+	    			"	$ret['result'] = $b;\n" +
+	    			"	header(\"Content-Type: application/json; charset=utf-8\");\n" +
+	    			"	echo json_encode($ret);\n" +
+	    			"?>\n";
+    	}
+    	return s;
+    }
+    private String getSSQLgetUpdateformJS(int num, String phpFileName) {
+    	String s = "";
+    	//s += "<script>\n" +
+		s +=    "<!-- SSQL get Update Form"+num+" start -->\n" +
+				"<script type=\"text/javascript\">\n" +
+    			"SSQL_getUpdateForm"+num+"();\n" +
+    			"function SSQL_getUpdateForm"+num+"(){\n" +
+    			"	$.ajax({\n" +
+    			"		type: \"POST\",\n" +
+    			"		url: \""+new File(phpFileName).getName()+"\",\n" +
+    			"		success: function(data, textStatus){\n" +
+    			"			if (data.result != \"\") {\n" +
+    			"				SSQL_echo(\"SSQL_UpdateForm"+num+"\", data.result, false);\n" +
+    			"			}\n" +
+    			"		},\n" +
+    			"		error: function(XMLHttpRequest, textStatus, errorThrown) {\n" +
+    			"			SSQL_echo(\"SSQL_UpdateForm"+num+"\", textStatus+\"<br>\"+errorThrown, false);\n" +
+    			"		}\n" +
+    			"	});\n" +
+    			"}\n" +
+    			"function SSQL_echo(id, str, clear){\n" +
+    			//"	document.getElementById(id).innerHTML = str;\n" +
+    			//"	$(\"#\"+id).append(str).trigger(\"create\");\n" +
+    			"	$(\"#\"+id).html(str).trigger(\"create\");\n" +
+    			"	if(clear){\n" +
+    			"		$(function(){\n" +
+    			"			setTimeout(function(){\n" +
+    			"				document.getElementById(id).innerHTML = '';\n" +
+    			"			},3000);\n" +
+    			"		});\n" +
+    			"	}\n" +
+    			"}\n" +
+    			"</script>\n" +
+    			"<!-- SSQL get Update Form"+num+" end -->\n";
+    	return s;
+    }
+    private String getSSQLUpdateformHTML(int num, String phpFileName, String title) {
+    	String s = "";
+    	if(!title.isEmpty()){
+			s += 
+				"<hr>\n<div style=\"font-size:30;\" id=\"SSQL_InsertTitle"+num+"\">"+title+"</div>\n<hr>\n" +
+				"<br>\n";
+		}
+    	s += "<!-- SSQL Update"+num+" start -->\n" +
+    			//"\n" +
+    			"<div id=\"SSQL_UpdateForm"+num+"\"></div>\n" +
+    			//"\n" +
+    			"<!-- SSQL Update"+num+" JS start -->\n" +
+    			"<script type=\"text/javascript\">\n" +
+    			"function SSQL_Update"+num+"_vali(id){\n" +
+    			"	$(function(){\n" +
+    			"		$(\"#\"+id+\"panel form\").validate({\n" +
+    			"		 	errorPlacement: function(error, element) {\n" +
+    			"	        	error.appendTo(element.parent().parent().after());\n" +
+    			"	    	},\n" +
+    			"			submitHandler: function(form) {\n" +
+    			"			 	SSQL_Update"+num+"(id);\n" +
+    			"			    return false;\n" +
+    			"			}\n" +
+    			"		});\n" +
+    			"	})\n" +
+    			"}\n" +
+    			"function SSQL_Update"+num+"(id){\n" +
+    			"	$.ajax({\n" +
+    			"		type: \"POST\",\n" +
+    			"		url: \""+new File(phpFileName).getName()+"\",\n" +
+    			//"		data: $(\"#\"+id+\"panel form\").serializeArray(),\n" +
+    			getFormFileUploadHTML2("#\"+id+\"") +
+    			"		dataType: \"json\",\n" +
+    			"        beforeSend: function(xhr, settings) {\n" +
+    			"            $('#'+id).attr('disabled', true);\n" +
+    			"        },\n" +
+    			"        complete: function(xhr, textStatus) {\n" +
+    			"            $('#'+id).attr('disabled', false);\n" +
+    			"        },\n" +
+    			"		success: function(data, textStatus){\n" +
+    			"			if (data.result != \"\") {\n" +
+    			"				SSQL_echo(\"\"+id+\"_result\", data.result, true);\n" +
+    			"			}\n" +
+    			"		},\n" +
+    			"		error: function(XMLHttpRequest, textStatus, errorThrown) {\n" +
+    			"			SSQL_echo(\"\"+id+\"_result\", textStatus+\"<br>\"+errorThrown, true);\n" +
+    			"		}\n" +
+    			"	});\n" +
+    			"}\n" +
+    			"</script>\n" +
+    			"<!-- SSQL Update"+num+" JS end -->\n" +
+    			"<!-- SSQL Update"+num+" end -->\n";
+    	return s;
+    }
+    
+    
+    
+    
     
     //20131127 form
     //result start
@@ -2933,6 +3368,8 @@ public class Mobile_HTML5Function extends Function {
     		}
     	}
     	
+    	Mobile_HTML5Env.addJsCss("jscss/googleMap.js");
+    	
     	if(searchFlg){
 	    	statement += 
 	    			"		<form method=\"post\" action=\"\" target=\"dummy_ifr\">\n" +
@@ -2941,43 +3378,52 @@ public class Mobile_HTML5Function extends Function {
 					"		</form>\n";
     	}
     	statement += 
-    			"		<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
-				"		<script type=\"text/javascript\">\n" +
-				"		<!--\n";
-    	if(!searchFlg)	statement += "$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n";
+    			//"		<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
+				//"		<script src=\"jscss/googleMap.js\"></script>\n" +
+				"		<script type=\"text/javascript\">\n";
+				//"		<!--\n";
+    	//if(!searchFlg)	statement += "$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n";	//←　dynamic時に動かないため、$(function(){へ変更
+    	if(!searchFlg)	statement += "$(function(){\n";
+
     	else			statement += "$(\"#search_map"+getCount(mapFuncCount)+"\").click(function () {\n";
     	statement += 
-				"  	var map = null; // Google Map\n" +
-				"    $(\"#map"+getCount(mapFuncCount)+"\").remove();	// 地図をクリア\n" +
+//				"  	var map = null; // Google Map\n" +
+				"  	var map = null;\n" +
+				//"    $(\"#map"+getCount(mapFuncCount)+"\").remove();	// 地図をクリア\n" +
+				"    $(\"#map"+getCount(mapFuncCount)+"\").remove();\n" +
 				//"    $(\"#map-wrapper"+getCount(mapFuncCount)+"\").append('<div id=\"map"+getCount(mapFuncCount)+"\" style=\"width: 100%; height: 250px;\"></div>'); // 地図を作成\n" +
-				"    $(\"#map-wrapper"+getCount(mapFuncCount)+"\").append('<div id=\"map"+getCount(mapFuncCount)+"\"" +
-						" style=\"width: 100%; height: "+( (!decos.containsKey("height"))? ("250px"):(decos.getStr("height")) )+";\"></div>'); // 地図を作成\n" +
+				"    $(\"#map-wrapper"+getCount(mapFuncCount)+"\").append(\"<div id=\\\\\"map"+getCount(mapFuncCount)+"\\\\\"" +
+//				" style=\"width: 100%; height: "+( (!decos.containsKey("height"))? ("250px"):(decos.getStr("height")) )+";\"></div>'); // 地図を作成\n" +
+				" style=\\\\\"width: 95%; height: "+( (!decos.containsKey("height"))? ("250px"):(decos.getStr("height")) )+";\\\\\"></div>\");\n" +
 				"      \n";
     	if(!searchFlg)	statement += "    var sad = \""+geolocation+"\";\n";
     	else			statement += "    var sad = $(\"#search_map_words"+getCount(mapFuncCount)+"\").val();\n";
 		statement += 
 				"    var geocoder = new google.maps.Geocoder();\n" +
-				"    geocoder.geocode({'address': sad}, function(results, status) {\n" +
+				"    geocoder.geocode({\"address\": sad}, function(results, status) {\n" +
 				"      if (status == google.maps.GeocoderStatus.OK) {\n" +
 				"	      var mapOptions = {\n" +
 				//"	        zoom: 17, // ズーム倍率\n" +
-				"        	zoom: " + ((zoom.equals(""))? ("17"):(zoom)  ) + ", // ズーム倍率\n" +
+				//"        	zoom: " + ((zoom.equals(""))? ("17"):(zoom)  ) + ", // ズーム倍率\n" +
+				"        	zoom: " + ((zoom.equals(""))? ("17"):(zoom)  ) + ",\n" +
 				"	        center: results[0].geometry.location,\n" +
-				"	        mapTypeId: google.maps.MapTypeId.ROADMAP // 地図の種類(市街地図)\n" +
+				//"	        mapTypeId: google.maps.MapTypeId.ROADMAP // 地図の種類(市街地図)\n" +
+				"	        mapTypeId: google.maps.MapTypeId.ROADMAP\n" +
 				"	      };\n" +
 				"	      map = new google.maps.Map(document.getElementById(\"map"+getCount(mapFuncCount)+"\"),mapOptions);\n" +
-				"      	  new google.maps.Marker({map : map, position : results[0].geometry.location" + ((icon.equals(""))? (""):(", icon : '"+icon+"'")  ) + "}); //\n" +
+//				"      	  new google.maps.Marker({map : map, position : results[0].geometry.location" + ((icon.equals(""))? (""):(", icon : '"+icon+"'")  ) + "}); //\n" +
+				"      	  new google.maps.Marker({map : map, position : results[0].geometry.location" + ((icon.equals(""))? (""):(", icon : \""+icon+"\"")  ) + "});\n" +
 				//"	      new google.maps.Marker({map : map, position : results[0].geometry.location});\n" +
 				"      } else {\n" +
 				//"      	  alert('場所を特定できませんでした。入力内容をご確認ください。');\n" +
-				"      	  $(\"#map"+getCount(mapFuncCount)+"\").text('場所を特定できませんでした。');\n" +
+				"      	  $(\"#map"+getCount(mapFuncCount)+"\").text(\"場所を特定できませんでした。\");\n" +
 				"      }\n" +
 				"    });\n" +
 				"});\n" +
-				"		// -->\n" +
+				//"		// -->\n" +
 				"		</script>\n" +
 				"		\n" +
-				"		<div id=\"map-wrapper"+getCount(mapFuncCount)+"\"></div>";
+				"		<div id=\"map-wrapper"+getCount(mapFuncCount)+"\" style=\"width:260;\"></div>";
     	
     			mapFuncCount++;
 
@@ -3018,7 +3464,7 @@ public class Mobile_HTML5Function extends Function {
     //map end
     
     //added by goto 20130717  "gps,gps_map"
-    /*  gps(type,icon) or gps_map(type,icon)  */
+    /*  gps(type[,icon]) or gps_map(type[,icon])  */
     /*  type:1 map  */
     /*  type:2 map + button */
     private String Func_gps() {
@@ -3035,12 +3481,16 @@ public class Mobile_HTML5Function extends Function {
 				}catch(Exception e){ }
 			}catch(Exception e){ }
 		}catch(Exception e){ }
+		
+		Mobile_HTML5Env.addJsCss("jscss/googleMap.js");
 
 		statement += 
-				"		<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
+				//"		<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
+				//"		<script src=\"jscss/googleMap.js\"></script>\n" +
 				"		<script type=\"text/javascript\">\n" +
 				"		<!--\n" +
-				"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +
+				//"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +	//←　$(function(){の方が良いかも
+				"$(function(){\n" +
 				"  // Geolocation APIのオプション設定\n" +
 				"  var geolocationOptions = {\n" +
 				"    \"enableHighAccuracy\" : true, // 高精度位置情報の取得\n" +
@@ -3115,11 +3565,14 @@ public class Mobile_HTML5Function extends Function {
 //		try{
 //			format = ((FuncArg) this.Args.get(0)).getStr();
 //		}catch(Exception e){ }
+    	Mobile_HTML5Env.addJsCss("jscss/googleMap.js");
     	statement += 
-    			"		<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
+    			//"		<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
+				//"		<script src=\"jscss/googleMap.js\"></script>\n" +
 				"		<script type=\"text/javascript\">\n" +
 				"		<!--\n" +
-				"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +
+				//"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +	//←　$(function(){の方が良いかも
+				"$(function(){\n" +
 				"  	// Geolocation APIのオプション設定\n" +
 				"  	var geolocationOptions = {\n" +
 				"    	\"enableHighAccuracy\" : true, // 高精度位置情報の取得\n" +
@@ -3135,7 +3588,7 @@ public class Mobile_HTML5Function extends Function {
 				"    }, geolocationOptions);\n" +
 				"});\n" +
 				"		// -->\n" +
-				"		</script>" +
+				"		</script>\n" +
 				"		<ul data-role=\"listview\" data-inset=\"true\">\n" +
 				"			<li>緯度:&nbsp;<span id=\"gps_latitude\"></span></li>\n" +
 				"			<li>経度:&nbsp;<span id=\"gps_longitude\"></span></li>\n" +
@@ -3323,8 +3776,12 @@ public class Mobile_HTML5Function extends Function {
     	return str;
     }
     //text end
-    
+
+    //null()
     private void Func_null() {
+    	func_null_count++;
+    	String c = html_env.code.toString();
+    	html_env.code = new StringBuffer(c.substring(0, c.lastIndexOf("<")));	//TODO
         return;
     }
 
@@ -4385,6 +4842,18 @@ public class Mobile_HTML5Function extends Function {
 			return Integer.MIN_VALUE;
 		}
     }
+    
+    private boolean isImage(String detailORurl) {
+    	detailORurl = detailORurl.toLowerCase().trim();
+    	if(detailORurl.endsWith(".gif")
+    	|| detailORurl.endsWith(".jpg")
+    	|| detailORurl.endsWith(".jpeg")
+    	|| detailORurl.endsWith(".png")
+    	|| detailORurl.endsWith(".tif")
+    	|| detailORurl.endsWith(".tiff")
+    	)	return true;
+		return false;
+	}
     
     //20131118 dynamic
     private String getCount(int count){

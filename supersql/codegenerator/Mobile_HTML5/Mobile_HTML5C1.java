@@ -57,7 +57,7 @@ public class Mobile_HTML5C1 extends Connector {
 //        	html_env2.code.append("<form"+Mobile_HTML5Env.getFormNumber()+"start />");
 //        	if(decos.getStr("form").toLowerCase().equals("search"))
 //        		Mobile_HTML5Env.setSearch(true);
-//        }	     
+//        }
 
         if(decos.containsKey("insert")){
         	Mobile_HTML5Env.setIDU("insert");
@@ -184,7 +184,7 @@ public class Mobile_HTML5C1 extends Connector {
         	
         	//20130312 collapsible
         	if(decos.containsKey("collapse")){
-            	html_env.code.append("<DIv data-role=\"collapsible\" data-content-theme=\"c\" style=\"padding: 0px 12px;\">\n");
+            	html_env.code.append("<DIV data-role=\"collapsible\" data-content-theme=\"c\" style=\"padding: 0px 12px;\">\n");
             	
             	//header
             	if(!decos.getStr("collapse").equals(""))
@@ -265,16 +265,14 @@ public class Mobile_HTML5C1 extends Connector {
            	//if((!HTMLG1.G1Flg && !tableFlg) || divFlg)		//20130326  div
             if(/* !HTMLG1.G1Flg  && */ !tableFlg){	//div
             	//20131002
-            	if(decos.containsKey("width")){
-            		Mobile_HTML5Env.divWidth = decos.getStr("width");
-    	    	}else{
-    	    		int tfesItemNum = tfes.contain_itemnum();
-                	float divWidth = (float)Math.floor((double)(100.0/(tfesItemNum))* 1000) / 1000;
-                	Mobile_HTML5Env.divWidth = divWidth+"%";
-    	    	}
-            	//tfe.addDeco("width", divWidth);	//☆HTMLEnvで行うように変更した
+            	int tfesItemNum = tfes.size();
+            	String divWidth = Mobile_HTML5.getDivWidth(decos, tfesItemNum - Mobile_HTML5Function.func_null_count);	//null()
+//            	Log.e(tfes.contain_itemnum()+" "+tfes.size()+" "+tfes);
+//            	tfe.addDeco("width", Mobile_HTML5Env.divWidth);	//☆HTMLEnvで行うように変更した <= この方法は、widthが上書き？されるためNG
             	
-            	html_env.code.append("\n<div class=\"ui-block "+Mobile_HTML5Env.getClassID(tfe)+"\">\n");	//20130309
+            	html_env.code.append("\n<div class=\"ui-block "+Mobile_HTML5Env.getClassID(tfe)+"\" style=\"width:"+divWidth+"\">\n");	//20130309
+//            	if(Count!=0)	html_env.code.append("\n<div class=\"ui-block "+Mobile_HTML5Env.getClassID(tfe)+"\" style=\"width:"+divWidth+"\">\n");	//20130309
+//            	else			html_env.code.append("\n<div class=\"ui-block "+Mobile_HTML5Env.getClassID(tfe)+"\" style=\"width:"+divWidth+" clear:left;\">\n");	//20130309
 
 //            	float divWidth0 = (float)Math.floor((double)(100.0/(Count))* 1000) / 1000;
 //            	String style0 = "style=\"width:"+divWidth0+"%;\"";
@@ -363,13 +361,17 @@ public class Mobile_HTML5C1 extends Connector {
             //20130309
             //20130314  table
         	if(tableFlg){
-	            if (html_env.not_written_classid.contains(classid)){
-	            	html_env.code.delete(html_env.code.indexOf(classid),html_env.code.indexOf(classid)+classid.length()+1);
-	            }
+        		try{
+		            if (html_env.not_written_classid.contains(classid)){
+		            	html_env.code.delete(html_env.code.indexOf(classid),html_env.code.indexOf(classid)+classid.length()+1);
+		            }
+        		}catch (Exception e) { }
         	}
             
-            if(/* !HTMLG1.G1Flg  && */ !tableFlg)	html_env.code.append("</div>\n");	//20130309
-        	if(tableFlg)	html_env.code.append("</TD>\n");					//20130314  table
+        	if(Mobile_HTML5Function.func_null_count<1){	//null()
+	            if(/* !HTMLG1.G1Flg  && */ !tableFlg)	html_env.code.append("</div>\n");	//20130309
+	        	if(tableFlg)	html_env.code.append("</TD>\n");					//20130314  table
+        	}
 //        	if(HTMLFunction.textFlg){					//20130914  "text"
 //        		Log.e("C1 text!");
 //	      		html_env.code.append(HTMLFunction.text);
@@ -395,7 +397,7 @@ public class Mobile_HTML5C1 extends Connector {
         
         //20130312 collapsible
     	if(decos.containsKey("collapse")){
-        	html_env.code.append("</DIv>");
+        	html_env.code.append("</DIV>");
         }
     	
     	//20130330 tab

@@ -97,6 +97,7 @@ public class Mobile_HTML5Env extends LocalEnv {
     StringBuffer div = new StringBuffer();
     //StringBuffer title = new StringBuffer();		//disuse
     StringBuffer titleclass = new StringBuffer();
+    public static String jscss = new String();		//js and css file names that using in the Mobile_HTML5
     StringBuffer cssfile = new StringBuffer();
 	StringBuffer jsFile = new StringBuffer();		//added by goto 20130703
 	StringBuffer cssjsFile = new StringBuffer();	//added by goto 20130703
@@ -151,7 +152,7 @@ public class Mobile_HTML5Env extends LocalEnv {
     //static boolean tabFlg = false;		//20130330  tab用
     static int maxTab = 15;				//20130330  tab用
     
-	static String divWidth = "";		//20131002
+//	static String divWidth = "";		//20131002
 	
 	static boolean noAd = false;		//20131106
     
@@ -305,8 +306,9 @@ public class Mobile_HTML5Env extends LocalEnv {
 //退避            header.append("<script src=\"http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js\"></script>\n");
 //退避            header.append("<script src=\"js/jquery.mobile.dynamic.popup.js\"></script>\n");
             header.append("<script src=\"jscss/jquery-1.7.1.min.js\"></script>\n");
+            header.append(Mobile_HTML5Function.updateFormJS);
             header.append("<script src=\"jscss/jquery-ui.min.js\"></script>\n");
-            header.append("<script src=\"jscss/showmore.js\"></script>\n");
+            header.append("<script src=\"jscss/supersql.showmore.js\"></script>\n");
             header.append("<script src=\"jscss/jquery.mobile-1.3.1.min.js\"></script>\n");
             header.append("<script src=\"jscss/jqm-datebox.core.min.js\"></script>\n");
             header.append("<script src=\"jscss/jqm-datebox.mode.calbox.min.js\"></script>\n");
@@ -333,9 +335,9 @@ public class Mobile_HTML5Env extends LocalEnv {
 //    		header.append("<script src=\"js/script2.js\"></script>\n");
 //退避    		header.append("<script src=\"http://www.db.ics.keio.ac.jp/ssqljscss/jquery.iframe-auto-height.plugin.js\"></script>\n");
 //退避    		header.append("<script src=\"http://www.db.ics.keio.ac.jp/ssqljscss/script2.js\"></script>\n");
-    		header.append("<script src=\"jscss/jquery.iframe-auto-height.plugin.js\"></script>\n");
+    		header.append("<script src=\"jscss/jquery.iframe-auto-height_re.plugin.js\"></script>\n");
     		header.append("<script src=\"jscss/jquery.validate.min.js\"></script>\n");
-    		header.append("<script src=\"jscss/script2.js\"></script>\n");
+    		header.append("<script src=\"jscss/supersql.prev-next.js\"></script>\n");
 
     		
     		//added by goto 20130512  "max-width"
@@ -350,7 +352,7 @@ public class Mobile_HTML5Env extends LocalEnv {
 					"</script>\n");
     		
 //退避    		header.append("<script src=\"js/script1.js\"></script>\n");
-    		header.append("<script src=\"jscss/script1.js\"></script>\n");
+    		header.append("<script src=\"jscss/supersql.js\"></script>\n");
             //added by goto 20121217 end
             
             header.append("\n");
@@ -370,7 +372,8 @@ public class Mobile_HTML5Env extends LocalEnv {
             header.append("<!-- .error{ color:red; text-align:left; display:block; } -->\n");
             header.append("<!--\n");
             header.append(".ui-grid { overflow: hidden; }\n");
-            header.append(".ui-block { margin: 0; padding: 0; border: 0; float: left; min-height: 1px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; }\n");
+            //header.append(".ui-block { margin: 0; padding: 0; border: 0; float: left; min-height: 1px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; }\n");
+            header.append(".ui-block { margin: 0; padding: 0; float: left; min-height: 1px; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box; }\n");
             header.append("-->\n");
           	header.append("</style>\n");
 
@@ -490,7 +493,7 @@ public class Mobile_HTML5Env extends LocalEnv {
 	    	        		"$(function() {\n" +
 	    	        		"	//タップ時: [更新]\n" +
 	    	        		"	$('#footer1').bind('tap',function(){\n" +
-	    	        		"		history.go(0);\n" +
+	    	        		"		location.reload();\n" +
 	    	        		"	});\n" +
 	    	        		"\n" +
 	    	        		"	//タッチイベントの取得\n" +
@@ -685,7 +688,8 @@ public class Mobile_HTML5Env extends LocalEnv {
           	}//通常のみの処理（jsファイル作成）end
         	
           	header.append("\n");
-	        header.append(cssjsFile);	//added by goto 20130703
+	        header.append(jscss);
+          	header.append(cssjsFile);	//added by goto 20130703
 	        header.append(cssfile);
 			header.append(jsFile);		//added by goto 20130703
 	        header.append("</HEAD>\n");
@@ -739,6 +743,9 @@ public class Mobile_HTML5Env extends LocalEnv {
 //	        		c2 = c2.substring(c2.lastIndexOf(":")+1).trim();
 //	        	}
 	        	String from = "";
+	        	String fromWhere = "";
+	        	String fromWhere_left = "";
+	        	String fromWhere_right = "";
 	        	String expire_time = "";
 	        	String sender_name = "";
 	        	String admin_email = "";
@@ -763,6 +770,16 @@ public class Mobile_HTML5Env extends LocalEnv {
 		        	
 		        	s = s.substring(s.indexOf(",")+1);
 		        	from = s.substring(0,s.indexOf(",")).trim();		//FROM
+		        	from = from.replace("\"", "").toLowerCase();
+		        	if(from.contains(" where ")){
+		        		fromWhere = ".\" and "+from.substring(from.indexOf(" where ")+6).trim()+"\"";
+		        		if(from.contains("=")){
+		        			fromWhere_left = ", "+from.substring(from.indexOf(" where ")+6,from.indexOf("=")).trim();
+		        			fromWhere_right = ", "+from.substring(from.indexOf("=")+1).trim();
+		        		}
+		        		from = from.substring(0,from.indexOf(" where ")).trim();
+			        	//Log.e(from+"|"+fromWhere+"|"+fromWhere_left+"|"+fromWhere_right);
+		        	}
 	        		
 	        		s = s.substring(s.indexOf(",")+1);
 	        		c3 = s.substring(0,s.indexOf(",")).replaceAll("\"","").replaceAll(";",",").trim();	//セッション変数として保存する属性
@@ -793,6 +810,16 @@ public class Mobile_HTML5Env extends LocalEnv {
 		        	}
 		        	s = s.substring(s.indexOf(",")+1);
 	        		from = s.substring(0,s.indexOf(",")).trim();						//FROM
+		        	from = from.replace("\"", "").toLowerCase();
+		        	if(from.contains(" where ")){
+		        		fromWhere = ".\" and "+from.substring(from.indexOf(" where ")+6).trim()+"\"";
+		        		if(from.contains("=")){
+		        			fromWhere_left = ", "+from.substring(from.indexOf(" where ")+6,from.indexOf("=")).trim();
+		        			fromWhere_right = ", "+from.substring(from.indexOf("=")+1).trim();
+		        		}
+		        		from = from.substring(0,from.indexOf(" where ")).trim();
+		        	}
+		        	
 	        		s = s.substring(s.indexOf(",")+1);
 	        		//for(int j=0; j<3;j++)	s = s.substring(s.indexOf(",")+1);			//3つ目の,までカット
 //	        		Log.i("s: "+s);
@@ -898,7 +925,7 @@ public class Mobile_HTML5Env extends LocalEnv {
 		        				"	$sqlite3_id = '"+c1+"';\n" +
 		        				"	$sqlite3_pw = '"+c2+"';\n" +
 		        				"	$sqlite3_c3 = '"+((!c3.equals(""))?(","+c3):("") )+"';\n" +
-		        				"	$sqlite3_table = '"+from+"';\n" +
+		        				"	$sqlite3_table = \""+from+"\";\n" +
 		        				"\n" +
 		        				"	$id = checkHTMLsc($_POST['id']);\n" +
 		        				"	$pw = checkHTMLsc($_POST['password']);\n" +
@@ -908,7 +935,7 @@ public class Mobile_HTML5Env extends LocalEnv {
 		        				"	if($pw && $id){\n" +
 		        				"		//Login\n" +
 		        				"		$db = new SQLite3($sqlite3_DB);\n" +
-		        				"		$sql = \"SELECT \".$sqlite3_id.\",\".$sqlite3_pw.\"\".$sqlite3_c3.\" FROM \".$sqlite3_table.\" where \".$sqlite3_id.\"='\".$id.\"' and \".$sqlite3_pw.\"='\".$pw.\"'\";\n" +
+		        				"		$sql = \"SELECT \".$sqlite3_id.\",\".$sqlite3_pw.\"\".$sqlite3_c3.\" FROM \".$sqlite3_table.\" WHERE \".$sqlite3_id.\"='\".$id.\"' and \".$sqlite3_pw.\"='\".$pw.\"'\""+fromWhere+";\n" +
 		        				"	    $result = $db->query($sql);\n" +
 		        				"	    $i = 0;\n" +
 		        				//"	    while($res = $result->fetchArray(SQLITE3_ASSOC)){\n" +
@@ -931,7 +958,7 @@ public class Mobile_HTML5Env extends LocalEnv {
 		        				"	    	$_SESSION["+sessionVariable_UniqueName+"id] = $id;\n" +
 		        				"	    	$_SESSION["+sessionVariable_UniqueName+"logintime] = date('Y/m/d(D) H:i:s', time());\n" +		//ユーザ名
 		        				"			echo '<script type=\"text/javascript\">window.parent.$(\\'#Login_text1\\').text(\"\");</script>';\n" +
-		        				"			echo '<script type=\"text/javascript\">window.parent.history.go(0);</script>';	//reload\n" +
+		        				"			echo '<script type=\"text/javascript\">window.parent.location.reload(true);</script>';	//reload\n" +
 		        				"	    }\n" +
 		        				"	}else if($newpw && $re_newpw && $id){\n" +
 		        				"		//check (pw==re_pw)?\n" +
@@ -943,7 +970,7 @@ public class Mobile_HTML5Env extends LocalEnv {
 		        				"			$db = new SQLite3($sqlite3_DB);\n" +
 		        				"			\n" +
 		        				"			//check\n" +
-		        				"			$sql1 = \"SELECT \".$sqlite3_id.\" FROM \".$sqlite3_table.\" where \".$sqlite3_id.\"='\".$id.\"'\";\n" +
+		        				"			$sql1 = \"SELECT \".$sqlite3_id.\" FROM \".$sqlite3_table.\" where \".$sqlite3_id.\"='\".$id.\"'\""+fromWhere+";\n" +
 		        				"		    $result1 = $db->query($sql1);\n" +
 		        				"		    $i=0;\n" +
 		        				"		    while($res = $result1->fetchArray(SQLITE3_ASSOC)){\n" +
@@ -953,7 +980,7 @@ public class Mobile_HTML5Env extends LocalEnv {
 		        				"		    if($i > 0)	p('<font color=#ff0000>\\\''.$id.'\\\' has been already registered.</font>');	//already registered.\n" +
 		        				"		    else{\n" +
 		        				"	   	       //registration\n" +
-		        				"	   	       $sql2 = \"INSERT INTO \".$sqlite3_table.\" (\".$sqlite3_id.\", \".$sqlite3_pw.\") VALUES ('\".$id.\"','\".$newpw.\"')\";\n" +
+		        				"	   	       $sql2 = \"INSERT INTO \".$sqlite3_table.\" (\".$sqlite3_id.\", \".$sqlite3_pw.\""+fromWhere_left+") VALUES ('\".$id.\"','\".$newpw.\"'"+fromWhere_right+")\";\n" +
 		        				"	   	       try{\n" +
 		        				"					$result2 = $db->exec($sql2);\n" +
 		        				"					p('<font color=gold>Registration Success!!</font>');\n" +
@@ -1132,14 +1159,14 @@ public class Mobile_HTML5Env extends LocalEnv {
     							"		$sqlite3_DB = '"+DB+"';\n" +
     							"		$sqlite3_id = '"+c1+"';\n" +
     							"		$sqlite3_pw = '"+c2+"';\n" +
-    							"		$sqlite3_table = '"+from+"';\n" +
+    							"		$sqlite3_table = \""+from+"\";\n" +
     							"	\n" +
     							"		$id = checkHTMLsc($_POST['id']);\n" +
     							"		$pw = checkHTMLsc($_POST['password']);\n" +
     							"	\n" +
     							"		if($pw && $id){\n" +
     							"	   		$db = new SQLite3($sqlite3_DB);\n" +
-    							"			$sql = \"SELECT \".$sqlite3_id.\",\".$sqlite3_pw.\" FROM \".$sqlite3_table.\" where \".$sqlite3_id.\"='\".$id.\"' and \".$sqlite3_pw.\"='\".$pw.\"'\";\n" +
+    							"			$sql = \"SELECT \".$sqlite3_id.\",\".$sqlite3_pw.\" FROM \".$sqlite3_table.\" where \".$sqlite3_id.\"='\".$id.\"' and \".$sqlite3_pw.\"='\".$pw.\"'\""+fromWhere+";\n" +
     							"		    $result = $db->query($sql);\n" +
     							"		    $i = 0;\n" +
     							"		    while($res = $result->fetchArray(SQLITE3_ASSOC)){\n" +
@@ -1151,7 +1178,7 @@ public class Mobile_HTML5Env extends LocalEnv {
     							"		    	//Login success.\n" +
     							"		    	$_SESSION["+sessionVariable_UniqueName+"id] = $id;\n" +
     							"				echo '<script type=\"text/javascript\">window.parent.$(\\'#Login_text1\\').text(\"\");</script>';\n" +
-    							"				echo '<script type=\"text/javascript\">window.parent.history.go(0);</script>';	//reload\n" +
+    							"				echo '<script type=\"text/javascript\">window.parent.location.reload(true);</script>';	//reload\n" +
     							"		    }\n" +
     							"		}else{\n" +
     							"			p('<font color=#ff0000>Please input form.</font>');\n" +
@@ -1172,7 +1199,7 @@ public class Mobile_HTML5Env extends LocalEnv {
     							"			//ユーザ定義\n" +
     							"			$sqlite3_DB = '"+DB+"';\n" +
     							"			$sqlite3_id = '"+c1+"';\n" +
-    							"			$sqlite3_table = '"+from+"';\n" +
+    							"			$sqlite3_table = \""+from+"\";\n" +
     							"			\n" +
     							"			$email = $_POST[\"mail1\"];\n" +
     							"	        \n" +
@@ -1204,10 +1231,10 @@ public class Mobile_HTML5Env extends LocalEnv {
     							"		$sqlite3_DB = '"+DB+"';\n" +
     							"		$sqlite3_id = '"+c1+"';\n" +
     							"		$sqlite3_pw = '"+c2+"';\n" +
-    							"		$sqlite3_table = '"+from+"';\n" +
+    							"		$sqlite3_table = \""+from+"\";\n" +
     							"\n" +
     							"		//$mail列のパスワードを「ランダムpassword」で初期化\n" +
-    							"		$reset_sql1 = \"UPDATE \".$sqlite3_table.\" SET \".$sqlite3_pw.\"='\".$r_password.\"' where \".$sqlite3_id.\"='\".$mail.\"'\";\n" +
+    							"		$reset_sql1 = \"UPDATE \".$sqlite3_table.\" SET \".$sqlite3_pw.\"='\".$r_password.\"' where \".$sqlite3_id.\"='\".$mail.\"'\""+fromWhere+";\n" +
     							"		$db = new SQLite3($sqlite3_DB);\n" +
     							"		$result1 = $db->exec($reset_sql1);\n" +
     							"		if ($result1) {\n" +
@@ -1285,13 +1312,13 @@ public class Mobile_HTML5Env extends LocalEnv {
     							"		$sqlite3_DB = '"+DB+"';\n" +
     							"		$sqlite3_id = '"+c1+"';\n" +
     							"		$sqlite3_pw = '"+c2+"';\n" +
-    							"		$sqlite3_table = '"+from+"';\n" +
+    							"		$sqlite3_table = \""+from+"\";\n" +
     							"		\n" +
     							"		//「メールアドレス」と「ランダムpassword」をDBへ登録\n" +
     							"		//check & registration\n" +
     							"		$db = new SQLite3($sqlite3_DB);\n" +
     							"		//一応、再check\n" +
-    							"		$sql1 = \"SELECT \".$sqlite3_id.\" FROM \".$sqlite3_table.\" where \".$sqlite3_id.\"='\".$mail.\"'\";\n" +
+    							"		$sql1 = \"SELECT \".$sqlite3_id.\" FROM \".$sqlite3_table.\" where \".$sqlite3_id.\"='\".$mail.\"'\""+fromWhere+";\n" +
     							"	    $result1 = $db->query($sql1);\n" +
     							"	    $i=0;\n" +
     							"	    while($res = $result1->fetchArray(SQLITE3_ASSOC)){\n" +
@@ -1303,7 +1330,7 @@ public class Mobile_HTML5Env extends LocalEnv {
     							"	     	return \"\";		//既に登録済み（レアケース）\n" +
     							"	    }else{\n" +
     							"   	       //「メールアドレス」と「ランダムpassword」をDBへ登録\n" +
-    							"   	       $sql2 = \"INSERT INTO \".$sqlite3_table.\" (\".$sqlite3_id.\", \".$sqlite3_pw.\") VALUES ('\".$mail.\"','\".$r_password.\"')\";\n" +
+    							"   	       $sql2 = \"INSERT INTO \".$sqlite3_table.\" (\".$sqlite3_id.\", \".$sqlite3_pw.\""+fromWhere_left+") VALUES ('\".$mail.\"','\".$r_password.\"'"+fromWhere_right+")\";\n" +
     							"   	       try{\n" +
     							"				$result2 = $db->exec($sql2);\n" +
     							"				unset($db);\n" +
@@ -1460,7 +1487,7 @@ public class Mobile_HTML5Env extends LocalEnv {
 	        				"    	setcookie(session_name(), '', time()-42000, '/');\n" +
 	        				"	}\n" +
 	        				"	session_destroy();\n" +
-	        				"	echo '<script type=\"text/javascript\">window.parent.history.go(0);</script>';	//reload\n" +
+	        				"	echo '<script type=\"text/javascript\">window.parent.location.reload(true);</script>';	//reload\n" +
 	        				"}\n" +
 	        				"?>\n" +
 	        				"<!-- Logout end -->\n");
@@ -1490,8 +1517,10 @@ public class Mobile_HTML5Env extends LocalEnv {
 	        }
 	        //data-role="content"
 	        header.append("<!-- data-role=content start -->\n<div data-role=\"content\" style=\"padding:0\" id=\"content1\">\n");
-	        header.append("\n<div id=\"showValues\"><!-- ユーザ名等を表示 --></div>\n");	//ユーザ名
-
+	        if(SSQLparser.sessionFlag){
+	        	header.append("\n<div id=\"showValues\"><!-- ユーザ名等を表示 --></div>\n");	//ユーザ名
+	        }
+	        	
 	        //commented out by goto  201203
 //	        header.append("<div");
 //	        header.append(div);
@@ -1584,7 +1613,7 @@ public class Mobile_HTML5Env extends LocalEnv {
     	if(GlobalEnv.getframeworklist() == null){
     		if(footerFlag==1){		//通常時のみ（Prev/Nextでは行わない）
     			if(!noAd || !copyright.isEmpty())
-    				footer.append("<hr size=\"1\">");
+    				footer.append("<hr size=\"1\">\n");
 	    		if(!copyright.equals("")){	//copyrightを付加
 	    			footer.append("<div>\n");
 	    			footer.append("Copyright &COPY; "+copyright+" All Rights Reserved.\n");
@@ -1624,7 +1653,10 @@ public class Mobile_HTML5Env extends LocalEnv {
     					"?>\n");
     		}//else
     		footer.append("<iframe name=\"dummy_ifr\" style=\"display:none;\"><!-- dummy iframe for Form target --></iframe>\n");	//dummy iframe
-    		footer.append(Mobile_HTML5Env.PHP);			//PHPストリングを付加			//added by goto 20130515  "search"
+    		//TODO: 下記でOK?
+    		if(SSQLparser.sessionFlag || Mobile_HTML5Function.searchCount>1 || Mobile_HTML5Function.selectCount>1){
+    			footer.append(Mobile_HTML5Env.PHP);			//PHPストリングを付加			//added by goto 20130515  "search"
+    		}
     		//footer.append(HTMLEnv.PHPpost+"\n?>\n");		//PHPpostストリングを付加		//added by goto 20130531
     		//footer.append(HTMLEnv.PHPfunc);		//PHPfuncストリングを付加		//added by goto 20130531
     		if(footerFlag==1)		//通常時のみ（Prev/Nextでは行わない）
@@ -1754,12 +1786,12 @@ public class Mobile_HTML5Env extends LocalEnv {
 
         //tk end//////////////////////////////////////////////////////////////
 
-        //20131002
-		if(!decos.containsKey("width")){
-			if(!Mobile_HTML5Env.divWidth.equals(""))
-				decos.put("width", Mobile_HTML5Env.divWidth);
-	  	}
-		Mobile_HTML5Env.divWidth = "";
+//        //20131002
+//		if(!decos.containsKey("width")){
+//			if(!Mobile_HTML5Env.divWidth.equals(""))
+//				decos.put("width", Mobile_HTML5Env.divWidth);
+//	  	}
+//		Mobile_HTML5Env.divWidth = "";
 		
 		// ��??
         if (decos.containsKey("width")) {
@@ -2090,7 +2122,7 @@ public class Mobile_HTML5Env extends LocalEnv {
 				//code.append("<A href=\"" + htmlEnv.linkUrl + "\" ");
 			fff = fff.substring(0,fff.lastIndexOf(".html"));	//.htmlをカット
 			fff += "_sql.html";
-        	
+
         }
         
         //20130521  "flickbar"
@@ -2323,6 +2355,13 @@ public class Mobile_HTML5Env extends LocalEnv {
 	}
 
 
+	//add js or css file names that using in the Mobile_HTML5 to the header
+	public static void addJsCss(String filename){
+		if(!jscss.contains(filename)){
+    		jscss += "<script src=\""+filename+"\"></script>\n";
+    	}
+	}
+	
 
 	//global form number : 1,2,3...
 	static int form_number = 1;

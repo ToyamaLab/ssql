@@ -21,8 +21,12 @@ import supersql.common.DB;
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
+import supersql.parser.SSQLparser;
 
 public class Mobile_HTML5 {
+	
+	static boolean G2 = false;
+	static int G2_dataQuantity = 0;
 	
 	public static boolean preProcess(String symbol, DecorateList decos, Mobile_HTML5Env html_env){
 		//Pre-process (前処理)
@@ -41,6 +45,10 @@ public class Mobile_HTML5 {
 			dynamicPreProcess(symbol, decos, html_env);//最終的には不要
 			
 //			formPreProcess(symbol, decos, html_env);
+		}
+		if(symbol.contains("G2")){
+			G2 = true;
+			//Log.e(G2_dataQuantity);
 		}
 		return true;
 	}
@@ -72,6 +80,13 @@ public class Mobile_HTML5 {
 //			formStringGetProcess(symbol, decos, html_env);
 //			formProcess(symbol, decos, html_env);
 		}
+		
+		Mobile_HTML5Function.func_null_count = 0;	//null()
+		if(symbol.contains("G2")){
+			G2 = false;
+			G2_dataQuantity = 0;
+			Mobile_HTML5Function.G2_form_count = 0;
+		}
 		return true;
 	}
 	public static boolean postProcess(String symbol, DecorateList decos, Mobile_HTML5Env html_env){
@@ -85,10 +100,25 @@ public class Mobile_HTML5 {
 		
 		//Post-process (後処理)
 		showCloseProcess(decos, html_env);
-		Mobile_HTML5Env.divWidth = "";
+//		Mobile_HTML5Env.divWidth = "";
 		dynamicString = "";
 		formString = "";
 		return true;
+	}
+	
+	
+	//get DIV width (C1,G1)
+	public static String getDivWidth(DecorateList decos, int numberOfColumns){
+    	//20131002
+		String divWidthStr = "";
+    	if(decos.containsKey("width")){
+    		divWidthStr = decos.getStr("width");
+    	}else{
+	    	float divWidth = (float)Math.floor((double)(100.0/numberOfColumns)* 1000) / 1000;
+        	divWidthStr = divWidth+"%";
+    	}
+//    	tfe.addDeco("width", Mobile_HTML5Env.divWidth); <= この方法は、widthが上書き？されるためNG
+		return divWidthStr;
 	}
 	
 	
@@ -549,7 +579,7 @@ public class Mobile_HTML5 {
 										""+((!textareaFlg[i])?(""):("</textarea>"))+"\n";
 							}else{
 								//TODO 2nd引数
-								statement += Mobile_HTML5.getFormValidationString(validationType[i], false, "form"+formCount+"_words"+(++insertWordCount), s_name_array[i]);
+								statement += Mobile_HTML5.getFormValidationString(validationType[i], false, "form"+formCount+"_words"+(++insertWordCount), s_name_array[i], null);
 							}
 						}
 					}else{
@@ -566,7 +596,8 @@ public class Mobile_HTML5 {
 									"<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
 									"<script type=\"text/javascript\">\n" +
 									"<!--\n" +
-									"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +
+									//"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +
+									"$(function(){\n" +
 									"  	// Geolocation APIのオプション設定\n" +
 									"  	var geolocationOptions = {\n" +
 									"    	\"enableHighAccuracy\" : true, // 高精度位置情報の取得\n" +
@@ -824,7 +855,8 @@ public class Mobile_HTML5 {
 	//20131201 form validation
 	public static String checkFormValidationType(String s){
 		String type = "";
-		String types[] = {"tel","url","email","password","alphabet_number","alphabet","number","color","file",
+		String types[] = {"tel","url","email","password","alphabet_number","alphabet","number","color",
+				"file","image","img","audio","video",
 				"date1","date2","date3","date4","date5","date","time"};	//Order is significant!
 		for(int i=0;i<types.length;i++){
 			if(s.contains(types[i])){	//TODO: リファクタリング
@@ -835,9 +867,11 @@ public class Mobile_HTML5 {
 		//Log.e("s = "+s+", "+"type = "+type);
 		return type;
 	}
-	public static String getFormValidationString(String type, Boolean notnull, String name, String placeholder){
+//	static String upFormVal = "";
+	public static String getFormValidationString(String type, Boolean notnull, String name, String placeholder, String updateFromValue){
 		String s = "";
 		type = type.toLowerCase().trim();
+//		upFormVal = updateFromValue; //TODO: 他の方法
 		
 		//date, time
 //	    ◎date <input type="text" name="insert1_words4" placeholder="Year / Month / Day" data-role="datebox" data-options='{"mode":"calbox", "useNewStyle":true, "overrideCalHeaderFormat": "%Y / %m / %d", "overrideDateFormat": "%Y/%m/%d" }' >
@@ -869,7 +903,13 @@ public class Mobile_HTML5 {
 			  s += getFormTag("color", name, placeholder,"Color", notnull, "");
 			  break;
 		  case "file":	//file
-			  s += getFormTag("file", name, placeholder,"Choose file", notnull, "");
+		  case "audio":	//audio
+		  case "video":	//video
+			  s += getFormTag(type, name, placeholder,"Choose file", notnull, "");
+			  break;
+		  case "image":	//image
+		  case "img":	//img
+			  s += getFormTag("image", name, placeholder,"Choose file", notnull, "");
 			  break;
 			  
 		  case "alphabet":	//alphabet (custom type)
@@ -880,33 +920,60 @@ public class Mobile_HTML5 {
 			  break;
 			  
 		  case "date":	//Year / Month / Day
-			  s += getFormTag("date", name, placeholder, "Year / Month / Day", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"calbox\", \"useNewStyle\":true, \"overrideCalHeaderFormat\": \"%Y / %m / %d\", \"overrideDateFormat\": \"%Y/%m/%d\" }'";
+			  s += getFormTag("date", name, placeholder, "Year / Month / Day", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"calbox\", \"useFocus\":true, \"useNewStyle\":true, \"overrideCalHeaderFormat\": \"%Y / %m / %d\", \"overrideDateFormat\": \"%Y/%m/%d\" }'";
 			  break;
 		  case "date1":	//Year
-			  s += getFormTag("date", name, placeholder, "Year", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"flipbox\", \"useNewStyle\":true, \"overrideHeaderFormat\": \"%Y\", \"overrideDateFormat\": \"%Y\", \"overrideDateFieldOrder\":[\"y\"] }'";
+			  s += getFormTag("date", name, placeholder, "Year", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"flipbox\", \"useFocus\":true, \"useNewStyle\":true, \"overrideHeaderFormat\": \"%Y\", \"overrideDateFormat\": \"%Y\", \"overrideDateFieldOrder\":[\"y\"] }'";
 			  break;
 		  case "date2":	//Month
-			  s += getFormTag("date", name, placeholder, "Month", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"flipbox\", \"useNewStyle\":true, \"overrideHeaderFormat\": \"%m\", \"overrideDateFormat\": \"%m\", \"overrideDateFieldOrder\":[\"m\"] }'";
+			  s += getFormTag("date", name, placeholder, "Month", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"flipbox\", \"useFocus\":true, \"useNewStyle\":true, \"overrideHeaderFormat\": \"%m\", \"overrideDateFormat\": \"%m\", \"overrideDateFieldOrder\":[\"m\"] }'";
 			  break;
 		  case "date3":	//Day
-			  s += getFormTag("date", name, placeholder, "Day", notnull, "") + "data-role=\"datebox\" min=\"2016-01-01\" max=\"2016-01-31\" data-options='{\"mode\":\"flipbox\", \"useNewStyle\":true, \"overrideHeaderFormat\": \"%d\", \"overrideDateFormat\": \"%d\", \"overrideDateFieldOrder\":[\"d\"] }'";
+			  //TODO getUpdate時
+			  s += getFormTag("date", name, placeholder, "Day", notnull, "") + "data-role=\"datebox\" min=\"2016-01-01\" max=\"2016-01-31\" data-options='{\"mode\":\"flipbox\", \"useFocus\":true, \"useNewStyle\":true, \"overrideHeaderFormat\": \"%d\", \"overrideDateFormat\": \"%d\", \"overrideDateFieldOrder\":[\"d\"] }'";
+			  //s += getFormTag("date", name, placeholder, "Day", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"flipbox\", \"useFocus\":true, \"useNewStyle\":true, \"overrideHeaderFormat\": \"%d\", \"overrideDateFormat\": \"%d\", \"overrideDateFieldOrder\":[\"d\"] }'";
 			  break;
 		  case "date4":	//Year / Month
-			  s += getFormTag("date", name, placeholder, "Year / Month", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"calbox\", \"useNewStyle\":true, \"overrideCalHeaderFormat\": \"%Y / %m\", \"overrideDateFormat\": \"%Y/%m\" }'";
+			  s += getFormTag("date", name, placeholder, "Year / Month", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"calbox\", \"useFocus\":true, \"useNewStyle\":true, \"overrideCalHeaderFormat\": \"%Y / %m\", \"overrideDateFormat\": \"%Y/%m\" }'";
 			  break;
 		  case "date5":	//Month / Day
-			  s += getFormTag("date", name, placeholder, "Month / Day", notnull, "") + "data-role=\"datebox\" min=\"2016-01-01\" max=\"2016-12-31\" data-options='{\"mode\":\"datebox\", \"useNewStyle\":true, \"overrideHeaderFormat\": \"%m / %d\",  \"overrideDateFormat\": \"%m/%d\", \"overrideDateFieldOrder\":[\"m\",\"d\"] }'";
+			  //TODO getUpdate時
+			  s += getFormTag("date", name, placeholder, "Month / Day", notnull, "") + "data-role=\"datebox\" min=\"2016-01-01\" max=\"2016-12-31\" data-options='{\"mode\":\"datebox\", \"useFocus\":true, \"useNewStyle\":true, \"overrideHeaderFormat\": \"%m / %d\",  \"overrideDateFormat\": \"%m/%d\", \"overrideDateFieldOrder\":[\"m\",\"d\"] }'";
+			  //s += getFormTag("date", name, placeholder, "Month / Day", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"datebox\", \"useFocus\":true, \"useNewStyle\":true, \"overrideHeaderFormat\": \"%m / %d\",  \"overrideDateFormat\": \"%m/%d\", \"overrideDateFieldOrder\":[\"m\",\"d\"] }'";
 			  break;
 		  case "time":	//Hour : Minute
-			  s += getFormTag("time", name, placeholder, "Ex) 12:01", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"timebox\", \"overrideTimeFormat\":24, \"useNewStyle\":true }'";
+			  s += getFormTag("time", name, placeholder, "Ex) 12:01", notnull, "") + "data-role=\"datebox\" data-options='{\"mode\":\"timebox\", \"useFocus\":true, \"overrideTimeFormat\":24, \"useNewStyle\":true }'";
 			  break;
+		}
+		if(updateFromValue != null && !updateFromValue.isEmpty()){
+			s = s.replace("'", "\\\'");
+			s += " value=\""+updateFromValue+"\"";
 		}
 		//Log.e("formValidation = "+s+"></span>");
 		return s+"></span>\n";
 	}
 	private static String getFormTag(String type, String name, String placeholder, String defaultPlaceholder, Boolean notnull, String customType) {
-		return "    <span><input type=\""+type+"\" id=\""+name+"\" name=\""+name+"\"" +
+		String add = "";
+		if(type.equals("image")||type.equals("audio")||type.equals("video")){
+			add = " accept=\""+type+"/*\"";
+			type = "file";
+		}
+		String ret = "    <span><input type=\""+type+"\""+add+" id=\""+name+"\" name=\""+name+"\"" +
 				" placeholder=\""+((!placeholder.isEmpty())? placeholder : defaultPlaceholder)+"\" " + getFormClass(notnull, customType);
+		if(type.equals("password")){
+			//add confirm password form
+			ret += 	"></span>\n" +
+					"    <span><input type=\""+type+"\" id=\""+name+"_confirm\" name=\""+name+"_confirm\"" +
+					" placeholder=\""+((!placeholder.isEmpty())? placeholder : defaultPlaceholder)+" (re-input)\" equalTo=\"#"+name+"\"";
+		}
+		return ret;
+////		if(upFormVal == null){
+//			return "    <span><input type=\""+type+"\" id=\""+name+"\" name=\""+name+"\"" +
+//			" placeholder=\""+((!placeholder.isEmpty())? placeholder : defaultPlaceholder)+"\" " + getFormClass(notnull, customType);
+////		}else{
+////			return "    <span><input type=\""+type+"\" id=\""+name+"\" name=\""+name+"\" value=\""+upFormVal+"\"" +
+////					" placeholder=\""+((!placeholder.isEmpty())? placeholder : defaultPlaceholder)+"\" " + getFormClass(notnull, customType);
+////		}
 	}
 	static String getFormClass(Boolean notnull, String customType) {
 		if(!notnull && customType.isEmpty())	return "";
@@ -937,7 +1004,7 @@ public class Mobile_HTML5 {
 	static String dynamicHTMLbuf0 = "";
 	static String dynamicHTMLbuf = "";
 	static int dynamicCount = 1;
-	static String dynamicFuncCountLabel = "___DynamicFunc_CountLabel___";
+	static String dynamicFuncCountLabel = "___SSQL_DynamicFunc_CountLabel___";
 	public static boolean dynamicDisplay = false;
 	public static String dynamicFuncArgProcess(ITFE tfe){
 		//For Function
@@ -951,8 +1018,10 @@ public class Mobile_HTML5 {
 		String s = ""+tfe;
 		s = s.trim();
 		if(s.startsWith("\"") && s.endsWith("\"")){
-			//not attribute
+			//not attribute, not number
 			s = s.substring(1,s.length()-1);
+		}else if(isNumber(s)){
+			//number
 		}else{
 			//attribute
 			s = "'||"+s+"||'";
@@ -1061,9 +1130,11 @@ public class Mobile_HTML5 {
 			
 			//TODO div, table以外の場合
 //			dynamicString = "'"+dynamicString2+"</div>'";
+			int numberOfColumns = 1;
+			String php_str1 = "", php_str2 = "", php_str3 = "", php_str4 = "";
 			if(!symbol.contains("G1") && !symbol.contains("G2")){
 				if(decos.containsKey("table")){
-					dynamicString = "'<table border=1><tr>"+dynamicString+"</tr></table>'";
+					dynamicString = "'<table border=\"1\"><tr>"+dynamicString+"</tr></table>'";
 				}else if(decos.containsKey("table0")){
 					dynamicString = "'<table><tr>"+dynamicString+"</tr></table>'";
 	//				String close = "";
@@ -1079,7 +1150,49 @@ public class Mobile_HTML5 {
 			}else{
 				//G1, G2
 				dynamicString = "'"+dynamicString+"'";
+				
+				//table
+				if(decos.containsKey("table") || decos.containsKey("table0")){
+					int border = 1;
+					if(decos.containsKey("table0"))	border = 0;
+					//table
+					php_str1 = "        $b .= '<table border=\""+border+"\">';\n";
+					php_str2 = "              $b .= '<tr><td>';\n";
+					php_str3 = "              $b .= '</td></tr>';\n";
+					php_str4 = "        $b .= '</table>';\n";
+				}
+
+				//decos contains Key("column")
+				if(decos.containsKey("column")){
+					try{
+						numberOfColumns = Integer.parseInt(decos.getStr("column"));
+					}catch(Exception e){}
+					if(numberOfColumns<2){
+						numberOfColumns = 1;
+	            		Log.err("<<Warning>> column指定の範囲は、2〜です。指定された「column="+numberOfColumns+"」は使用できません。");
+					}else{
+						if(decos.containsKey("table") || decos.containsKey("table0")){
+							//table
+							int border = 1;
+							if(decos.containsKey("table0"))	border = 0;
+							php_str1 = "        $b .= '<table border=\""+border+"\"><tr>';\n";
+							php_str2 = "              $b .= '<td>';\n";
+							php_str3 = "              $b .= '</td>';\n" +
+									   "              if($i%"+numberOfColumns+"==0) $b .= '</tr><tr>';\n";
+							php_str4 = "        $b .= '</tr></table>';\n";
+						}else{
+							//div
+							php_str1 = "        $b .= '<div Class=\"ui-grid\">';\n";
+							php_str2 = "              $clear = '';\n" +
+								       "              if($i%"+numberOfColumns+"==1) $clear = ' clear:left;';\n" +
+									   "              $b .= '<div class=\"ui-block\" style=\"width:"+(1.0/numberOfColumns*100.0)+"%;'.$clear.'\">';\n";
+							php_str3 = "              $b .= '</div>';\n";
+							php_str4 = "        $b .= '</div>';\n";
+						}
+					}
+				}
 			}
+			
 			
 			dynamicString = dynamicString.replaceAll("\r\n", "").replaceAll("\r", "").replaceAll("\n", "");	//改行コードの削除
 //			if(!dynamicRowFlg)	dynamicString = dynamicString.replaceAll("\"", "\\\\\\\\\\\\\"");			//　" -> \\\"			//TODO これでOK?
@@ -1271,7 +1384,11 @@ public class Mobile_HTML5 {
 	    	}
 	    	if(query.contains(" where ")){
 	    		where = query.substring(query.lastIndexOf(" where ")+" where ".length());
-	    		where = where.replaceAll("\\'","\\\\'");		// ' -> \'
+	    		//where = where.replaceAll("\\'","\\\\'");		// ' -> \'
+	    		if(where.contains("$session")){
+	    			//if WHERE phrase contains $session(XX)
+	    			where = where.replaceAll("\\$session","'\".\\$_SESSION").replaceAll("\\(","[\"").replaceAll("\\)","\"].\"'");
+	    		}
 	    		query = query.substring(0,query.lastIndexOf(" where "));
 	    	}
 	    	from = query.trim();
@@ -1285,7 +1402,8 @@ public class Mobile_HTML5 {
 	    	
 	    	
 	    	String statement = "";
-	    	String php = "<?php\n";
+	    	String php = getSessionStartString()
+	    			     +"<?php\n";
 	    	//sqlite3 php
 	    	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
 	    		if(!dynamicRowFlg){
@@ -1337,7 +1455,8 @@ public class Mobile_HTML5 {
 	    			php += 
 							"if ($_POST['currentPage'] != \"\") {\n" +
 							"	$cp = $_POST['currentPage'];\n" +
-							"	$r = $_POST['row'];\n" +
+							"	$col = "+numberOfColumns+";\n" +
+							"	$r = $_POST['row'] * $col;\n" +
 							"	$end = $cp * $r;\n" +
 							"	$start = $end - $r + 1;\n" +
 							"\n";
@@ -1351,7 +1470,7 @@ public class Mobile_HTML5 {
 							"    $dynamic_col = \""+dynamic_col+"\";\n" +
 							"    $col_num = "+col_num+";                          //カラム数(Java側で指定)\n" +
 							"    $table = '"+from+"';\n" +
-							"    $where0 = '"+where+"';\n" +
+							"    $where0 = \""+where+"\";\n" +
 							"    $dynamic_col_array = array("+dynamic_col_array+");\n" +
 							"    $dynamic_col_num = count($dynamic_col_array);\n" +
 							"    $dynamic_a_Flg = array("+dynamic_aFlg+");\n" +
@@ -1427,10 +1546,12 @@ public class Mobile_HTML5 {
 							"        $i = 0;\n" +
 							"        $pop_num = 0;\n" +
 							"        $b = \"\";\n" +
+							php_str1 +
 							"        while($row = $result->fetchArray()){\n" +
 							"              $i++;\n" +
 							//"              $k=0;\n" +
 							((dynamicRowFlg)? "              if($i>=$start && $i<=$end){	//New\n":"") +
+							php_str2 +
 							"              for($j=0; $j<$dynamic_col_num; $j++){\n" +
 							//"                    dynamic"+dynamicCount+"_p2($row[$j], $j+1);     //tdに結果を埋め込む\n" +
 //							"					if($dynamic_a_Flg[$j]=='true' || $dynamic_mail_Flg[$j]=='true' || $dynamic_pop_Flg[$j]=='true')	;\n" +
@@ -1449,8 +1570,10 @@ public class Mobile_HTML5 {
 							"              		//$b .= $row[$j];\n" +
 							"              		$b .= str_replace("+dynamicFuncCountLabel+", '_'.$i, $row[$j]);\n" +	//For function's count
 							"              }\n" +
+							php_str3 +
 							((dynamicRowFlg)? "              }\n":"") +
 							"        }\n" +
+							php_str4 +
 //							"		 if($i>0)	echo \"<script type=\\\"text/javascript\\\">window.parent.$('#Dynamic"+dynamicCount+"_text_th').show();</script>\";    //カラム名を表示\n" +
 							//"        dynamic"+dynamicCount+"_p1($i.' result'.(($i != 1)?('s'):('')));    //件数表示\n" +
 							//"        dynamic"+dynamicCount+"_p1('"+dynamicString+"');    //件数表示\n" +
@@ -1570,8 +1693,9 @@ public class Mobile_HTML5 {
 				 "},"+ajax_loadInterval+");\n";
 		}
 		s +=	"function SSQL_DynamicDisplay"+num+"_echo(str){\n" +
-				"  var textArea = document.getElementById(\"SSQL_DynamicDisplay"+num+"\");\n" +
-				"  textArea.innerHTML = str;\n" +
+				//"  var textArea = document.getElementById(\"SSQL_DynamicDisplay"+num+"\");\n" +
+				//"  textArea.innerHTML = str;\n" +
+				"  $(\"#SSQL_DynamicDisplay"+num+"\").html(str).trigger(\"create\");\n" +
 				"}\n" +
 				"function SSQL_DynamicDisplay"+num+"(){\n" +
 				"	//ajax: PHPへ値を渡して実行\n" +
@@ -1612,8 +1736,9 @@ public class Mobile_HTML5 {
 				"\n" +
 				"var SSQL_DynamicDisplayPaging"+num+"_currentItems = 1;		//グローバル変数\n" +
 				"function SSQL_DynamicDisplayPaging"+num+"_echo(str){\n" +
-				"  var textArea = document.getElementById(\"SSQL_DynamicDisplayPaging"+num+"\");\n" +
-				"  textArea.innerHTML = str;\n" +
+				//"  var textArea = document.getElementById(\"SSQL_DynamicDisplayPaging"+num+"\");\n" +
+				//"  textArea.innerHTML = str;\n" +
+				"  $(\"#SSQL_DynamicDisplayPaging"+num+"\").html(str).trigger(\"create\");\n" +
 				"}\n";
 		if(ajax_loadInterval>0){
 			s += "\n" +
@@ -1782,6 +1907,19 @@ public class Mobile_HTML5 {
 	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
+	//return session_start string
+	public static String getSessionStartString(){
+		if(SSQLparser.sessionFlag){
+			return "<?php\n" +
+					"	session_start();\n" +
+					//"	session_regenerate_id(TRUE);\n" +	//これがあると、phpファイルへのアクセスごとにセッションが切れる？
+					"?>\n\n";
+		}
+		return "";
+	}
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////
 	
 	//create file
 	public static boolean createFile(Mobile_HTML5Env html_env, String fileName, String code){
@@ -1797,6 +1935,30 @@ public class Mobile_HTML5 {
             return true;
         } catch (Exception e) { }
         return false;
+    }
+
+	//check query
+	public static String checkQuery(String query) {
+		//contains $session() or not
+		//ex)　WHERE s_id = $session(id)	->	WHERE s_id = id
+		//大文字小文字の区別なし：先頭に(?i)
+		if(query.contains(" FROM ") && query.contains(" WHERE ")){
+			if(query.indexOf(" FROM ") < query.indexOf(" WHERE ")){
+				//TODO " and ' の外側かどうかチェック
+				query = query.replaceAll("(?i)\\$\\s*session\\s*\\(\\s*([A-Za-z0-9]+)\\s*\\)", "$1");
+			}
+		}
+		
+		return query;
+	}
+	
+	private static boolean isNumber(String s) {
+        try {
+            Double.parseDouble(s);
+            return true;
+        } catch(NumberFormatException e) {
+            return false;
+        }
     }
 	
 }

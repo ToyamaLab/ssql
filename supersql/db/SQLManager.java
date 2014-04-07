@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import supersql.codegenerator.Mobile_HTML5.Mobile_HTML5;
 import supersql.common.DB;
 
 import supersql.common.GlobalEnv;
@@ -76,6 +77,7 @@ public class SQLManager {
     	}
 
     	if(query.contains(" #"))	query = query.substring(0,query.indexOf(" #"));	//TODO
+    	query = Mobile_HTML5.checkQuery(query);
         Log.out("[SQLManager ExecQuery]");
         if(!query.equals("SELECT DISTINCT  FROM ;") && !query.equals("SELECT  FROM ;")){
 	        Log.info("\n********** SQL is **********");

@@ -135,7 +135,7 @@ public class Import {
 				//Log.i(s);
 				
 				String def = "";
-				String s2 = "";
+				String s1 = "", s2 = "";
 				if(s.contains(dn0)){
 					//Log.e("!!! "+s+"	"+dn0);
 					//Log.i("	!!!!!!!!!!!!!!!!!!!!!!!!! " + s);
@@ -188,6 +188,7 @@ public class Import {
 			                	//Log.i(a);
 			                }
 			                
+			                dc = dc0;
 							int l = 0;
 							while(ss.contains(",")){
 								if(l>=a.size()){
@@ -205,16 +206,16 @@ public class Import {
 								dc = dc.replace(a.get(l), b);
 								l++;
 							}
-							s2 = s2.substring(s2.indexOf(dn2));
+							s1 = s2.substring(0,s2.indexOf(dn2));
 							s2 = s2.substring(s2.indexOf(")")+1);
 							if(l==a.size()){
-								s = dc+s2;	//TODO
+								s = s1+dc+s2;	//TODO
 							}else{
 								//The number of arguments passed to the function is wrong. (渡された引数の個数が異なる)
 								Log.err("[Parser:Import] Argument Error in "+dn0+"() : wrong number of arguments ("+l+" for "+a.size()+")");
 								Log.err("\n### "+dn0+"() is ###");
 								Log.err("#define "+dn0.substring(1)+a.toString().replace("[","(").replace("]",") {")+"\n"+dc0+"\n}\n");
-								s = s2;
+								s = s1+s2;
 							}
 						}
 						

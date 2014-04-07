@@ -1,7 +1,9 @@
 package supersql.codegenerator.Mobile_HTML5;
 
+import supersql.codegenerator.DecorateList;
 import supersql.codegenerator.Grouper;
 import supersql.codegenerator.Manager;
+import supersql.codegenerator.TFE;
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
@@ -60,14 +62,15 @@ public class Mobile_HTML5G1 extends Grouper {
         //1行ごとのカラム数 (range: 2〜)
         boolean columnFlg = false;
     	if(tableFlg)	numberOfColumns = -1;	//@{table}時のDefault	//20130917  [ ],10@{table}
-    	else			numberOfColumns = data_info.contain_itemnum();	//div
+    	else			numberOfColumns = data_info.size();	//div
+//    	Log.e(data_info.contain_itemnum()+" "+tfe.countconnectitem()+" "+data_info.size());
     	if(decos.containsKey("column") && !Mobile_HTML5.dynamicDisplay){
         	try{
             	numberOfColumns = Integer.parseInt(decos.getStr("column").replace("\"", ""));
             	if(numberOfColumns<2){
             		Log.err("<<Warning>> column指定の範囲は、2〜です。指定された「column="+numberOfColumns+"」は使用できません。");
 	            	if(tableFlg)	numberOfColumns = -1;							//20130917  [ ],10@{table}
-	            	else			numberOfColumns = data_info.contain_itemnum();	//div
+	            	else			numberOfColumns = data_info.size();	//div
             	}else columnFlg = true;
         	}catch(Exception e){ }
         }
@@ -223,7 +226,7 @@ public class Mobile_HTML5G1 extends Grouper {
         	
         	//20130312 collapsible
         	if(decos.containsKey("collapse")){
-            	html_env.code.append("<DIv data-role=\"collapsible\" data-content-theme=\"c\" style=\"padding: 0px 12px;\">\n");
+            	html_env.code.append("<DIV data-role=\"collapsible\" data-content-theme=\"c\" style=\"padding: 0px 12px;\">\n");
             	
             	//header
             	if(!decos.getStr("collapse").equals(""))
@@ -285,45 +288,6 @@ public class Mobile_HTML5G1 extends Grouper {
                 html_env.setOutlineMode();
             }
             
-//            //おそらくXML
-//            if(GlobalEnv.isOpt()){
-//	            html_env2.code.append("<tfe type=\"repeat\" dimension=\"1\"");
-//	            
-//	            if(decos.containsKey("class")){
-//		        	//class=menu�Ȃǂ̎w�肪��������t��
-//	            	html_env2.code.append(" class=\"");
-//		        	html_env2.code.append(decos.getStr("class") + " ");
-//		        }
-//	            if(html_env.written_classid.contains(HTMLEnv.getClassID(this))){
-//		        	//TFE10000�Ȃǂ̎w�肪��������t��
-//	            	if(decos.containsKey("class")){
-//	            		html_env2.code.append(HTMLEnv.getClassID(this) + "\"");
-//	            	}else{
-//	            		html_env2.code.append(" class=\""
-//	            				+ HTMLEnv.getClassID(this) + "\"");
-//	            	}
-//	            }else if(decos.containsKey("class")){
-//	            	html_env2.code.append("\"");
-//	            }
-//	            
-//	            html_env2.code.append(" border=\"" + html_env.tableborder + "\"");
-//	
-//	            if (decos.containsKey("tablealign") )
-//	            	html_env2.code.append(" align=\"" + decos.getStr("tablealign") +"\"");
-//	            if (decos.containsKey("tablevalign") )
-//	            	html_env2.code.append(" valign=\"" + decos.getStr("tablevalign") +"\"");
-//	            
-//	            if(decos.containsKey("tabletype")){
-//	            	html_env2.code.append(" tabletype=\"" + decos.getStr("tabletype") + "\"");
-//	            	if(decos.containsKey("cellspacing")){
-//	                	html_env2.code.append(" cellspacing=\"" + decos.getStr("cellspacing") + "\"");
-//	                }
-//	            	if(decos.containsKey("cellpadding")){
-//	                	html_env2.code.append(" cellpadding=\"" + decos.getStr("cellpadding") + "\"");
-//	                }
-//	            }
-//	            html_env2.code.append(">");
-//            }
             
             //20130309
 //            Count = ( ((gridInt>=jj)&&(!HTMLG1.G1Flg))? jj:gridInt );
@@ -373,16 +337,13 @@ public class Mobile_HTML5G1 extends Grouper {
         		//20130309
     	    if(!tableFlg){
     	    	//20131002
-            	if(decos.containsKey("width")){
-            		Mobile_HTML5Env.divWidth = decos.getStr("width");
-    	    	}else{
-        	    	float divWidth = (float)Math.floor((double)(100.0/numberOfColumns)* 1000) / 1000;
-                	Mobile_HTML5Env.divWidth = divWidth+"%";
-    	    	}
-            	//tfe.addDeco("width", divWidth);	//☆HTMLEnvで行うように変更した
+    	    	String divWidth = Mobile_HTML5.getDivWidth(decos, numberOfColumns - Mobile_HTML5Function.func_null_count);	//null()
+//            	tfe.addDeco("width", divWidth);	//☆HTMLEnvで行うように変更した <= この方法は、widthが上書き？されるためNG
             	
-            	if(Count!=0)	html_env.code.append("\n	<div class=\"ui-block"+" "+Mobile_HTML5Env.getClassID(tfe)+"\">\n");
-    	    	else			html_env.code.append("\n	<div class=\"ui-block"+" "+Mobile_HTML5Env.getClassID(tfe)+"\" style=\"clear:left;\">\n");
+            	if(Count!=0)	html_env.code.append("\n<div class=\"ui-block"+" "+Mobile_HTML5Env.getClassID(tfe)+"\" style=\"width:"+divWidth+"\">\n");
+    	    	else			html_env.code.append("\n<div class=\"ui-block"+" "+Mobile_HTML5Env.getClassID(tfe)+"\" style=\"width:"+divWidth+"; clear:left;\">\n");
+//            	if(Count!=0)	html_env.code.append("\n<div class=\"ui-block"+" "+Mobile_HTML5Env.getClassID(tfe)+" \">\n");
+//            	else			html_env.code.append("\n<div class=\"ui-block"+" "+Mobile_HTML5Env.getClassID(tfe)+"\" style=\"clear:left;\">\n");
             	
 //    	    	float divWidth = (float)Math.floor((double)(100.0/numberOfColumns)* 1000) / 1000;
 //    	    	if(Count!=0)	html_env.code.append("\n	<div class=\"ui-block"+" "+HTMLEnv.getClassID(tfe)+"\" style=\"width:"+divWidth+"%;\">\n");
@@ -476,7 +437,7 @@ public class Mobile_HTML5G1 extends Grouper {
 //    	        html_env.code.append("	</p>\n");
 //        	}else{
 
-            if(!tableFlg)	html_env.code.append("	</div>");	//20130309
+            if(!tableFlg)	html_env.code.append("</div>");	//20130309
         	else	        html_env.code.append("</TD>\n");    //20130314 table
             //Log.out("</TD>");
 //            if(HTMLFunction.textFlg){					//20130914  "text"
@@ -579,7 +540,7 @@ public class Mobile_HTML5G1 extends Grouper {
         
         //20130312 collapsible
     	if(decos.containsKey("collapse")){
-        	html_env.code.append("</DIv>");
+        	html_env.code.append("</DIV>");
         }
         
     	//20130330 tab

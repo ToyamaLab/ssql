@@ -6,6 +6,7 @@ import supersql.codegenerator.Manager;
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
+import supersql.parser.Embed;
 
 
 public class Mobile_HTML5C2 extends Connector {
@@ -154,7 +155,7 @@ public class Mobile_HTML5C2 extends Connector {
         	
         	//20130312 collapsible
         	if(decos.containsKey("collapse")){
-            	html_env.code.append("<DIv data-role=\"collapsible\" data-content-theme=\"c\" style=\"padding: 0px 12px;\">\n");
+            	html_env.code.append("<DIV data-role=\"collapsible\" data-content-theme=\"c\" style=\"padding: 0px 12px;\">\n");
             	
             	//header
             	if(!decos.getStr("collapse").equals(""))
@@ -306,6 +307,8 @@ public class Mobile_HTML5C2 extends Connector {
 //	      	HTMLFunction.textFlg = false;				//20130914  "text"
             
             html_env.code.append("\n");		//20130309
+            
+            html_env.code = Embed.postProcess(html_env.code);	//goto 20130915-2  "<$  $>"
 
             i++;
         }	//	/while
@@ -331,7 +334,7 @@ public class Mobile_HTML5C2 extends Connector {
       	
         //20130312 collapsible
       	if(decos.containsKey("collapse")){
-          	html_env.code.append("</DIv>");
+          	html_env.code.append("</DIV>");
         }
       	
     	//20130330 tab

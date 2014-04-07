@@ -464,6 +464,7 @@ public class TFEparser {
 		//""の外に=があるかどうかチェック
 		//(Check whether there is an equal sign outside the double quote.)
 		boolean equalSignOutsideDoubleQuote = false;
+		boolean equalSignOutsideSingleQuote = false;
 		if(token.contains("\"")){
 			for(int i=0;i<token.length();i++){
 				if(token.charAt(i) == '"'){
@@ -474,9 +475,19 @@ public class TFEparser {
 				}
 			}
 		}else equalSignOutsideDoubleQuote = true;
+		if(token.contains("'")){
+			for(int i=0;i<token.length();i++){
+				if(token.charAt(i) == '\''){
+					break;
+				}else if(token.charAt(i)=='='){
+					equalSignOutsideSingleQuote = true;
+					break;
+				}
+			}
+		}else equalSignOutsideSingleQuote = true;
 		
 //		if (equalidx != -1 && !skipCondition) {
-		if (equalidx != -1 && !skipCondition && equalSignOutsideDoubleQuote) {
+		if (equalidx != -1 && !skipCondition && equalSignOutsideDoubleQuote && equalSignOutsideSingleQuote) {
 			// found key = att
 			key = token.substring(0, equalidx);
 			token = token.substring(equalidx + 1);		//TODO: <= This causes an error.  ex) "x==100"!  -> solved
