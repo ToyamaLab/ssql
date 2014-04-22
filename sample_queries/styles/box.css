@@ -69,6 +69,8 @@ Note : horizontal is often used as a default container.
 }
 
 .att{
+	margin:5px;
+	border: 1px solid;
 	padding: 3px;
 }
 

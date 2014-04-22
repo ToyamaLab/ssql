@@ -29,7 +29,7 @@ public class MakeSQL {
 	private ExtList table_group;
 
 	public MakeSQL(SSQLparser p) {
-		from = p.get_from_info();
+		setFrom(p.get_from_info());
 		where = p.get_where_info();
 		atts = p.get_att_info();
 
@@ -160,16 +160,16 @@ public class MakeSQL {
 
 		//Iterator it = tg1.iterator();		//changed by goto 20120523
 
-		Log.out("FROM_INFO:" + from);
+		Log.out("FROM_INFO:" + getFrom());
 
 		//tk to use outer join////
 		try{
 			//changed by goto 20120523 start
-			//¡‚Ü‚Å‚ÌSSQL‚Å‚ÍAˆêˆÓ‚È‘®«‚Ìê‡‚Å‚ ‚Á‚Ä‚à•K‚¸‘®«–¼‚Ì‘O‚É
-			//uƒe[ƒuƒ‹–¼.v‚ğ•t‚¯‚é(qualify‚·‚é)•K—v‚ª‚ ‚Á‚½
-			//‰º‹L‚Ì•ÏX‚É‚æ‚èA‚»‚Ì–â‘è‚ğ‰ü‘P‚µ‚½
-			//i‚±‚ê‚É‚æ‚èA’Êí‚ÌSQL“¯—lAƒ†ƒj[ƒN‚È—ñ–¼‚Ì‘O‚É‚Íqualification‚Í•s—v‚Æ‚È‚éj
-			buf.append(((FromParse) from.getFromTable().get("")).getLine());
+			//ï¿½ï¿½ï¿½Ü‚Å‚ï¿½SSQLï¿½Å‚ÍAï¿½ï¿½Ó‚È‘ï¿½ï¿½ï¿½ï¿½Ìê‡ï¿½Å‚ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Kï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‘Oï¿½ï¿½
+			//ï¿½uï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½ï¿½.ï¿½vï¿½ï¿½tï¿½ï¿½ï¿½ï¿½(qualifyï¿½ï¿½ï¿½ï¿½)ï¿½Kï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			//ï¿½ï¿½ï¿½Lï¿½Ì•ÏXï¿½É‚ï¿½ï¿½Aï¿½ï¿½ï¿½Ì–ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Pï¿½ï¿½ï¿½ï¿½
+			//ï¿½iï¿½ï¿½ï¿½ï¿½É‚ï¿½ï¿½Aï¿½Êï¿½ï¿½SQLï¿½ï¿½ï¿½lï¿½Aï¿½ï¿½ï¿½jï¿½[ï¿½Nï¿½È—ñ–¼‚Ì‘Oï¿½É‚ï¿½qualificationï¿½Í•sï¿½vï¿½Æ‚È‚ï¿½j
+			buf.append(((FromParse) getFrom().getFromTable().get("")).getLine());
 
 			/*while (it.hasNext()) {
 				String tbl = (String) it.next();
@@ -190,7 +190,7 @@ public class MakeSQL {
 			
 		//tk to use outer join//////////////
 		}catch(NullPointerException e){
-			buf.append(from.getLine());
+			buf.append(getFrom().getLine());
 		}
 		//tk/////////////
 
@@ -217,6 +217,14 @@ public class MakeSQL {
 
 		return buf.toString();
 
+	}
+
+	public FromInfo getFrom() {
+		return from;
+	}
+
+	public void setFrom(FromInfo from) {
+		this.from = from;
 	}
 
 }

@@ -24,7 +24,10 @@ public class FromInfo {
 		SSQLparser.set_from_info_st(line);
 		if(line.equalsIgnoreCase("dbpedia")){
 			SSQLparser.setDbpediaQuery(true);
-		}else{
+		}else if(line.toLowerCase().startsWith("api")){
+			SSQLparser.setJsonQuery(true);
+		}
+		else{
 			StringTokenizer st = new StringTokenizer(line, ",");
 			while (st.hasMoreTokens()) {
 				String ch = st.nextToken().trim();

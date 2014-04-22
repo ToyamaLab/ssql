@@ -50,6 +50,8 @@ public class GlobalEnv {
 	private static String password;
 
 	private static String encode;
+	
+	private static String apiServerUrl;
 
 	//chie start
 	private static String driver;
@@ -177,17 +179,7 @@ public class GlobalEnv {
 		}
 		else {
 			Log.out("[GlobalEnv:getConfig] config file =" + config);
-
-			if(config.contains("http"))
-			{
-				Log.out("online config");
-				c_value = getConfigValue2(config);
-			}
-			else
-			{
-				Log.out("offline config");
-				c_value = getConfigValue(config);
-			}
+			c_value = getConfigValue(config);
 		}
 		//tk
 
@@ -235,6 +227,9 @@ public class GlobalEnv {
 			}
 			if(c_value[11] != null){
 				setLayout(c_value[11]);
+			}
+			if(c_value[12] != null){
+				setApiServerUrl(c_value[12]);
 			}
 		} catch (Exception ex) {
 		}
@@ -422,11 +417,6 @@ public class GlobalEnv {
 		return seek("-query");
 	}
 
-	//morya start
-	public static String getframeworklist() {
-		return seek("-fwlist");
-	}
-
 	public static String cssout() {
 		return seek("-cssout");
 	}
@@ -444,7 +434,7 @@ public class GlobalEnv {
 		//tk added embedtmp
 		//chie added driver, optimizer
 		//(invokeServletPath and fileDirectory are not used in offline)
-		String[] con = { "host", "db", "user", "outdir", "embedtmp","driver", "password", "encode", "optimizer","invokeServletPath","fileDirectory", "layout"};
+		String[] con = { "host", "db", "user", "outdir", "embedtmp","driver", "password", "encode", "optimizer","invokeServletPath","fileDirectory", "layout", "api_server_url"};
 
 		try {
 			filein = new BufferedReader(new FileReader(config));
@@ -756,5 +746,16 @@ public class GlobalEnv {
 
 	public static void setLayout(String layout) {
 		GlobalEnv.layout = layout;
+	}
+
+	public static String getApiServerUrl() {
+		return apiServerUrl;
+	}
+
+	public static void setApiServerUrl(String apiServerUrl) {
+		GlobalEnv.apiServerUrl = apiServerUrl;
+	}
+	public static String getframeworklist() {
+		return seek("-fwlist");
 	}
 }

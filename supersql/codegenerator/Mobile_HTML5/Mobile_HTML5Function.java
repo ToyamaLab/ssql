@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 
-import com.sun.org.apache.regexp.internal.recompile;
 
 import supersql.codegenerator.CodeGenerator;
 import supersql.codegenerator.DecorateList;

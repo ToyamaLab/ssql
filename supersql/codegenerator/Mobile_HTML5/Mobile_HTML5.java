@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Map;
 
 import com.ibm.db2.jcc.am.no;
-import com.sun.org.apache.regexp.internal.recompile;
 
 import supersql.codegenerator.DecorateList;
 import supersql.codegenerator.FuncArg;

@@ -11,7 +11,7 @@ public class WhereInfo {
 	private String sparqlWhereQuery;
 
 	public WhereInfo() {
-		if(SSQLparser.isDbpediaQuery())
+		if(SSQLparser.isDbpediaQuery() || SSQLparser.isJsonQuery())
 			setSparqlWhereQuery("");
 		else{
 			this.where_clause = new ExtList();
@@ -19,7 +19,7 @@ public class WhereInfo {
 	}
 
 	public WhereInfo(String line) {
-		if(SSQLparser.isDbpediaQuery())
+		if(SSQLparser.isDbpediaQuery() || SSQLparser.isJsonQuery())
 			setSparqlWhereQuery(line);
 		else{
 			this.where_clause = new ExtList();

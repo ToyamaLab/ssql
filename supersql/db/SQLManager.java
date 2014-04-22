@@ -62,8 +62,12 @@ public class SQLManager {
         }
     }
 
+    public void ExecSQL(String query) {
+		ExecSQL(query, null, null);
+	}
+    
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	public void ExecSQL(String query) {
+	public void ExecSQL(String query, String create, String update) {
     	if(isMulti)
     	{
     		Log.out("thred name:"+cdb.getName());
@@ -91,6 +95,17 @@ public class SQLManager {
 
         try {
             Statement stat = conn.createStatement();
+            if(create != null && update != null){
+            	String[] creates = create.split("\n");
+            	for (int j = 0; j < creates.length; j++) {
+					stat.addBatch(creates[j]);
+				}
+            	String[] updates = update.split("\n");
+            	for(int k = 0; k < updates.length; k++){
+            		stat.addBatch(updates[k]);
+            	}
+            	stat.executeBatch();
+            }
             ResultSet rs = stat.executeQuery(query);
             ResultSetMetaData rsmd = rs.getMetaData();
             int columnCount = rsmd.getColumnCount();

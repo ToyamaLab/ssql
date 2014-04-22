@@ -36,6 +36,7 @@ public class SSQLparser {
 	public static ArrayList<String> textString = new ArrayList<String>();
 	public static int textNum = 0;
 	
+	private static boolean jsonQuery = false;
 	private static boolean dbpediaQuery = false;
 	private static String fromInfoString;
 	public static String DB2_XQUERY = new String();
@@ -1660,6 +1661,14 @@ public class SSQLparser {
 
 	public static void setDistinct(boolean distinct) {
 		SSQLparser.distinct = distinct;
+	}
+
+	public static boolean isJsonQuery() {
+		return jsonQuery;
+	}
+
+	public static void setJsonQuery(boolean jsonQuery) {
+		SSQLparser.jsonQuery = jsonQuery;
 	}
 
 }

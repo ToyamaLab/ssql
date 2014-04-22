@@ -38,7 +38,6 @@ table {
 	border: 1px solid;
 }
 
-.att { padding: 0px; margin : 0px;height : 100%; z-index: 2}
 .linkbutton {text-align:center; margin-top: 5px; padding:5px;}
 .embed { vertical-align : text-top; padding : 0px ; margin : 0px; border: 0px,0px,0px,0px; width: 100%;}
 .noborder { 	
