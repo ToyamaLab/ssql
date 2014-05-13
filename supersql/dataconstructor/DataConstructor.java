@@ -161,7 +161,7 @@ public class DataConstructor {
 					keyIterator = item.keys();
 					while(keyIterator.hasNext()){
 						String key = keyIterator.next();
-						insertSql += "'" + item.get(key).toString() + "',";
+						insertSql += "'" + item.get(key).toString().replace("'", "''").replace("\"", "\\\"") + "',";
 					}
 					insertSql = insertSql.substring(0, insertSql.length() - 1) + ");\n";
 				}

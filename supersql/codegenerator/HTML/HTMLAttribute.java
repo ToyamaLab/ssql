@@ -39,7 +39,7 @@ public class HTMLAttribute extends Attribute {
 		Element result = new Element(Tag.valueOf("td"), "");
 		//***APPEND DATABASE VALUE***//
 		String elementText = this.getStr(data_info);
-		elementText = elementText.replace(" ", "&#160;");
+//		elementText = elementText.replace(" ", "&#160;");
 		result.html(elementText);
 		return result;
 	}
@@ -128,7 +128,7 @@ public class HTMLAttribute extends Attribute {
 
 		// ***APPEND DATABASE VALUE***//
 		String elementText = this.getStr(data_info);
-		elementText = elementText.replace(" ", "&#160;");
+//		elementText = elementText.replace(" ", "&#160;");
 		result.html(elementText);
 
 		if (HTMLEnv.linkFlag > 0) {
