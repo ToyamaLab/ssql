@@ -446,7 +446,7 @@ public class HTMLEnv extends LocalEnv {
 
 	public static void setBackground(String str) {
 		htmlDocument.head().appendElement("style").attr("type", "text/css")
-				.html("body {background-image: " + str + ";}");
+				.html("body {background: " + str + ";}");
 	}
 
 	public static void addStyle(String str) {

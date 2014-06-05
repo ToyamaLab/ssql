@@ -81,3 +81,7 @@ Note : horizontal is often used as a default container.
 input[type="submit"]{
 	align-self:flex-start;
 }
+
+.group2 .con1 .att:last-child{
+	width:200px;
+}

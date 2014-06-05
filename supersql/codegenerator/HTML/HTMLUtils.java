@@ -103,11 +103,17 @@ public class HTMLUtils {
 		}
 		if (decos.containsKey("background"))
 			HTMLEnv.setBackground(decos.getStr("background"));
+
+		
 		
 		if(decos.getConditionsSize() > 0)
 			HTMLEnv.addStyle(computeConditionalDecorations(decos));
 		
 		for (String key : decos.keySet()) {
+			if(key.equalsIgnoreCase("color") || key.equalsIgnoreCase("background-color") || 
+					key.equalsIgnoreCase("width") || key.equalsIgnoreCase("height")){
+				result.attr("style", result.attr("style") + ";" + key + ":" + decos.getStr(key));
+			}
 			result.attr(key, decos.getStr(key));
 		}
 	}
