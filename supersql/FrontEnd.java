@@ -73,6 +73,7 @@ public class FrontEnd {
 		} else 
 			LogError.logErr();
 		
+		
 		if (GlobalEnv.getErrFlag() != 0 && GlobalEnv.getOnlineFlag() == 0)
 			System.exit(-1);
 //			return TFEmatcher.TFEList; // 20141107 halken check needs		
