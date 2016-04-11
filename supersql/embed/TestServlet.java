@@ -23,18 +23,18 @@ public void doGet(HttpServletRequest req,
 	  //work(req,res);
 
 	  	
-	    // ContentType¤òÀßÄê
+	    // ContentTypeã‚’è¨­å®š
 //	    res.setContentType("text/xml; charset=UTF8");
 	    res.setCharacterEncoding("UTF8");
 	    req.setCharacterEncoding("Shift-JIS");
 	    
-	    // ½ĞÎÏÍÑPrintWriter¤ò¼èÆÀ
+	    // å‡ºåŠ›ç”¨PrintWriterã‚’å–å¾—
 	    PrintWriter out = res.getWriter();
 	    
 		Date d1 = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyymmddHHmmss");
 		String today = sdf.format(d1);
-		Log.info("º£¤Ï:"+today);
+		Log.info("ä»Šã¯:"+today);
 		
 	    String msg ="";
 //	    msg = "<script type=\"text/javascript\"> \n";
@@ -45,7 +45,7 @@ public void doGet(HttpServletRequest req,
 		msg += "<end of script>\n";
 		//		msg += "</script>\n";
 
-		msg += "<div id=\"http://localhost:8080/tab/car.sql+ca.id=31\"  class=\"carname\" >¥ì¥¸¥§¥ó¥É</div>";
+		msg += "<div id=\"http://localhost:8080/tab/car.sql+ca.id=31\"  class=\"carname\" >ãƒ¬ã‚¸ã‚§ãƒ³ãƒ‰</div>";
 		msg += "<div class=\"menu\" id =\"testdrag1\">testfromhtml</div>\n";
 //		msg += "<div class=\"drop1\" id=\"testdrop1\" >test 1</div>\n";
 //		msg += "<div id=\"output\"></div>\n";

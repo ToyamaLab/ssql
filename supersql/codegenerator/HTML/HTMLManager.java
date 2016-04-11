@@ -10,7 +10,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Vector;
 
-import supersql.codegenerator.CopyJscss;
+import supersql.codegenerator.CodeGenerator;
+import supersql.codegenerator.Jscss;
 import supersql.codegenerator.ITFE;
 import supersql.codegenerator.Manager;
 import supersql.common.GlobalEnv;
@@ -36,7 +37,7 @@ public class HTMLManager extends Manager {
 		if (fileDir.length() < htmlEnv.outFile.length()
 				&& fileDir
 						.equals(htmlEnv.outFile.substring(0, fileDir.length())))
-			htmlEnv.outFile = htmlEnv.outFile.substring(fileDir.length() + 1); // ���Хѥ��ե�����̾
+			htmlEnv.outFile = htmlEnv.outFile.substring(fileDir.length() + 1); // 鐃緒申鐃出パワ申鐃春ワ申鐃緒申鐃緒申名
 		// added by goto 20120627 end
 
 		String tmpqueryfile = new String();
@@ -71,12 +72,12 @@ public class HTMLManager extends Manager {
 	}
 
 	private int indexOf(String string) {
-		// TODO ��ư�������줿�᥽�åɡ�������
+		// TODO 鐃緒申動鐃緒申鐃緒申鐃緒申鐃曙た鐃潤ソ鐃獣ド¥申鐃緒申鐃緒申鐃緒申
 		return 0;
 	}
 
 	private int lastIndexOf(String string) {
-		// TODO ��ư�������줿�᥽�åɡ�������
+		// TODO 鐃緒申動鐃緒申鐃緒申鐃緒申鐃曙た鐃潤ソ鐃獣ド¥申鐃緒申鐃緒申鐃緒申
 		return 0;
 	}
 
@@ -87,9 +88,9 @@ public class HTMLManager extends Manager {
 		htmlEnv.outDir = outdir;
 
 		/*
-		 * ���ϥե���?(outfilename)�����ꤵ?�Ƥ�???
-		 * html_env.outfile��globalenv.outfilename�ˤ�?
-		 * ��?�ʳ��ΤȤ��ϥ���?�ե���?��̾��(filename)�ˤ�?
+		 * 鐃緒申鐃熟フワ申鐃緒申?(outfilename)鐃緒申鐃緒申鐃所さ?鐃銃わ申???
+		 * html_env.outfile鐃緒申globalenv.outfilename鐃祝わ申?
+		 * 鐃緒申?鐃淑鰹申鐃塾とわ申鐃熟ワ申鐃緒申?鐃春ワ申鐃緒申?鐃緒申名鐃緒申(filename)鐃祝わ申?
 		 */
 		if (GlobalEnv.getQuery() != null) {
 			htmlEnv.outFile = "./fromquery";
@@ -119,7 +120,7 @@ public class HTMLManager extends Manager {
 		 * Log.out("outfile log:"+html_env.outfile); } //tk end
 		 */
 		/*
-		 * ������ǥ�?����?(outdirectory)�����ꤵ?�Ƥ�???
+		 * 鐃緒申鐃緒申鐃緒申妊鐃����?(outdirectory)�����ꤵ?�Ƥ�???
 		 * outdirectory��filename��Ĥʤ�����Τ�file�Ȥ�?
 		 */
 
@@ -191,68 +192,78 @@ public class HTMLManager extends Manager {
 				+ Utils.getEncode() + "\"?><SSQL>");
 		htmlEnv2.footer.append("</SSQL>");
 		try {
-			if (!GlobalEnv.isOpt()) {
-				// changed by goto 20120715 start
-				// PrintWriter pw = new PrintWriter(new BufferedWriter(new
-				// FileWriter(
-				// html_env.filename)));
-				PrintWriter pw;
-				if (htmlEnv.charset != null) {
-					pw = new PrintWriter(new BufferedWriter(
-							new OutputStreamWriter(new FileOutputStream(
-									htmlEnv.fileName), htmlEnv.charset)));
-					Log.info("File encoding: " + htmlEnv.charset);
-				} else
-					pw = new PrintWriter(new BufferedWriter(new FileWriter(
-							htmlEnv.fileName)));
-				// Log.info("File encoding: "+((html_env.charset!=null)?
-				// html_env.charset : "UTF-8"));
-				// changed by goto 20120715 end
-
-				if (GlobalEnv.cssout() == null)
+			
+			if(CodeGenerator.getMedia().equalsIgnoreCase("html")){
+			
+				if (!GlobalEnv.isOpt()) {
+					// changed by goto 20120715 start
+					// PrintWriter pw = new PrintWriter(new BufferedWriter(new
+					// FileWriter(
+					// html_env.filename)));
+					PrintWriter pw;
+					if (htmlEnv.charset != null) {
+						pw = new PrintWriter(new BufferedWriter(
+								new OutputStreamWriter(new FileOutputStream(
+										htmlEnv.fileName), htmlEnv.charset)));
+						Log.info("File encoding: " + htmlEnv.charset);
+					} else
+						pw = new PrintWriter(new BufferedWriter(new FileWriter(
+								htmlEnv.fileName)));
+					// Log.info("File encoding: "+((html_env.charset!=null)?
+					// html_env.charset : "UTF-8"));
+					// changed by goto 20120715 end
+	
+					if (GlobalEnv.cssout() == null)
+						pw.println(htmlEnv.header);
+					pw.println(htmlEnv.code);
+					pw.println(htmlEnv.footer);
+					pw.close();
+				}
+				// xml
+				if (GlobalEnv.isOpt()) {
+	
+					/*
+					 * int i=0; while(html_env2.code.indexOf("&",i) != -1){ i =
+					 * html_env2.code.indexOf("&",i); html_env2.code =
+					 * html_env2.code.replace(i,i+1, "&amp;"); i++; }
+					 */
+	
+					htmlEnv2.fileName = htmlEnv.outFile + ".xml";
+					PrintWriter pw2 = new PrintWriter(new BufferedWriter(
+							new FileWriter(htmlEnv2.fileName)));
+					if (GlobalEnv.cssout() == null)
+						pw2.println(htmlEnv2.header);
+					pw2.println(htmlEnv2.code);
+					pw2.println(htmlEnv2.footer);
+					pw2.close();
+					HTMLoptimizer xml = new HTMLoptimizer();
+					String xml_str = xml.generateHtml(htmlEnv2.fileName);
+					PrintWriter pw = new PrintWriter(new BufferedWriter(
+							new FileWriter(htmlEnv.fileName)));
 					pw.println(htmlEnv.header);
-				pw.println(htmlEnv.code);
-				pw.println(htmlEnv.footer);
-				pw.close();
+					pw.println(xml_str);
+					// StringBuffer footer = new
+					// StringBuffer("</div></body></html>");
+					pw.println(htmlEnv.footer);
+					pw.close();
+				}
+	
+				if (GlobalEnv.cssout() != null) {
+					PrintWriter pw3 = new PrintWriter(new BufferedWriter(
+							new FileWriter(GlobalEnv.cssout())));
+					pw3.println(htmlEnv.header);
+					pw3.close();
+				}
+			// add 20141204 masato for ehtml
+			} else {
+				Log.ehtmlInfo("=-=-=-=");
+				Log.ehtmlInfo(htmlEnv.header);
+				Log.ehtmlInfo(htmlEnv.code);
+				Log.ehtmlInfo(htmlEnv.footer);
 			}
-			// xml
-			if (GlobalEnv.isOpt()) {
-
-				/*
-				 * int i=0; while(html_env2.code.indexOf("&",i) != -1){ i =
-				 * html_env2.code.indexOf("&",i); html_env2.code =
-				 * html_env2.code.replace(i,i+1, "&amp;"); i++; }
-				 */
-
-				htmlEnv2.fileName = htmlEnv.outFile + ".xml";
-				PrintWriter pw2 = new PrintWriter(new BufferedWriter(
-						new FileWriter(htmlEnv2.fileName)));
-				if (GlobalEnv.cssout() == null)
-					pw2.println(htmlEnv2.header);
-				pw2.println(htmlEnv2.code);
-				pw2.println(htmlEnv2.footer);
-				pw2.close();
-				HTMLoptimizer xml = new HTMLoptimizer();
-				String xml_str = xml.generateHtml(htmlEnv2.fileName);
-				PrintWriter pw = new PrintWriter(new BufferedWriter(
-						new FileWriter(htmlEnv.fileName)));
-				pw.println(htmlEnv.header);
-				pw.println(xml_str);
-				// StringBuffer footer = new
-				// StringBuffer("</div></body></html>");
-				pw.println(htmlEnv.footer);
-				pw.close();
-			}
-
-			if (GlobalEnv.cssout() != null) {
-				PrintWriter pw3 = new PrintWriter(new BufferedWriter(
-						new FileWriter(GlobalEnv.cssout())));
-				pw3.println(htmlEnv.header);
-				pw3.close();
-			}
-
+			
 			HTMLEnv.initAllFormFlg();
-			CopyJscss.copyJSCSS_to_outputDir();	//goto 20141201
+			Jscss.process();	//goto 20141209
 		} catch (FileNotFoundException fe) {
 			fe.printStackTrace();
 			Log.err("Error: specified outdirectory \""

@@ -1,6 +1,5 @@
 *.DS_Store
 bin/
-*.db
 *.swp
 .project
 .settings/org.eclipse.core.resources.prefs

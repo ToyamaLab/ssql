@@ -4,7 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Operator, Manager ¤òÀ¸À®¤¹¤ë¥¯¥é¥¹
+ * Operator, Manager ã‚’ç”Ÿæˆã™ã‚‹ã‚¯ãƒ©ã‚¹
  */
 public class Factory {
 

@@ -839,10 +839,22 @@ public class HTMLFunction extends Function {
 	}
 
 	private void Func_sinvoke(ExtList data_info) {
-		String file = this.getAtt("file");
-		String action = this.getAtt("action");
-		int attNo = 1;
+		// link関数の仕様変更　link(att_name, url, value1, value2, ...)
+		String file = this.Args.get(1).toString();
+		if(file.startsWith("\'") || file.startsWith("\"")){
+			file = file.substring(1, file.length()-1);
+		}
 		String att = new String();
+		for(int i = 2; i < this.Args.size(); i++){
+			att += "_" + this.Args.get(i).getStr();
+		}
+		
+		
+		
+//		String file = this.getAtt("file");
+		String action = this.getAtt("action");
+//		int attNo = 1;
+//		String att = new String();
 		Log.out("sinvoke file 3: " + file);
 
 		// tk start/////////////////////////////////////////////////////////////
@@ -851,15 +863,14 @@ public class HTMLFunction extends Function {
 		 * file.substring(file.lastIndexOf("/") + 1); }
 		 */
 		// tk end//////////////////////////////////////////////////////////////
-		Log.out("1 att:" + att + " attNo:" + attNo + " att1:"
-				+ this.getAtt("att1"));
-
-		while (!this.getAtt("att" + attNo).equals("")) {
-			att = att + "_" + this.getAtt("att" + attNo);
-			attNo++;
-			Log.out("att:" + att + " attNo:" + attNo);
-			// System.out.println(att);
-		}
+//		Log.out("1 att:" + att + " attNo:" + attNo + " att1:"
+//				+ this.getAtt("att1"));
+//
+//		while (!this.getAtt("att" + attNo).equals("")) {
+//			att = att + "_" + this.getAtt("att" + attNo);
+//			attNo++;
+//			Log.out("att:" + att + " attNo:" + attNo);
+//		}
 		try {
 			att = URLEncoder.encode(att, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -890,6 +901,7 @@ public class HTMLFunction extends Function {
 				else
 					filename = file + "_" + this.getAtt("att") + ".html";
 			} else {
+//				filename = file + "_" + ret + ".html"; masato
 				filename = file + att + ".html";
 			}
 
@@ -1039,13 +1051,28 @@ public class HTMLFunction extends Function {
 		return;
 	}
 
+	// for educ2015
+	protected void Func_echo(){
+		String target = this.Args.get(0).getStr().trim();
+		String statement = "<h1>" + target + "</h1>";
+		htmlEnv.code.append(statement);
+	}
+	
 	protected void Func_imagefile() {
 
 		/*
 		 * ImageFile function : <td> <img src="${imgpath}/"+att /> </td>
 		 */
-
-		String path = this.getAtt("path", ".");
+		// little change by masato 20150623
+		String path = this.Args.get(1).toString();
+		if(path == null){
+			path = ".";
+		} else {
+			if(path.startsWith("'") || path.startsWith("\"")){
+				path = path.substring(1,  path.length()-1);
+			}
+		}
+//		String path = this.getAtt("path", ".");
 		if (!path.startsWith("/")) {
 			String basedir = GlobalEnv.getBaseDir();
 			if (basedir != null && basedir != "") {
@@ -1381,6 +1408,10 @@ public class HTMLFunction extends Function {
         		|| FuncName.equalsIgnoreCase("image_a")){
 			Func_url(false, "image");
 		} 
+        // for educ2015
+		else if(FuncName.equalsIgnoreCase("echo")){
+			Func_echo();
+		}
 		
 		Log.out("TFEId = " + HTMLEnv.getClassID(this));
 		htmlEnv.append_css_def_td(HTMLEnv.getClassID(this), this.decos);

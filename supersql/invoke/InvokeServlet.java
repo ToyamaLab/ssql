@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 public class InvokeServlet extends HttpServlet {
 
 	/**
-	 * <code>serialVersionUID</code> §Œ•≥•·•Û•»
+	 * <code>serialVersionUID</code> „ÅÆ„Ç≥„É°„É≥„Éà
 	 */
 	private static final long serialVersionUID = 8021503235844232672L;
 

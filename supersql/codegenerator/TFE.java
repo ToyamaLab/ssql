@@ -11,7 +11,7 @@ public class TFE implements ITFE {
 	protected String order;
 	protected String aggregate;    
 	public DecorateList decos;
-
+	
 	public TFE() {
 		orderFlag = false;
 		aggregateFlag = false;
@@ -68,7 +68,7 @@ public class TFE implements ITFE {
 		this.order = new String();
 		this.order = order;
 	}
-
+	
 	@Override
 	public void setAggregate(String aggregate) {
 		aggregateFlag = true;
@@ -103,5 +103,5 @@ public class TFE implements ITFE {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 }

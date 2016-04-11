@@ -15,7 +15,7 @@ import supersql.cache.CacheData;
 public class CacheInvokeServlet extends HttpServlet {
 
 	/**
-	 * <code>serialVersionUID</code> ‚ÌƒRƒƒ“ƒg
+	 * <code>serialVersionUID</code> ã®ã‚³ãƒ¡ãƒ³ãƒˆ
 	 */
 	private static final long serialVersionUID = 7659912749361655506L;
 

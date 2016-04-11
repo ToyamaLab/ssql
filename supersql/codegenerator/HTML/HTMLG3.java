@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 import supersql.codegenerator.Grouper;
+import supersql.codegenerator.Jscss;
 import supersql.codegenerator.Manager;
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
@@ -91,7 +92,7 @@ public class HTMLG3 extends Grouper {
 			html_env2.code = new StringBuffer();
 
 			/*
-			 * ����Foreach func�Ǥʤ��?�����̤�G3
+			 * ����Foreach func�Ǥʤ��?鐃緒申鐃緒申鐃縮わ申G3
 			 */
 			if (!html_env.foreachFlag) {
 				backfile = html_env.nextBackFile;
@@ -174,6 +175,7 @@ public class HTMLG3 extends Grouper {
 					pw.close();
 				}
 				html_env.header = new StringBuffer();
+				Jscss.process();	//masato 20141231
 				html_env.footer = new StringBuffer();
 				html_env2.header = new StringBuffer();
 				html_env2.footer = new StringBuffer();

@@ -39,21 +39,35 @@ public class FrontEnd {
 
 		Log.info("//Entering SuperSQL System//");
 
+		Log.info("$$$$$ SSQLparser start $$$$$");
 		SSQLparser parser = new SSQLparser();
+		Log.info("%%%%% SSQLparser end %%%%%");
+		
+		if (GlobalEnv.isCheckquery()){
+			if (GlobalEnv.getErrFlag() == 0)
+				Log.info("// Parser completed normally //");
+			return;
+		}
 
 		long afterparser = System.currentTimeMillis();
 		long afterdc = 0;
 		long aftercg = 0;
 
 		if (GlobalEnv.getErrFlag() == 0) {
+			Log.info("$$$$$ codegenerator start $$$$$");
 			CodeGenerator codegenerator = parser.getcodegenerator();
+			Log.info("%%%%% codegenerator end %%%%%");
 
 			if (GlobalEnv.getErrFlag() == 0) {
+				Log.info("$$$$$ DataConstructor start $$$$$");
 				DataConstructor dc = new DataConstructor(parser);
+				Log.info("%%%%% DataConstructor end %%%%%");
 				afterdc = System.currentTimeMillis();
 
 				if (GlobalEnv.getErrFlag() == 0) {
+					Log.info("$$$$$ generateCode start $$$$$");
 					codegenerator.generateCode(parser, dc.getData());
+					Log.info("%%%%% generateCode end %%%%%");
 					aftercg = System.currentTimeMillis();
 				}
 			}
@@ -80,4 +94,5 @@ public class FrontEnd {
 			return;
 //			return TFEmatcher.TFEList;
 	}
+	
 }

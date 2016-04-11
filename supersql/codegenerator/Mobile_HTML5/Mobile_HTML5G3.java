@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 
 import supersql.codegenerator.Attribute;
 import supersql.codegenerator.Grouper;
+import supersql.codegenerator.Jscss;
 import supersql.codegenerator.Manager;
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
@@ -143,6 +144,7 @@ public class Mobile_HTML5G3 extends Grouper {
 					pw.close();
                 }
                 html_env.header = new StringBuffer();
+				Jscss.process();	//masato 20150101
                 html_env.footer = new StringBuffer();
                 html_env2.header = new StringBuffer();
                 html_env2.footer = new StringBuffer();

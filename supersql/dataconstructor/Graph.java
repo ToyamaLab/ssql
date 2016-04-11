@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import supersql.common.Log;
 import supersql.extendclass.ExtList;
 
 public class Graph 
@@ -23,7 +24,7 @@ public class Graph
 		nodeList.addAll( vertices.values() );
 		AddEdges();
 		
-		System.out.println("No. of vertices: " + size );
+		Log.info("No. of vertices: " + size );
 	}
 	
 	public void addAttribute( Attribute n )

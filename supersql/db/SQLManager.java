@@ -11,7 +11,6 @@ import java.util.List;
 
 import supersql.codegenerator.Mobile_HTML5.Mobile_HTML5;
 import supersql.common.DB;
-
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.common.Suggest;
@@ -82,6 +81,52 @@ public class SQLManager {
 	    	conn = cdb.getConn();
     	}
 
+    	//exception
+//    	boolean isSession = false;
+    	if(query.toLowerCase().contains("$session (\"") && query.toLowerCase().contains("\" )")){
+    		if(query.contains(")OR"))	query = query.replace(")OR", ") OR");
+    		if(query.contains(")or"))	query = query.replace(")or", ") OR");
+    		
+    		String[] b = query.split(" ");
+    		boolean sq = false, s = false, w = false;
+    		for(int i=0; i<b.length; i++){
+    			//シングルクォート内かどうか
+    			if(b[i].contains("'")){
+    				for(int j=0; j<b[i].length(); j++){
+    					if(b[i].charAt(j)=='\'')	sq = !sq;
+    				}
+    			}
+
+    			if(!sq && s){
+    				if(b[i].contains(")")){
+    					s = false;
+    					if(w && (i+1)<b.length){
+    						if(b[i+1].equals("AND") || b[i+1].equals("OR"))
+    							b[i+1] = "WHERE";
+//    			    		isSession = true;
+    						w = false;
+    					}
+    				}
+    				b[i] = "";
+    			}
+    			else if(!sq && b[i].contains("$session")){
+    				for(int j=i; j>0; j--){
+    					if(b[j].equals("WHERE") || b[j].equals("AND") || b[j].equals("OR")){
+    						if(b[j].equals("WHERE")) w = true;
+    						b[j] = "";
+    						break;
+    					}
+    					b[j] = "";
+    				}
+    				s = true;
+    			}
+    		}
+    		query = "";
+    		for(int i=0; i<b.length; i++)
+    			if(!b[i].equals(""))	query += b[i]+" ";
+    		query = query.trim();
+    		if(!query.endsWith(";"))	query += ";";
+    	}
     	if(query.contains(" #"))	query = query.substring(0,query.indexOf(" #"));	//TODO
     	query = Mobile_HTML5.checkQuery(query);
         Log.out("[SQLManager ExecQuery]");
@@ -196,9 +241,8 @@ public class SQLManager {
 			      return ;
         	}
         } catch (IllegalStateException e) {
-            System.err
-                    .println("Error[SQLManager.ExecSQL]: No Data Found : query = "
-                            + query);
+//        	if(!isSession)
+        		System.err.println("Error[SQLManager.ExecSQL]: No Data Found : query = " + query);
         }
     }
 

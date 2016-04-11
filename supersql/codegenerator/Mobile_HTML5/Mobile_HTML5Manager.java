@@ -10,8 +10,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Vector;
 
-import supersql.codegenerator.CopyJscss;
 import supersql.codegenerator.ITFE;
+import supersql.codegenerator.Jscss;
 import supersql.codegenerator.Manager;
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
@@ -122,9 +122,6 @@ public class Mobile_HTML5Manager extends Manager{
         try {
         	if(!GlobalEnv.isOpt()){
         		//changed by goto 20120715 start
-	        	//PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(
-	            //        html_env.filename)));
-//        		Log.info("Window max-width: "+html_env.maxWidth);
         		PrintWriter pw;
 	            if (html_env.charset != null){
 		        	pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
@@ -133,9 +130,7 @@ public class Mobile_HTML5Manager extends Manager{
 	            }else
 	            	pw = new PrintWriter(new BufferedWriter(new FileWriter(
 	        	                    html_env.filename)));
-	            //Log.info("File encoding: "+((html_env.charset!=null)? html_env.charset : "UTF-8"));
         		//changed by goto 20120715 end
-
 	        	if(GlobalEnv.cssout()==null)
 	        		pw.println(html_env.header);
 	            pw.println(html_env.code);
@@ -179,9 +174,16 @@ public class Mobile_HTML5Manager extends Manager{
 	            pw3.println(html_env.header);
 	            pw3.close();
 	        }
+	        
+            //create '.htaccess'
+	        String fn = html_env.getFileParent()+GlobalEnv.OS_FS+".htaccess";
+    		PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+	        			new FileOutputStream(fn), GlobalEnv.DEFAULT_CHARACTER_CODE)));
+            pw.println("AddType application/x-httpd-php .html");
+            pw.close();
 
             Mobile_HTML5Env.initAllFormFlg();
-            CopyJscss.copyJSCSS_to_outputDir();	//goto 20141201
+			Jscss.process();	//goto 20141209
         } catch (FileNotFoundException fe) {
         	fe.printStackTrace();
         	System.err.println("Error: specified outdirectory \""

@@ -260,7 +260,7 @@ public class Import {
 	private static String removeCommentOut(BufferedReader in, String line) {
 		String commentOutLetters = ""+GlobalEnv.COMMENT_OUT_LETTER+GlobalEnv.COMMENT_OUT_LETTER;	//="--"
 		
-		if (line.contains("/*")){
+		while (line.contains("/*")){
 			String line1 = line.substring(0, line.indexOf("/*"));
 			while (!line.contains("*/")){
 				try {

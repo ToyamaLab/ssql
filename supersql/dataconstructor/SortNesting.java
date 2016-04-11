@@ -6,7 +6,7 @@ import java.util.Hashtable;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 
-/* Æ?ÎÏ¤Ï sch¤Ë¤½¤Ã¤¿nest¤¬½ª¤?¤Ã¤¿tuple¤Ç¤¢¤?¤³¤È */
+/* å±¡?æ–œç…®ç—”ç…® schç—”å°„ç—”æ¼†ç—”å²ç—”è³ªnestç—”æ±æ¼†è’”ç—”?ç—”å²ç—”è³ªtupleç—”è•Šç—”çˆ¾ç—”?ç—”å®ç—”ç¸ */
 
 public class SortNesting {
 

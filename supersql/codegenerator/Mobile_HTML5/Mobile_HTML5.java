@@ -8,12 +8,12 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 
-import com.ibm.db2.jcc.am.no;
-
+import supersql.codegenerator.Asc_Desc;
+import supersql.codegenerator.Asc_Desc.AscDesc;
 import supersql.codegenerator.DecorateList;
-import supersql.codegenerator.FuncArg;
 import supersql.codegenerator.ITFE;
 import supersql.codegenerator.TFE;
 import supersql.common.DB;
@@ -71,13 +71,10 @@ public class Mobile_HTML5 {
 		}
 		return true;
 	}
-	public static boolean afterWhileProcess(String symbol, DecorateList decos, Mobile_HTML5Env html_env){
+	public static boolean afterWhileProcess(String symbol, String tfeID, DecorateList decos, Mobile_HTML5Env html_env){
 		if(!symbol.contains("G1") && !symbol.contains("G2")){
 			dynamicStringGetProcess(symbol, decos, html_env);//最終的には不要
-			dynamicProcess(symbol, decos, html_env);//最終的には不要
-			
-//			formStringGetProcess(symbol, decos, html_env);
-//			formProcess(symbol, decos, html_env);
+			dynamicProcess(tfeID, symbol, decos, html_env);//最終的には不要
 		}
 		
 		Mobile_HTML5Function.func_null_count = 0;	//null()
@@ -88,9 +85,9 @@ public class Mobile_HTML5 {
 		}
 		return true;
 	}
-	public static boolean postProcess(String symbol, DecorateList decos, Mobile_HTML5Env html_env){
+	public static boolean postProcess(String symbol, String tfeID, DecorateList decos, Mobile_HTML5Env html_env){
 		if(symbol.contains("G1") || symbol.contains("G2")){
-			dynamicProcess(symbol, decos, html_env);
+			dynamicProcess(symbol, tfeID, decos, html_env);
 		}
 		if(!symbol.contains("G1") && !symbol.contains("G2")){
 			formStringGetProcess(symbol, decos, html_env);
@@ -99,7 +96,6 @@ public class Mobile_HTML5 {
 		
 		//Post-process (後処理)
 		showCloseProcess(decos, html_env);
-//		Mobile_HTML5Env.divWidth = "";
 		dynamicString = "";
 		formString = "";
 		return true;
@@ -107,16 +103,20 @@ public class Mobile_HTML5 {
 	
 	
 	//get DIV width (C1,G1)
-	public static String getDivWidth(DecorateList decos, int numberOfColumns){
+	public static String getDivWidth(String type, DecorateList decos, int numberOfColumns){
     	//20131002
 		String divWidthStr = "";
-    	if(decos.containsKey("width")){
-    		divWidthStr = decos.getStr("width");
-    	}else{
-	    	float divWidth = (float)Math.floor((double)(100.0/numberOfColumns)* 1000) / 1000;
+		if(type.equals("C1"))
+	    	if(decos.containsKey("width")){
+	    		divWidthStr = decos.getStr("width");
+	    	}else{
+		    	float divWidth = (float)Math.floor((double)(100.0/numberOfColumns)* 1000) / 1000;
+	        	divWidthStr = divWidth+"%";
+	    	}
+		else if(type.equals("G1")){
+			float divWidth = (float)Math.floor((double)(100.0/numberOfColumns)* 1000) / 1000;
         	divWidthStr = divWidth+"%";
-    	}
-//    	tfe.addDeco("width", Mobile_HTML5Env.divWidth); <= この方法は、widthが上書き？されるためNG
+		}
 		return divWidthStr;
 	}
 	
@@ -474,6 +474,12 @@ public class Mobile_HTML5 {
 	    	
 	    	String DBMS = GlobalEnv.getdbms();										//DBMS
 	    	String DB = GlobalEnv.getdbname();										//DB
+	    	String HOST = "", USER = "", PASSWD = "";
+	    	if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+	    		HOST = GlobalEnv.gethost();
+	    		USER = GlobalEnv.getusername();
+	    		PASSWD = GlobalEnv.getpassword();
+	    	}
 	    	
 	    	String query = "";
 	    	//Log.i(after_from_string);
@@ -494,7 +500,7 @@ public class Mobile_HTML5 {
 	    	if(update){
 	    		update_where = from.substring(from.indexOf(" where ")).trim();
 	    		if(update_where.contains("$session"))
-	    			update_where = update_where.replaceAll("\\$session","'\".\\$_SESSION").replaceAll("\\(","[").replaceAll("\\)","].\"'");
+	    			update_where = update_where.replaceAll("\\$session","'\".\\$_SESSION").replaceAll("\\(","['").replaceAll("\\)","'].\"'");
 	    		from = from.substring(0,from.indexOf(" where ")).trim();
 	    	}
 	    	//Log.i("	FROM:"+from+"	update_where:"+update_where);
@@ -505,206 +511,200 @@ public class Mobile_HTML5 {
 
 	    	String statement = "";
 	    	String gps_js = "";
-	    	//sqlite3 php
-	    	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
-	    		statement += 
-	    				"<!-- Form start -->\n" +
-	    				"<!-- Form Panel start -->\n" +
-	    				"<br>\n" +
-	    				//"<div id=\"FORM"+insertCount+"panel\" style=\"background-color:whitesmoke; width:99%; border:0.1px gray solid;\" data-role=\"none\">\n" +
-	    				//"<div style=\"padding:3px 5px;border-color:hotpink;border-width:0 0 1px 7px;border-style:solid;background:#F8F8F8; font-size:30;\" id=\"FormTitle"+formCount+"\">"+title+"</div>\n" +
-	    				"<div id=\"FORM"+formCount+"panel\" style=\"\" data-role=\"none\">\n" +
+	    	
+	    	//php
+    		statement += 
+    				"<!-- Form start -->\n" +
+    				"<!-- Form Panel start -->\n" +
+    				"<br>\n" +
+    				//"<div id=\"FORM"+insertCount+"panel\" style=\"background-color:whitesmoke; width:99%; border:0.1px gray solid;\" data-role=\"none\">\n" +
+    				//"<div style=\"padding:3px 5px;border-color:hotpink;border-width:0 0 1px 7px;border-style:solid;background:#F8F8F8; font-size:30;\" id=\"FormTitle"+formCount+"\">"+title+"</div>\n" +
+    				"<div id=\"FORM"+formCount+"panel\" style=\"\" data-role=\"none\">\n" +
 //	    				"<hr>\n<div style=\"font-size:30;\" id=\"FormTitle"+formCount+"\">"+title+"</div>\n<hr>\n" +
 //	    				"<br>\n" +
-	    				"<form method=\"post\" action=\"\" target=\"dummy_ifr\">\n";
-	    				//"<form method=\"post\" action=\"\" target=\"form"+formCount+"_ifr\">\n";
-	
-	    		//TODO 下の部分の処理が必要
-//				statement += formString;
-				
-	    		int insertWordCount = 0;
-	    		for(int i=0; i<col_num; i++){
-//	    			if(!textareaFlg[i]){
-					if($session_array[i].equals("") && $time_array[i].equals("") && $gps_array[i].equals("")){
-						if(!button_array[i].equals("")){
-							//Log.i("bt_array:"+button_array[i]);
-							String ss = button_array[i]+"|";
-							int btRcount = ss.length() - ss.replaceAll("\\|","").length();
-							//Log.i("btRcount:"+btRcount);
-							
-							if(btRcount == 1){				//テキスト ex){2013秋}
+    				"<form method=\"post\" action=\"\" target=\"dummy_ifr\">\n";
+    				//"<form method=\"post\" action=\"\" target=\"form"+formCount+"_ifr\">\n";
 
-								//statement +=
-								//		"    <input type="text" disabled="disabled" value="お名前: 五嶋">";
+    		//TODO 下の部分の処理が必要
+//				statement += formString;
+			
+    		int insertWordCount = 0;
+    		for(int i=0; i<col_num; i++){
+				if($session_array[i].equals("") && $time_array[i].equals("") && $gps_array[i].equals("")){
+					if(!button_array[i].equals("")){
+						//Log.i("bt_array:"+button_array[i]);
+						String ss = button_array[i]+"|";
+						int btRcount = ss.length() - ss.replaceAll("\\|","").length();
+						//Log.i("btRcount:"+btRcount);
+						
+						if(btRcount == 1){				//テキスト ex){2013秋}
+
+							//statement +=
+							//		"    <input type="text" disabled="disabled" value="お名前: 五嶋">";
+							statement += 
+									"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
+									""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+button_array[i]+"" +
+									""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
+							if(!noinsertFlg[i])
 								statement += 
-										"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
-										""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+button_array[i]+"" +
-										""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
-								if(!noinsertFlg[i])
-									statement += 
-											"    <input type=\"hidden\" name=\"form"+formCount+"_words"+(++insertWordCount)+"\" value=\""+button_array[i]+"\">\n";
-							
-							
-							}else if(btRcount == 2){		//ボタン ex){出席|欠席}
-								String bt1=ss.substring(0,ss.indexOf("|")).trim();
-								String bt2=ss.substring(ss.indexOf("|")+1,ss.length()-1).trim();
-								insertWordCount++;
+										"    <input type=\"hidden\" name=\"form"+formCount+"_words"+(++insertWordCount)+"\" value=\""+button_array[i]+"\">\n";
+						
+						
+						}else if(btRcount == 2){		//ボタン ex){出席|欠席}
+							String bt1=ss.substring(0,ss.indexOf("|")).trim();
+							String bt2=ss.substring(ss.indexOf("|")+1,ss.length()-1).trim();
+							insertWordCount++;
+							statement += 
+									"	<div class=\"ui-grid-a\">\n" +
+									"		<div class=\"ui-block-a\">\n" +
+									"    		<input type=\"submit\" name=\"form"+formCount+"_words"+(insertWordCount)+"\" value=\""+bt1+"\" data-theme=\"a\">\n" +
+									"		</div>\n" +
+									"		<div class=\"ui-block-b\">\n" +
+									"    		<input type=\"submit\" name=\"form"+formCount+"_words"+(insertWordCount)+"\" value=\""+bt2+"\" data-theme=\"a\">\n" +
+									"		</div>\n" +
+									"	</div>\n";
+							buttonSubmit += " || $_POST['form"+formCount+"_words"+(insertWordCount)+"']";
+						}else{							//ラジオボタン ex){出席|欠席|その他}
+							statement += "   <div data-role=\"controlgroup\">\n";
+							insertWordCount++;
+							for(int k=1; k<=btRcount; k++){
+								String val = ss.substring(0,ss.indexOf("|")).trim();
 								statement += 
-										"	<div class=\"ui-grid-a\">\n" +
-										"		<div class=\"ui-block-a\">\n" +
-										"    		<input type=\"submit\" name=\"form"+formCount+"_words"+(insertWordCount)+"\" value=\""+bt1+"\" data-theme=\"a\">\n" +
-										"		</div>\n" +
-										"		<div class=\"ui-block-b\">\n" +
-										"    		<input type=\"submit\" name=\"form"+formCount+"_words"+(insertWordCount)+"\" value=\""+bt2+"\" data-theme=\"a\">\n" +
-										"		</div>\n" +
-										"	</div>\n";
-								buttonSubmit += " || $_POST['form"+formCount+"_words"+(insertWordCount)+"']";
-							}else{							//ラジオボタン ex){出席|欠席|その他}
-								statement += "   <div data-role=\"controlgroup\">\n";
-								insertWordCount++;
-								for(int k=1; k<=btRcount; k++){
-									String val = ss.substring(0,ss.indexOf("|")).trim();
-									statement += 
-											"		<input type=\"radio\" name=\"form"+formCount+"_words"+(insertWordCount)+"\" id=\"form"+formCount+"_words"+(insertWordCount)+"_"+k+"\" value=\""+val+"\""+( (k>1)? (""):(" checked=\"checked\"") )+">\n" +
-											"		<label for=\"form"+formCount+"_words"+(insertWordCount)+"_"+k+"\">"+val+"</label>\n";
-									ss = ss.substring(ss.indexOf("|")+1);
-								}
-								statement += "	</div>\n";
+										"		<input type=\"radio\" name=\"form"+formCount+"_words"+(insertWordCount)+"\" id=\"form"+formCount+"_words"+(insertWordCount)+"_"+k+"\" value=\""+val+"\""+( (k>1)? (""):(" checked=\"checked\"") )+">\n" +
+										"		<label for=\"form"+formCount+"_words"+(insertWordCount)+"_"+k+"\">"+val+"</label>\n";
+								ss = ss.substring(ss.indexOf("|")+1);
 							}
-						}else{
-							if(validationType[i].isEmpty()){
-								statement += 
-										"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" name=\"form"+formCount+"_words"+(++insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\">" +
-										""+((!textareaFlg[i])?(""):("</textarea>"))+"\n";
-							}else{
-								//TODO 2nd引数
-								statement += Mobile_HTML5.getFormValidationString(validationType[i], false, "form"+formCount+"_words"+(++insertWordCount), s_name_array[i], null);
-							}
+							statement += "	</div>\n";
 						}
 					}else{
-						//statement += "    <input type=\"text\" name=\"form"+formCount+"_words"+(++insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\">\n";
-						String echo = "";
-						if(!$session_array[i].equals(""))	echo += "	echo $_SESSION['"+$session_array[i]+"'];\n";
-						else if(!$time_array[i].equals(""))	echo += "	echo "+$time_array[i]+";\n";
-						//else if(!$gps_array[i].equals(""))	echo += "	echo \"<script> getGPSinfo(); </script>\";\n";
-						//else if(!$gps_array[i].equals(""))	echo += "	echo\"<script> getGPSinfo(); </script>\";\n";
-						else if(!$gps_array[i].equals("")){
-							echo += "	echo \"位置情報(緯度・経度)\";\n";
-							gps_js +=
-									"\n<!-- getGPSinfo() -->\n" +
-									"<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
-									"<script type=\"text/javascript\">\n" +
-									"<!--\n" +
-									//"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +
-									"$(function(){\n" +
-									"  	// Geolocation APIのオプション設定\n" +
-									"  	var geolocationOptions = {\n" +
-									"    	\"enableHighAccuracy\" : true, // 高精度位置情報の取得\n" +
-									"    	\"maximumAge\" : 0, // キャッシュの無効化\n" +
-									"    	\"timeout\" : 30000 // タイムアウトは30秒\n" +
-									"  	};\n" +
-									"    navigator.geolocation.getCurrentPosition(function(pos) {\n" +
-									"      	// 経度、緯度を取得 //\n" +
-									"		document.getElementsByName('form"+formCount+"_words"+(insertWordCount+1)+"')[0].value=pos.coords.latitude+\",\"+pos.coords.longitude;\n" +
-									"    }, function(e) {\n" +
-									"		gpsInfo = \"\";\n" +
-									"    }, geolocationOptions);\n" +
-									"});\n" +
-									"// -->\n" +
-									"</script>\n";
+						if(validationType[i].isEmpty()){
+							statement += 
+									"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" name=\"form"+formCount+"_words"+(++insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\">" +
+									""+((!textareaFlg[i])?(""):("</textarea>"))+"\n";
+						}else{
+							//TODO 2nd引数
+							statement += Mobile_HTML5.getFormValidationString(validationType[i], false, "form"+formCount+"_words"+(++insertWordCount), s_name_array[i], null, "");
 						}
+					}
+				}else{
+					//statement += "    <input type=\"text\" name=\"form"+formCount+"_words"+(++insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\">\n";
+					String echo = "";
+					if(!$session_array[i].equals(""))	echo += "	echo $_SESSION['"+$session_array[i]+"'];\n";
+					else if(!$time_array[i].equals(""))	echo += "	echo "+$time_array[i]+";\n";
+					//else if(!$gps_array[i].equals(""))	echo += "	echo \"<script> getGPSinfo(); </script>\";\n";
+					//else if(!$gps_array[i].equals(""))	echo += "	echo\"<script> getGPSinfo(); </script>\";\n";
+					else if(!$gps_array[i].equals("")){
+						echo += "	echo \"位置情報(緯度・経度)\";\n";
+						gps_js +=
+								"\n<!-- getGPSinfo() -->\n" +
+								"<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
+								"<script type=\"text/javascript\">\n" +
+								"<!--\n" +
+								//"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +
+								"$(function(){\n" +
+								"  	// Geolocation APIのオプション設定\n" +
+								"  	var geolocationOptions = {\n" +
+								"    	\"enableHighAccuracy\" : true, // 高精度位置情報の取得\n" +
+								"    	\"maximumAge\" : 0, // キャッシュの無効化\n" +
+								"    	\"timeout\" : 30000 // タイムアウトは30秒\n" +
+								"  	};\n" +
+								"    navigator.geolocation.getCurrentPosition(function(pos) {\n" +
+								"      	// 経度、緯度を取得 //\n" +
+								"		document.getElementsByName('form"+formCount+"_words"+(insertWordCount+1)+"')[0].value=pos.coords.latitude+\",\"+pos.coords.longitude;\n" +
+								"    }, function(e) {\n" +
+								"		gpsInfo = \"\";\n" +
+								"    }, geolocationOptions);\n" +
+								"});\n" +
+								"// -->\n" +
+								"</script>\n";
+					}
+					
+					statement += 
+							"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
+							""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+"\n";
+					statement += 
+							"EOF;\n" +
+							echo +
+							"		echo <<<EOF\n";
 						
+					statement += 
+							""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
+					if(!noinsertFlg[i])
 						statement += 
-								"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
-								""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+"\n";
-						statement += 
+								"    <input type=\"hidden\" name=\"form"+formCount+"_words"+(++insertWordCount)+"\" value=\"\n" +
 								"EOF;\n" +
 								echo +
-								"		echo <<<EOF\n";
-							
-						statement += 
-								""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
-						if(!noinsertFlg[i])
-							statement += 
-									"    <input type=\"hidden\" name=\"form"+formCount+"_words"+(++insertWordCount)+"\" value=\"\n" +
-									"EOF;\n" +
-									echo +
-									"		echo <<<EOF\n" +
-									"\">\n";
-					}
-	    		}
-	    		
-	    		if(buttonSubmit.equals(""))
-	    			statement += 
-		    			"    <input type=\"submit\" value=\"OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"form"+formCount+"\" id=\"form"+formCount+"\" data-mini=\"false\" data-inline=\"false\">\n";
-//	    				"    <input type=\"submit\" value=\""+( (!update)? ("登録"):("更新") )+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"form"+formCount+"\" id=\"form"+formCount+"\" data-icon=\"insert\" data-mini=\"false\" data-inline=\"false\">\n";
-				
-	    		statement += 
-	    				"</form>\n" +
-//	    				"\n" +
-//	    				"<div id=\"Form"+formCount+"_text0\" data-role=\"none\"><!-- Form result --></div>\n" +
-//	    				"\n" +
-//	    				"<br>\n" +
-	    				"</div>\n";
-	    		//getGPSinfo()
-	    		statement += gps_js;
-	    		statement += 
-	    				"<!-- Form Panel end -->\n" +
-	    				"\n";
-				statement += 
-	    				"\n" +
-	    				"<script type=\"text/javascript\">\n" +
-	    				"function Form"+formCount+"_echo1(str){\n" +
-	    				"  jQuery(function ($) {\n" +
-	    				"  	$('input,textarea').not('input[type=\\\"radio\\\"],input[type=\\\"checkbox\\\"],:hidden, :button, :submit,:reset').val('');\n" +
-	    				"	$('input[type=\"radio\"], input[type=\\\"checkbox\\\"],select').removeAttr('checked').removeAttr('selected');\n" +
-	    				"  });\n" +
-	    				"  var textArea = document.getElementById(\"Form"+formCount+"_result\");\n" +
-	    				"  textArea.innerHTML = str;\n" +
-	    				"}\n" +
-	    				"</script>\n" +
-	    				"<!-- Form end -->\n";
-				
-				
-				Mobile_HTML5Env.PHP +=
-	    				"<?php\n" +
-	    				"if($_POST['form"+formCount+"'] "+buttonSubmit+"){\n" +
-	    				//"if($_POST['form"+formCount+"'] || $_POST['form"+formCount+"_words"+formCount+"']){\n" +
-	    				"    //ユーザ定義\n" +
-	    				"    $sqlite3_DB = '"+DB+"';\n" +
-	    				"    $insert_col = \""+insert_col+"\";\n";
-				if(update){
-					Mobile_HTML5Env.PHP +=
-							"    $update_col_array = array("+update_col_array+");\n" +
-							"    $update_where = \""+update_where+"\";\n";
+								"		echo <<<EOF\n" +
+								"\">\n";
 				}
+    		}
+    		
+    		if(buttonSubmit.equals(""))
+    			statement += 
+	    			"    <input type=\"submit\" value=\"OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"form"+formCount+"\" id=\"form"+formCount+"\" data-mini=\"false\" data-inline=\"false\">\n";
+			
+    		statement += 
+    				"</form>\n" +
+    				"</div>\n";
+    		//getGPSinfo()
+    		statement += gps_js;
+    		statement += 
+    				"<!-- Form Panel end -->\n" +
+    				"\n";
+			statement += 
+    				"\n" +
+    				"<script type=\"text/javascript\">\n" +
+    				"function Form"+formCount+"_echo1(str){\n" +
+    				"  jQuery(function ($) {\n" +
+    				"  	$('input,textarea').not('input[type=\\\"radio\\\"],input[type=\\\"checkbox\\\"],:hidden, :button, :submit,:reset').val('');\n" +
+    				"	$('input[type=\"radio\"], input[type=\\\"checkbox\\\"],select').removeAttr('checked').removeAttr('selected');\n" +
+    				"  });\n" +
+    				"  var textArea = document.getElementById(\"Form"+formCount+"_result\");\n" +
+    				"  textArea.innerHTML = str;\n" +
+    				"}\n" +
+    				"</script>\n" +
+    				"<!-- Form end -->\n";
+			
+			
+			Mobile_HTML5Env.PHP +=
+    				"<?php\n" +
+    				"if($_POST['form"+formCount+"'] "+buttonSubmit+"){\n" +
+    				"    //ユーザ定義\n" +
+    				((DBMS.equals("sqlite") || DBMS.equals("sqlite3"))? ("    $sqlite3_DB = '"+DB+"';\n"):"") +
+    				"    $insert_col = \""+insert_col+"\";\n";
+			if(update){
 				Mobile_HTML5Env.PHP +=
-	    				"    $notnullFlg = array("+notnullFlg_array+");\n" +
-	    				"    $col_num = "+(col_num - noinsert_count)+";                          //カラム数(Java側で指定)\n" +
-	    				"    $table = '"+from+"';\n" +
-	    				"\n" +
-	    				"	$insert_str = \"notnull\";\n" +
-	    				"	for($k=1; $k<=$col_num; $k++){\n" +
-	    				"    	$var[$k] = checkHTMLsc($_POST['form"+formCount+"_words'.$k]);\n" +
-	    				"    	$var[$k] = str_replace(array(\"\\r\\n\",\"\\r\",\"\\n\"), '<br>', $var[$k]);	//改行コードを<br>へ\n" +
-	    				//"    	//$var[$k] = mb_convert_encoding($var[$k], 'UTF-8', 'auto');					//エンコードをUTF-8へ PHP環境によってはうまく動かない？\n" +
-	    				//"    	$insert_str .= trim($var[$k]);\n" +
-	    				"    	if($notnullFlg[$k-1]){\n" +
-	    				"    		if(trim($var[$k]) == \"\")	$insert_str = \"\";\n" +
-	    				"    	}\n";
-				for(int i=0; i<col_num; i++){
-					if(!$time_array[i].equals(""))
-						Mobile_HTML5Env.PHP += "		if($k=="+i+")	$var[$k] = "+$time_array[i]+";\n";	//現在時刻
-				}
-				Mobile_HTML5Env.PHP +=	
-	    				"    }\n" +
-	    				"\n" +
-	    				"	if($insert_str == \"\"){\n" +
-	    				"        form"+formCount+"_p1('<font color=\\\"red\\\">Please check the value.</font>');\n" +
-	    				"	}else{\n";
-				
-				if(!update){
-					//insert()
+						"    $update_col_array = array("+update_col_array+");\n" +
+						"    $update_where = \""+update_where+"\";\n";
+			}
+			Mobile_HTML5Env.PHP +=
+    				"    $notnullFlg = array("+notnullFlg_array+");\n" +
+    				"    $col_num = "+(col_num - noinsert_count)+";                          //カラム数(Java側で指定)\n" +
+    				"    $table = '"+from+"';\n" +
+    				"\n" +
+    				"	$insert_str = \"notnull\";\n" +
+    				"	for($k=1; $k<=$col_num; $k++){\n" +
+    				"    	$var[$k] = checkHTMLsc($_POST['form"+formCount+"_words'.$k]);\n" +
+    				"    	$var[$k] = str_replace(array(\"\\r\\n\",\"\\r\",\"\\n\"), '<br>', $var[$k]);	//改行コードを<br>へ\n" +
+    				//"    	//$var[$k] = mb_convert_encoding($var[$k], 'UTF-8', 'auto');					//エンコードをUTF-8へ PHP環境によってはうまく動かない？\n" +
+    				//"    	$insert_str .= trim($var[$k]);\n" +
+    				"    	if($notnullFlg[$k-1]){\n" +
+    				"    		if(trim($var[$k]) == \"\")	$insert_str = \"\";\n" +
+    				"    	}\n";
+			for(int i=0; i<col_num; i++){
+				if(!$time_array[i].equals(""))
+					Mobile_HTML5Env.PHP += "		if($k=="+i+")	$var[$k] = "+$time_array[i]+";\n";	//現在時刻
+			}
+			Mobile_HTML5Env.PHP +=	
+    				"    }\n" +
+    				"\n" +
+    				"	if($insert_str == \"\"){\n" +
+    				"        form"+formCount+"_p1('<font color=\\\"red\\\">Please check the value.</font>');\n" +
+    				"	}else{\n";
+			
+			if(!update){
+				//insert()
+				if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
 					Mobile_HTML5Env.PHP +=
 		    				"		$insert_str = \"\";\n" +
 		    				"		for($k=1; $k<=$col_num; $k++){\n" +
@@ -713,25 +713,46 @@ public class Mobile_HTML5 {
 		    				"		}\n" +
 		    				"		//DBへ登録\n" +
 		    				"		$insert_db"+formCount+" = new SQLite3($sqlite3_DB);\n" +
-		    				"        $insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES (\".$insert_str.\")\";\n" +
-		    				"        \n" +
-		    				"        try{\n" +
+		    				"       $insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES (\".$insert_str.\")\";\n" +
+		    				"       \n" +
+		    				"       try{\n" +
 		    				"			$result2 = $insert_db"+formCount+"->exec($insert_sql);\n" +
-		    				"			unset($insert_db"+formCount+");\n" +
 		    				"		 	form"+formCount+"_p1(\"Registration completed.\");\n" +
 		    				"		 	//form"+formCount+"_p1($insert_sql);\n" +
-		    				"        }catch(Exception $e){\n" +
-		    				"       		unset($insert_db"+formCount+");\n" +
+		    				"       }catch(Exception $e){\n" +
 		    				"       		form"+formCount+"_p1('<font color=red>Registration failed.</font>');	//登録失敗\n" +
-		    				"        }\n";
-				}else{
-					//update()
+		    				"       }\n" +
+		    				"		unset($insert_db"+formCount+");\n";
+				} else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+					String pg_prepare_array = "";
+					for(int i=1; i<=(col_num - noinsert_count); i++)
+						pg_prepare_array += "$"+i+",";
+					pg_prepare_array = pg_prepare_array.substring(0, pg_prepare_array.length()-1);
+					
 					Mobile_HTML5Env.PHP +=
-							"		$insert_db1 = new SQLite3($sqlite3_DB);\n" +
+							"		//DBへ登録\n" +
+		    				"		$insert_db"+formCount+" = pg_connect (\"host="+HOST+" dbname="+DB+" user="+USER+""+(!PASSWD.isEmpty()? (" password="+PASSWD):"")+"\");\n" +
+		    				"		$insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES ("+pg_prepare_array+")\";\n" +
+		    				"       \n" +
+		    				"		try{\n" +
+							"			$result2 = pg_prepare($insert_db"+formCount+", \"ssql_insert_"+formCount+"\", $insert_sql);\n" +
+							"			$result2 = pg_execute($insert_db"+formCount+", \"ssql_insert_"+formCount+"\", $var);\n" +
+		    				"		 	form"+formCount+"_p1(\"Registration completed.\");\n" +
+		    				"		 	//form"+formCount+"_p1($insert_sql);\n" +
+		    				"       }catch(Exception $e){\n" +
+		    				"       		form"+formCount+"_p1('<font color=red>Registration failed.</font>');	//登録失敗\n" +
+		    				"       }\n" +
+		    				"		pg_close($insert_db"+formCount+");\n";
+				}
+			}else{
+				//update()
+				if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
+					Mobile_HTML5Env.PHP +=
+							"		$insert_db"+formCount+" = new SQLite3($sqlite3_DB);\n" +
 							"		try{\n" +
 							"			//データが存在しているかチェック\n" +
 							"			$select_sql = \"SELECT \".$insert_col.\" FROM \".$table.\" \".$update_where;\n" +
-							"			$result2 = $insert_db1->query($select_sql);\n" +
+							"			$result2 = $insert_db"+formCount+"->query($select_sql);\n" +
 							"			$j = 0;\n" +
 							"			while($row = $result2->fetchArray()){\n" +
 							"			    $j++;\n" +
@@ -746,67 +767,85 @@ public class Mobile_HTML5 {
 							"				}\n" +
 							"				\n" +
 							"				$update_sql = \"UPDATE \".$table.\" SET \".$update_str.\" \".$update_where;\n" +
-							"				$result2 = $insert_db1->exec($update_sql);\n" +
+							"				$result2 = $insert_db"+formCount+"->exec($update_sql);\n" +
 							"				//echo '変更された行の数: ', $db->changes();\n" +
 							"				form"+formCount+"_p1(\"Update completed.\");\n" +
 							"			}else{\n";
-					//Log.i("formFlag:"+formFlag);
-					if(!insertFlag.equals("true"))
-							Mobile_HTML5Env.PHP +=
-								"				form"+formCount+"_p1('<font color=red>No data found.</font>');	//更新データなし\n";
-					else
-							Mobile_HTML5Env.PHP +=
-								"				//新規登録(insert)\n" +
-								"				$insert_str = \"\";\n" +
-								"				for($k=1; $k<=$col_num; $k++){\n" +
-								"					if($k==1)	$insert_str .= \"'\".$var[$k].\"'\";\n" +
-								"					else		$insert_str .= \",'\".$var[$k].\"'\";\n" +
-								"				}\n" +
-								"				\n" +
-								"				$insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES (\".$insert_str.\")\";\n" +
-								"				$result2 = $insert_db1->exec($insert_sql);\n" +
-								"				form"+formCount+"_p1(\"Registration completed.\");\n";
+				} else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
 					Mobile_HTML5Env.PHP +=
+							"		$insert_db"+formCount+" = pg_connect (\"host="+HOST+" dbname="+DB+" user="+USER+""+(!PASSWD.isEmpty()? (" password="+PASSWD):"")+"\");\n" +
+							"		try{\n" +
+							"			//データが存在しているかチェック\n" +
+							"			$select_sql = \"SELECT \".$insert_col.\" FROM \".$table.\" \".$update_where;\n" +
+							"			$result2 = pg_query($insert_db"+formCount+", $select_sql);\n" +						//TODO $update_where
+							"			$j = 0;\n" +
+							"			while($row = pg_fetch_assoc($result2)){\n" +
+							"			    $j++;\n" +
 							"			}\n" +
-							"        }catch(Exception $e){\n" +
-							"       		unset($insert_db1);\n" +
-							"       		form"+formCount+"_p1('<font color=red>Update failed.</font>');	//更新失敗\n" +
-							"        }\n" +
-							"        unset($insert_db1);\n";
+							"			\n" +
+							"			if($j>0){\n" +
+							"				//更新(update)\n" +
+							"				$update_str = \"\";\n" +
+							"				for($k=1; $k<=$col_num; $k++){\n" +
+							"					if($k==1)	$update_str .= $update_col_array[$k-1].\"=$\".$k;\n" +
+							"					else		$update_str .= \",\".$update_col_array[$k-1].\"=$\".$k;\n" +
+							"				}\n" +
+							"				\n" +
+							"				$update_sql = \"UPDATE \".$table.\" SET \".$update_str.\" \".$update_where;\n" +	//TODO $update_where
+							"				$result2 = pg_prepare($insert_db"+formCount+", \"ssql_insert_"+formCount+"\", $update_sql);\n" +
+							"				$result2 = pg_execute($insert_db"+formCount+", \"ssql_insert_"+formCount+"\", $var);\n" +
+							"				form"+formCount+"_p1(\"Update completed.\");\n" +
+							"			}else{\n";
 				}
-	    				
+				if(!insertFlag.equals("true"))
+						Mobile_HTML5Env.PHP +=
+							"				form"+formCount+"_p1('<font color=red>No data found.</font>');	//更新データなし\n";
+				else
+						if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
+							Mobile_HTML5Env.PHP +=
+									"				//新規登録(insert)\n" +
+									"				$insert_str = \"\";\n" +
+									"				for($k=1; $k<=$col_num; $k++){\n" +
+									"					if($k==1)	$insert_str .= \"'\".$var[$k].\"'\";\n" +
+									"					else		$insert_str .= \",'\".$var[$k].\"'\";\n" +
+									"				}\n" +
+									"				\n" +
+									"				$insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES (\".$insert_str.\")\";\n" +
+									"				$result2 = $insert_db"+formCount+"->exec($insert_sql);\n" +
+									"				form"+formCount+"_p1(\"Registration completed.\");\n";
+						} else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+							String pg_prepare_array = "";
+							for(int i=1; i<=(col_num - noinsert_count); i++)
+								pg_prepare_array += "$"+i+",";
+							pg_prepare_array = pg_prepare_array.substring(0, pg_prepare_array.length()-1);
+							Mobile_HTML5Env.PHP +=
+									"				//新規登録(insert)\n" +
+									"				$insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES ("+pg_prepare_array+")\";\n" +
+									"				$result2 = pg_prepare($insert_db"+formCount+", \"ssql_insert_"+formCount+"\", $insert_sql);\n" +
+									"				$result2 = pg_execute($insert_db"+formCount+", \"ssql_insert_"+formCount+"\", $var);\n" +
+									"				form"+formCount+"_p1(\"Registration completed.\");\n";
+						}
 				Mobile_HTML5Env.PHP +=
-	    				"    }\n" +
-	    				"}\n" +
-	    				"function form"+formCount+"_p1($str){\n" +
-	    				"    echo '<script type=\"text/javascript\">window.parent.Form"+formCount+"_echo1(\"'.$str.'\");</script>';\n" +
-	    				"}\n" +
-	    				"?>\n";
-	    				
+						"			}\n" +
+						"        }catch(Exception $e){\n" +
+						"       		form"+formCount+"_p1('<font color=red>Update failed.</font>');	//更新失敗\n" +
+						"        }\n" +
+						((DBMS.equals("sqlite") || DBMS.equals("sqlite3"))?      ("        unset($insert_db"+formCount+");\n"):"") +
+						((DBMS.equals("sqlite") || DBMS.equals("sqlite3"))?      ("        pg_close($insert_db"+formCount+");\n"):"");
+			}
+    				
+			Mobile_HTML5Env.PHP +=
+    				"    }\n" +
+    				"}\n" +
+    				"function form"+formCount+"_p1($str){\n" +
+    				"    echo '<script type=\"text/javascript\">window.parent.Form"+formCount+"_echo1(\"'.$str.'\");</script>';\n" +
+    				"}\n" +
+    				"?>\n";
+			//End of php
 
-	    	}
-	    	//else if(DBMS.equals("postgresql")){
-	    	//	;
-	    	//}
-
+			
 	    	// 各引数毎に処理した結果をHTMLに書きこむ
 	    	html_env.code.append(statement);
-	    	
-
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			//Log.e(" - End form process -");
 
 			formCount++;
 			formWordCount = 1;
@@ -867,7 +906,7 @@ public class Mobile_HTML5 {
 		return type;
 	}
 //	static String upFormVal = "";
-	public static String getFormValidationString(String type, Boolean notnull, String name, String placeholder, String updateFromValue){
+	public static String getFormValidationString(String type, Boolean notnull, String name, String placeholder, String updateFromValue, String outTitle){
 		String s = "";
 		type = type.toLowerCase().trim();
 //		upFormVal = updateFromValue; //TODO: 他の方法
@@ -882,6 +921,7 @@ public class Mobile_HTML5 {
 //	    X date5<input type="text" name="insert1_words4" placeholder="Month / Day" data-role="datebox" data-options='{"mode":"calbox", "useNewStyle":true, "overrideCalHeaderFormat": "%m / %d", "overrideDateFormat": "%m/%d" }'}' >
 //	    ◎time <input type="text" name="insert1_words5" placeholder="Ex) 12:01" data-role="datebox" data-options='{"mode":"timebox", "overrideTimeFormat":24, "useNewStyle":true}'>
 
+		s += outTitle;
 		switch (type){
 		  case "tel":	//tel (custom type)
 			  s += getFormTag("tel", name, placeholder, "Telephone number", notnull, type);
@@ -1023,6 +1063,7 @@ public class Mobile_HTML5 {
 			//number
 		}else{
 			//attribute
+			s = "COALESCE("+s+", '')";	//NULL値 -> ''　NULLを含む行の表示のため（postgresql, sqlie, mysql共通関数）
 			s = "'||"+s+"||'";
 		}
 		return s;
@@ -1082,30 +1123,12 @@ public class Mobile_HTML5 {
 		}
 		return false;
 	}
-	private static boolean dynamicProcess(String symbol, DecorateList decos, Mobile_HTML5Env html_env){
+	private static boolean dynamicProcess(String symbol, String tfeID, DecorateList decos, Mobile_HTML5Env html_env){
 		if(decos.containsKey("dynamic")){
-			//if(symbol.contains("Attribute")){
-			//	Log.e("in dynamic: <"+symbol+"> "+data+" "+data_info+" "+tfe+" "+tfes+" "+tfeItems);
-			//}
-//			html_env.code.append("</DIV><!-- End of Show More -->\n");
-			
-//			dynamicWhileCount = 0;	//init
 			
 			if(symbol.contains("G1") || symbol.contains("G2")){
-//				String currentHTML = html_env.code.toString();
-//				String cut = currentHTML.substring(dynamicHTMLbuf0.length(), currentHTML.length());
 				html_env.code = new StringBuffer(dynamicHTMLbuf0);
 			}
-			
-//			Log.e("");
-//			Log.e("");
-//			Log.e(dynamicString2);
-//			Log.e("");
-//			Log.e("");
-			//Log.e(" - Start dynamic process -");
-//			Log.e(dynamicString);
-			
-			
 			
 			//ajax load interval
 			if(decos.containsKey("ajax-load") || decos.containsKey("load") || decos.containsKey("load-interval")
@@ -1122,13 +1145,8 @@ public class Mobile_HTML5 {
 				ajax_loadInterval = (int) (Float.parseFloat(s)*1000.0);
 				//Log.i(ajax_loadInterval);
 			}
-			 
-			
-			
-//			dynamicString = dynamicString.replaceAll("'", "\\\\\\\\\\\\\'");											//　' -> \'				//TODO これでOK?
 			
 			//TODO div, table以外の場合
-//			dynamicString = "'"+dynamicString2+"</div>'";
 			int numberOfColumns = 1;
 			String php_str1 = "", php_str2 = "", php_str3 = "", php_str4 = "";
 			if(!symbol.contains("G1") && !symbol.contains("G2")){
@@ -1136,13 +1154,6 @@ public class Mobile_HTML5 {
 					dynamicString = "'<table border=\"1\"><tr>"+dynamicString+"</tr></table>'";
 				}else if(decos.containsKey("table0")){
 					dynamicString = "'<table><tr>"+dynamicString+"</tr></table>'";
-	//				String close = "";
-	//				if(symbol.contains("Attribute")){
-	//					close = "</td></tr>";
-	//				}else if(symbol.contains("C1") || symbol.contains("G1")){
-	//					close = "</tr>";
-	//				}
-	//				dynamicString = "'"+dynamicString+close+"</table>'";
 				}else{
 					dynamicString = "'"+dynamicString+"</div>'";
 				}
@@ -1168,7 +1179,7 @@ public class Mobile_HTML5 {
 					}catch(Exception e){}
 					if(numberOfColumns<2){
 						numberOfColumns = 1;
-	            		Log.err("<<Warning>> column指定の範囲は、2〜です。指定された「column="+numberOfColumns+"」は使用できません。");
+	            		//Log.err("<<Warning>> column指定の範囲は、2〜です。指定された「column="+numberOfColumns+"」は使用できません。");
 					}else{
 						if(decos.containsKey("table") || decos.containsKey("table0")){
 							//table
@@ -1194,8 +1205,6 @@ public class Mobile_HTML5 {
 			
 			
 			dynamicString = dynamicString.replaceAll("\r\n", "").replaceAll("\r", "").replaceAll("\n", "");	//改行コードの削除
-//			if(!dynamicRowFlg)	dynamicString = dynamicString.replaceAll("\"", "\\\\\\\\\\\\\"");			//　" -> \\\"			//TODO これでOK?
-//			else				dynamicString = dynamicString.replaceAll("\"", "\\\\\"");					//　" -> \"
 			dynamicString = dynamicString.replaceAll("\"", "\\\\\"");										//　" -> \"
 			//Log.e(dynamicString);
 			
@@ -1216,35 +1225,11 @@ public class Mobile_HTML5 {
 	    	 *    $limit = " LIMIT 10 ";
 	    	 */
 	    	
-	    	
-//	    	String title = "";
 	    	String columns = "";
 	    	String after_from = "";
-	    	//columns = "w.wh_id, w.name";
-	    	//columns = "'<h1>'||w.wh_id||' '||w.name||'</h1>'";
 	    	columns = dynamicString;
-	    	//after_from = "FROM world_heritage w";
 	    	after_from = Mobile_HTML5Function.after_from_string;
 	    	
-//	    	try{
-////	    		//title（第一引数）
-//////	    		FuncArg fa1 = (FuncArg) this.Args.get(0);
-////	    		if(!fa1.getStr().equals(""))	title = fa1.getStr();
-////	    		else							title = "Dynamic";
-//	    		//columns（第二引数）
-//	    		FuncArg fa2 = (FuncArg) this.Args.get(1);
-//	    		columns += fa2.getStr();
-//	    		//after_from（第三引数）
-//	    		FuncArg fa3 = (FuncArg) this.Args.get(2);
-//	    		after_from += fa3.getStr().trim();
-//	    	}catch(Exception e){
-//	    		Log.info("<Warning> serach関数の引数が不足しています。 ex. dynamic(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
-//	    		return false;
-//	    	}
-//	    	if(columns.trim().equals("") || after_from.equals("")){
-//	    		Log.info("<Warning> serach関数の引数が不足しています。 ex. dynamic(\"title\", \"c1:column1, c2:column2, ... \", \"From以下\")");
-//	    		return false;
-//	    	}
 	    	if(after_from.toLowerCase().startsWith("from "))	after_from = after_from.substring("from".length()).trim();
 	    	//Log.info(title);
 	    	
@@ -1325,8 +1310,6 @@ public class Mobile_HTML5 {
 	    		dynamic_col_array += s_array[i] +"\""+((i<col_num-1)?(",\""):(""));
 	    	}
 	    	col_num -= a_pop_count;
-	//    	dynamic_col = dynamic_col.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("mail\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("\\)","");
-	//    	dynamic_col_array = dynamic_col_array.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("mail\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("\\)","");
 	    	dynamic_col = dynamic_col.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("mail\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("count\\(\\*\\)","count[*]").replaceAll("\\)","").replaceAll("count\\[\\*\\]","count(*)");
 	    	dynamic_col_array = dynamic_col_array.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("mail\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("count\\(\\*\\)","count[*]").replaceAll("\\)","").replaceAll("count\\[\\*\\]","count(*)");
 	    	
@@ -1342,20 +1325,16 @@ public class Mobile_HTML5 {
 	    	
 	    	String DBMS = GlobalEnv.getdbms();										//DBMS
 	    	String DB = GlobalEnv.getdbname();										//DB
+	    	String HOST = "", USER = "", PASSWD = "";
+	    	if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+	    		HOST = GlobalEnv.gethost();
+	    		USER = GlobalEnv.getusername();
+	    		PASSWD = GlobalEnv.getpassword();
+	    	}
 	    	
 	    	String query = "";
-	    	//Log.i(after_from_string);
-//	    	if(after_from.startsWith("#")){					//From以下をクエリの下(#*)から取ってくる場合	//TODO
-//	    		if(!after_from_string.contains(after_from)){
-//	    			Log.info("<Warning> dynamic関数の第三引数に指定されている '"+after_from+"' が見つかりません。");
-//	    			return false;
-//	    		}
-//	    		query = after_from_string
-//	    				.substring(after_from_string.indexOf(after_from)+after_from.length())
-//	    				.trim().toLowerCase();
-//	    		if(query.contains("#"))	query = query.substring(0,query.indexOf("#")).trim().toLowerCase();
-//	    	}else
-	    		query = after_from.toLowerCase();			//From以下を第三引数へ書く場合
+	    	//Log.e(after_from);
+    		query = after_from.toLowerCase();			//From以下を第三引数へ書く場合
 	
 	    	//Log.i("\n	Query: "+query);
 	    	String from = "";
@@ -1372,6 +1351,11 @@ public class Mobile_HTML5 {
 	    		orderby = query.substring(query.lastIndexOf(" order by ")+" order by ".length());
 	    		query = query.substring(0,query.lastIndexOf(" order by "));
 	    	}
+	    	String asc_desc = getOrderByString(dynamicCount);
+	    	if(!asc_desc.isEmpty()){
+	    		if (!orderby.isEmpty())	orderby += ", ";
+	    		orderby += asc_desc;
+	    	}
 	    	if(query.contains(" having ")){
 	    		having = query.substring(query.lastIndexOf(" having ")+" having ".length());
 	    		having = having.replaceAll("\\\"","\\\\\"");	// " -> \"
@@ -1387,160 +1371,118 @@ public class Mobile_HTML5 {
 	    		if(where.contains("$session")){
 	    			//if WHERE phrase contains $session(XX)
 	    			where = where.replaceAll("\\$session","'\".\\$_SESSION").replaceAll("\\(","[\"").replaceAll("\\)","\"].\"'");
+	    			//if it contains $_SESSION [""attribute""] or $_SESSION [" "attribute" "]
+	    			where = where.replace("[\"\"","[\"").replace("\"\"]","\"]").replace("[\" \"","[\"").replace("\" \"]","\"]");
 	    		}
 	    		query = query.substring(0,query.lastIndexOf(" where "));
 	    	}
 	    	from = query.trim();
-	    	//Log.i("	FROM: "+from+"\n	WHERE: "+where+"\n	GROUP: "+groupby+"\n	HAVING: "+having);
-	    	//Log.i("	ORDER: "+orderby+"\n	LIMIT: "+limit+"\n	Query: "+query);
-	    	
-	    	if(!groupbyFlg){
-	    		groupby = "";
-	    		having = "";
-	    	}
 	    	
 	    	
 	    	String statement = "";
 	    	String php = getSessionStartString()
 	    			     +"<?php\n";
-	    	//sqlite3 php
-	    	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
-	    		if(!dynamicRowFlg){
-		    		statement += getDynamicHTML(dynamicCount, dynamicPHPfileName);
-//		    				"<!-- SSQL Dynamic start -->\n" +
-//							"<!-- SSQL Dynamic Panel start -->\n" +
-//							//"<br>\n" +
-//							"<div id=\"DYNAMIC"+dynamicCount+"panel\" style=\"\" data-role=\"none\">\n" +
-//	//						"<hr>\n<div style=\"font-size:30;\" id=\"DynamicTitle"+dynamicCount+"\">"+title+"</div>\n<hr>\n" +
-//							//"<br>\n" +
-//							"\n" +
-//							"<div id=\"Dynamic"+dynamicCount+"_text0\" data-role=\"none\"><!--データ --></div>\n" +
-//							"\n" +
-//	//						"<table style=\"table-layout:fixed;\" data-role=\"table\" id=\"table-column-toggle"+dynamicCount+"\" data-mode=\"columntoggle\" class=\"ui-responsive table-stroke\">\n" +
-//	//						"  <thead>\n" +
-//	//						"    <tr id=\"Dynamic"+dynamicCount+"_text_th\">\n";
-//	//	    		for(int i=0; i<col_num; i++){
-//	//	    			statement += 
-//	//						"        <th data-priority=\"1\">"+s_name_array[i]+"</th>\n";
-//	//	    		}
-//	//	    		statement += 
-//	//	    				"    </tr>\n" +
-//	//						"  </thead>\n" +
-//	//						"  <tbody>\n" +
-//	//						"    <tr>\n";
-//	//	    		for(int i=0; i<col_num; i++){
-//	//	    			statement +=
-//	//						"        <td id=\"Dynamic"+dynamicCount+"_text"+(i+1)+"\" style=\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\"></td>\n";
-//	//	    		}
-//	//	    		statement += 
-//	//	    				"    </tr>\n" +
-//	//						"  </tbody>\n" +
-//	//						"</table>\n" +
-//	//						"\n" +
-//							//"<br>\n" +
-//							"</div>\n" +
-//	//						"<script type=\"text/javascript\"> $('#Dynamic"+dynamicCount+"_text_th').hide(); </script>\n" +
-//							"<!-- SSQL Dynamic Panel end -->\n" +
-//							"\n";
-	    		}else{
-	    			statement += getDynamicPagingHTML(dynamicRow, dynamicPagingCount, dynamicPHPfileName);
-	    		}
-	    		
-	    		
-	    		php += 
-						"$ret = array();\n" +
-						"$ret['result'] = \"\";\n\n";
-	    		if(dynamicRowFlg){
-	    			php += 
-							"if ($_POST['currentPage'] != \"\") {\n" +
-//							"if (isset($_POST['currentPage'])) {\n" +
-							"	$cp = $_POST['currentPage'];\n" +
-							"	$col = "+numberOfColumns+";\n" +
-							"	$r = $_POST['row'] * $col;\n" +
-							"	$end = $cp * $r;\n" +
-							"	$start = $end - $r + 1;\n" +
-							"\n";
-	    		}
+	    	//php
+    		if(!dynamicRowFlg){
+	    		statement += getDynamicHTML(tfeID, dynamicCount, dynamicPHPfileName);
+    		}else{
+    			statement += getDynamicPagingHTML(tfeID, dynamicRow, dynamicPagingCount, dynamicPHPfileName);
+    		}
+    		php += 
+					"$ret = array();\n" +
+					"$ret['result'] = \"\";\n\n";
+    		if(dynamicRowFlg){
+    			php += 
+						"if ($_POST['currentPage'] != \"\") {\n" +
+						"	$cp = $_POST['currentPage'];\n" +
+						"	$col = "+numberOfColumns+";\n" +
+						"	$r = $_POST['row'] * $col;\n" +
+						"	$end = $cp * $r;\n" +
+						"	$start = $end - $r + 1;\n" +
+						"\n";
+    		}
+    		php +=
+						"    //ユーザ定義\n" +
+						((DBMS.equals("sqlite") || DBMS.equals("sqlite3"))? ("    $sqlite3_DB = '"+DB+"';\n"):"") +
+						"    $dynamic_col = \""+dynamic_col+"\";\n" +
+						"    $col_num = "+col_num+";                          //カラム数(Java側で指定)\n" +
+						"    $table = '"+from+"';\n" +
+						"    $where0 = \""+where+"\";\n" +
+						"    $dynamic_col_array = array("+dynamic_col_array+");\n" +
+						"    $dynamic_col_num = count($dynamic_col_array);\n" +
+						"    $dynamic_a_Flg = array("+dynamic_aFlg+");\n" +
+						"    $dynamic_mail_Flg = array("+dynamic_mailFlg+");\n" +
+						"    $dynamic_pop_Flg = array("+dynamic_popFlg+");\n" +
+						"    $groupby = \""+groupby+"\";\n" +
+						"    $having0 = \""+having+"\";\n" +
+						"    $orderby = \""+((!orderby.isEmpty())?(" ORDER BY "+orderby+" "):("")) +"\";\n" +
+						"    $limit = \""+((limit!="")?(" LIMIT "+limit+" "):("")) +"\";\n" +
+						((limit!="")?("    $limitNum = "+limit+";\n"):("")) +	//TODO dynamicPaging時にLIMITが指定されていた場合
+						"\n";
+//						"    $dynamicWord"+dynamicCount+" = checkHTMLsc('%');\n" +
+//						"    $dynamicWord"+dynamicCount+" = preg_replace('/　/', ' ', $dynamicWord"+dynamicCount+");       //全角スペースを半角スペースへ\n" +
+//						"    $dynamicWord"+dynamicCount+" = preg_replace('/\\s+/', ' ', $dynamicWord"+dynamicCount+");      //連続する半角スペースを1つの半角スペースへ\n" +
+//						"    $dynamicWord"+dynamicCount+" = trim($dynamicWord"+dynamicCount+");                            //trim\n" +
+//						"    $dynamicWord"+dynamicCount+" = preg_replace('/\\s/', '%', $dynamicWord"+dynamicCount+");       //半角スペースを%へ変換\n" +
+//						"\n" +
+//						"    if($dynamicWord"+dynamicCount+" != \"\"){\n";
+    		if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
+    			php +=	"        $dynamic_db"+dynamicCount+" = new SQLite3($sqlite3_DB);\n";
+    		} else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+    			php +=	"        $dynamic_db"+dynamicCount+" = pg_connect (\"host="+HOST+" dbname="+DB+" user="+USER+""+(!PASSWD.isEmpty()? (" password="+PASSWD):"")+"\");\n";
+    		}
+    		php +=
+						"        $sql = \"SELECT \".$dynamic_col.\" FROM \".$table;\n" +
+						"        if($where0 != \"\")	$sql .= \" WHERE \".$where0.\" \";\n" +
+						"        if($groupby != \"\")	$sql .= \" GROUP BY \".$groupby.\" \";\n" +
+						"        if($having0 != \"\")	$sql .= \" HAVING \".$having0.\" \";\n" +
+//						"    \n" +
+//						"    	//左辺の作成（※Java側でOK?)\n" +
+//						"        $sw = $dynamicWord"+dynamicCount+";\n" +
+//						"        $sw_buf = \"\";\n" +
+//						"        $l_str = \"\";\n" +
+//						"        foreach($dynamic_col_array as $val)    $l_str .= \""+IFNULL+"(\".$val.\",'')||\";\n" +
+//						"        $l_str = substr($l_str, 0, -2);      //substring   最後の||をカット\n" +
+//						"        $l_str .= \" LIKE '%\";\n" +
+//						"        //右辺の作成\n" +
+//						"        while(strpos($sw,'%')){		//%を含んでいる間\n" +
+//						"            $pos = strpos($sw,'%');          //indxOf  		%が最初に現れる位置\n" +
+//						"            $rest = substr($sw, 0, $pos);    //substring    最初の%以降をカット\n" +
+//						"            $sw = substr($sw, $pos+1);       //substring    最初の%までカット\n" +
+//						"            $sw_buf .= $l_str.$rest.\"%' AND \";\n" +
+//						"        }\n" +
+//						"        $sw_buf .= $l_str.$sw.\"%' \";         //最後のswを結合\n" +
+//						"        \n" +
+//						"        if($groupby == \"\"){    //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
+//						"            /*** WHERE句の作成 start ***/\n" +
+//						"            //WHERE  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
+//						"            //   AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
+//						"            \n" +
+//						"            $WHERE = \"\";\n" +
+//						"            if($where0 == \"\")   $WHERE = \" WHERE \";\n" +
+//						"            else                $WHERE = \" AND \";\n" +
+//						"            $WHERE .= $sw_buf;\n" +
+//						"            \n" +
+//						"            $sql .= \" \".$WHERE.\" \";\n" +
+//						"            //$sql .= $WHERE.\" \".$groupby.\" \";\n" +
+//						"            /*** WHERE句の作成 end ***/\n" +
+//						"        }else{                        //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
+//						"            /*** HAVING句の作成 start ***/\n" +
+//						"            //HAVING  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
+//						"            //    AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
+//						"            \n" +
+//						"            $HAVING = \"\";\n" +
+//						"            if($having0 == \"\")  $HAVING = \" HAVING \";\n" +
+//						"            else	            $HAVING = \" HAVING \".$having0.\" AND \";\n" +
+//						"    		$HAVING .= $sw_buf;\n" +
+//						"            \n" +
+//						"            $sql .= \" GROUP BY \".$groupby.\" \".$HAVING;\n" +
+//						"            /*** HAVING句の作成 end ***/\n" +
+//						"        }\n" +
+						"        $sql .= \" \".$orderby.\" \".$limit;\n" +
+						"\n";
+    		if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
 	    		php +=
-//    						"if($_POST['dynamic"+dynamicCount+"'] || $_POST['dynamic_words"+dynamicCount+"']){\n" +
-//    						"    echo '<script type=\"text/javascript\">window.parent.Dynamic"+dynamicCount+"_refresh();</script>';    //表示をリフレッシュ\n" +
-//    						"\n" +
-    						"    //ユーザ定義\n" +
-							"    $sqlite3_DB = '"+DB+"';\n" +
-							"    $dynamic_col = \""+dynamic_col+"\";\n" +
-							"    $col_num = "+col_num+";                          //カラム数(Java側で指定)\n" +
-							"    $table = '"+from+"';\n" +
-							"    $where0 = \""+where+"\";\n" +
-							"    $dynamic_col_array = array("+dynamic_col_array+");\n" +
-							"    $dynamic_col_num = count($dynamic_col_array);\n" +
-							"    $dynamic_a_Flg = array("+dynamic_aFlg+");\n" +
-							"    $dynamic_mail_Flg = array("+dynamic_mailFlg+");\n" +
-							"    $dynamic_pop_Flg = array("+dynamic_popFlg+");\n" +
-							"    $groupby = \""+groupby+"\"; 	           //null => WHERE句にlikeを書く／ not null => HAVING句に～    //[要] Java側で、列名に予約語から始まるものがあるかチェック\n" +
-							"    $having0 = \""+having+"\";\n" +
-							"    $orderby = \""+((orderby!="")?(" ORDER BY "+orderby+" "):("")) +"\";\n" +
-							"    $limit = \""+((limit!="")?(" LIMIT "+limit+" "):("")) +"\";\n" +
-							((limit!="")?(" $limitNum = "+limit+";\n"):("")) +	//TODO dynamicPaging時にLIMITが指定されていた場合
-							"\n" +
-							//"    $dynamicWord"+dynamicCount+" = checkHTMLsc($_POST['dynamic_words"+dynamicCount+"']);\n" +
-							"    $dynamicWord"+dynamicCount+" = checkHTMLsc('%');\n" +
-							"    $dynamicWord"+dynamicCount+" = preg_replace('/　/', ' ', $dynamicWord"+dynamicCount+");       //全角スペースを半角スペースへ\n" +
-							"    $dynamicWord"+dynamicCount+" = preg_replace('/\\s+/', ' ', $dynamicWord"+dynamicCount+");      //連続する半角スペースを1つの半角スペースへ\n" +
-							"    $dynamicWord"+dynamicCount+" = trim($dynamicWord"+dynamicCount+");                            //trim\n" +
-							"    $dynamicWord"+dynamicCount+" = preg_replace('/\\s/', '%', $dynamicWord"+dynamicCount+");       //半角スペースを%へ変換\n" +
-							"\n" +
-							"    if($dynamicWord"+dynamicCount+" != \"\"){\n" +
-							"        $dynamic_db"+dynamicCount+" = new SQLite3($sqlite3_DB);\n" +
-							//"        $sql = \"SELECT DISTINCT \".$dynamic_col.\" FROM \".$table;\n" +
-							"        $sql = \"SELECT \".$dynamic_col.\" FROM \".$table;\n" +
-							"        if($where0 != \"\")    $sql .= \" WHERE \".$where0.\" \";\n" +
-							"    \n" +
-							"    	//左辺の作成（※Java側でOK?)\n" +
-							"        $sw = $dynamicWord"+dynamicCount+";\n" +
-							"        $sw_buf = \"\";\n" +
-							"        $l_str = \"\";\n" +
-							"        foreach($dynamic_col_array as $val)    $l_str .= \"ifnull(\".$val.\",'')||\";\n" +
-							"        $l_str = substr($l_str, 0, -2);      //substring   最後の||をカット\n" +
-							"        $l_str .= \" LIKE '%\";\n" +
-							"        //右辺の作成\n" +
-							"        while(strpos($sw,'%')){		//%を含んでいる間\n" +
-							"            $pos = strpos($sw,'%');          //indxOf  		%が最初に現れる位置\n" +
-							"            $rest = substr($sw, 0, $pos);    //substring    最初の%以降をカット\n" +
-							"            $sw = substr($sw, $pos+1);       //substring    最初の%までカット\n" +
-							"            $sw_buf .= $l_str.$rest.\"%' AND \";\n" +
-							"        }\n" +
-							"        $sw_buf .= $l_str.$sw.\"%' \";         //最後のswを結合\n" +
-							"        \n" +
-							"        if($groupby == \"\"){    //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
-							"            /*** WHERE句の作成 start ***/\n" +
-							"            //WHERE  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
-							"            //   AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
-							"            \n" +
-							"            $WHERE = \"\";\n" +
-							"            if($where0 == \"\")   $WHERE = \" WHERE \";\n" +
-							"            else                $WHERE = \" AND \";\n" +
-							"            $WHERE .= $sw_buf;\n" +
-							"            \n" +
-							"            $sql .= \" \".$WHERE.\" \";\n" +
-							"            //$sql .= $WHERE.\" \".$groupby.\" \";\n" +
-							"            /*** WHERE句の作成 end ***/\n" +
-							"        }else{                        //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
-							"            /*** HAVING句の作成 start ***/\n" +
-							"            //HAVING  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
-							"            //    AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
-							"            \n" +
-							"            $HAVING = \"\";\n" +
-							"            if($having0 == \"\")  $HAVING = \" HAVING \";\n" +
-							"            else	            $HAVING = \" HAVING \".$having0.\" AND \";\n" +
-							"    		$HAVING .= $sw_buf;\n" +
-							"            \n" +
-							"            $sql .= \" GROUP BY \".$groupby.\" \".$HAVING;\n" +
-							"            /*** HAVING句の作成 end ***/\n" +
-							"        }\n" +
-							"        $sql .= \" \".$orderby.\" \".$limit;	//order by句とlimitを結合\n" +
-							//((dynamicRowFlg)? "//":"") +
-							//"        dynamic"+dynamicCount+"_p1('<font color=red>SQL error: '.$sql.\";</font>\");	//エラー時\n" +
-							"\n" +
 							"        $result = $dynamic_db"+dynamicCount+"->query($sql);\n" +
 							"\n" +
 							"        $i = 0;\n" +
@@ -1549,106 +1491,64 @@ public class Mobile_HTML5 {
 							php_str1 +
 							"        while($row = $result->fetchArray()){\n" +
 							"              $i++;\n" +
-							//"              $k=0;\n" +
 							((dynamicRowFlg)? "              if($i>=$start && $i<=$end){	//New\n":"") +
 							php_str2 +
 							"              for($j=0; $j<$dynamic_col_num; $j++){\n" +
-							//"                    dynamic"+dynamicCount+"_p2($row[$j], $j+1);     //tdに結果を埋め込む\n" +
-//							"					if($dynamic_a_Flg[$j]=='true' || $dynamic_mail_Flg[$j]=='true' || $dynamic_pop_Flg[$j]=='true')	;\n" +
-//							"                    else if($j>0 && $dynamic_a_Flg[$j-1]=='true')	dynamic"+dynamicCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
-//							"                    else if($j>0 && $dynamic_mail_Flg[$j-1]=='true')	dynamic"+dynamicCount+"_p2('<a href=\\\"mailto:'.$row[$j].'\\\" target=\\\"_self\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
-//							"                    //else if($j>0 && $dynamic_pop_Flg[$j-1]=='true')	dynamic"+dynamicCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
-//							"                    else if($j>0 && $dynamic_pop_Flg[$j-1]=='true' && !is_null($row[$j])){\n" +
-//							"                    	$pop_str = '<a href=\\\"#dynamic_popup1_'.(++$pop_num).'\\\" data-rel=\\\"popup\\\" data-icon=\\\"arrow-r\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>'\n" +
-//							"							.'<div data-role=\\\"popup\\\" id=\\\"dynamic_popup1_'.($pop_num).'\\\" data-transition=\\\"slideup\\\" style=\\\"width:95%;\\\" data-overlay-theme=\\\"a\\\">'\n" +
-//							"								.'<a href=\\\"#\\\" data-rel=\\\"back\\\" data-role=\\\"button\\\" data-theme=\\\"a\\\" data-icon=\\\"delete\\\" data-iconpos=\\\"notext\\\" class=\\\"ui-btn-right\\\">Close</a>'\n" +
-//							"								.'<h2>'.$row[$j-1].'</h2>'\n" +
-//							"								.'<p>'.$row[$j].'</p>'\n" +
-//							"							.'</div>';\n" +
-//							"                    	dynamic"+dynamicCount+"_p2($pop_str, ++$k);     	//tdに結果を埋め込む\n" +
-//							"                    }else									dynamic"+dynamicCount+"_p2($row[$j], ++$k);     //tdに結果を埋め込む\n" +
-							"              		//$b .= $row[$j];\n" +
 							"              		$b .= str_replace('"+dynamicFuncCountLabel+"', '_'.$i, $row[$j]);\n" +	//For function's count
 							"              }\n" +
 							php_str3 +
 							((dynamicRowFlg)? "              }\n":"") +
 							"        }\n" +
 							php_str4 +
-//							"		 if($i>0)	echo \"<script type=\\\"text/javascript\\\">window.parent.$('#Dynamic"+dynamicCount+"_text_th').show();</script>\";    //カラム名を表示\n" +
-							//"        dynamic"+dynamicCount+"_p1($i.' result'.(($i != 1)?('s'):('')));    //件数表示\n" +
-							//"        dynamic"+dynamicCount+"_p1('"+dynamicString+"');    //件数表示\n" +
-							//((dynamicRowFlg)? "//":"") +
-							//"        dynamic"+dynamicCount+"_p1($b);    //データ表示\n" +
-							"    }\n" +
-							//"	 else{\n" +
-							//((dynamicRowFlg)? "//":"") +
-							//"        dynamic"+dynamicCount+"_p1('0 results');\n" +
-							//"    }\n" +
-							"    \n" +
-							"    unset($dynamic_db"+dynamicCount+");\n" +
-	    					((dynamicRowFlg)? "}\n":"") +
-							//"function dynamic"+dynamicCount+"_p1($str){\n" +
-							//((dynamicRowFlg)? "//":"") +
-							//"    echo '<script type=\"text/javascript\">window.parent.Dynamic"+dynamicCount+"_echo1(\"'.$str.'\");</script>';\n" +
-							//"}\n" +
-//							"function dynamic"+dynamicCount+"_p2($str,$num){\n" +
-//							"    echo '<script type=\"text/javascript\">window.parent.Dynamic"+dynamicCount+"_echo2(\"'.$str.'\",\"'.$num.'\");</script>';\n" +
-//							"}\n";
-	    					"$ret['result'] = $b;\n";
-	    		if(dynamicRowFlg){
-	    			php += 
-							"$ret['start'] = $start;\n" +
-							"$ret['end'] = ($end<$i)? $end:$i;\n" +
-							"$ret['all'] = $i;\n" +
-							"$ret['info'] = (($ret['start']!=$ret['end'])? ($ret['start'].\" - \") : (\"\")) .$ret['end'].\" / \".$ret['all'];\n" +
-							"$ret['currentItems'] = ceil($i/$r);\n";
-	    		}
-	    		php += 
+//							"    }\n" +
+							"    unset($dynamic_db"+dynamicCount+");\n\n";
+    		} else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+	    		php +=
+							"        $result = pg_query($dynamic_db"+dynamicCount+", $sql);\n" +
 							"\n" +
-							"header(\"Content-Type: application/json; charset=utf-8\");\n" +
-							"echo json_encode($ret);\n" +
-							"\n" +
-							"//XSS対策\n" +
-							"function checkHTMLsc($str){\n" +
-							"	return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');\n" +
-							"}\n" +
-							"?>\n";
-	    		
-//	    		statement += 
-//    						"\n" +
-//    						"<script type=\"text/javascript\">\n" +
-//    						"function Dynamic"+dynamicCount+"_echo1(str){\n" +
-//    						"  var textArea = document.getElementById(\"Dynamic"+dynamicCount+"_text0\");\n" +
-//    						"  textArea.innerHTML = str;\n" +
-//    						"}\n" +
-////    						"function Dynamic"+dynamicCount+"_echo2(str,num){\n" +
-////    						"  var textArea = document.getElementById(\"Dynamic"+dynamicCount+"_text\"+num);\n" +
-////    						//"  textArea.innerHTML += str+\"<br>\";\n" +
-////    						//"  $(\"#Dynamic"+dynamicCount+"_text\"+num).html(textArea.innerHTML+str+\"<br>\").trigger(\"create\");\n" +
-////    						"  $(\"#Dynamic"+dynamicCount+"_text\"+num).html(textArea.innerHTML+str+\"<br>\");\n" +
-////    						"}\n" +
-////    						"\n" +
-////    						"function Dynamic"+dynamicCount+"_refresh(){\n";
-////	    		
-////	    		for(int i=0; i<col_num; i++){
-////	    			statement +=
-////	    					"  document.getElementById(\"Dynamic"+dynamicCount+"_text"+(i+1)+"\").innerHTML = \"\";\n";
-////	    		}
-////	    		statement +=
-////	    					"}\n" +
-//    						"</script>\n" +
-//    						"<!-- SSQL Dynamic end -->\n";
-	    		
-	    		
-	    	}
-	    	else if(DBMS.equals("sqlite")){
-	    		Log.e("<Warning> dynamic() for 'sqlite' is not implemented yet.");
-	    		;	//TODO
-	    	}
-	    	else if(DBMS.equals("postgresql")){
-	    		Log.e("<Warning> dynamic() for 'postgresql' is not implemented yet.");
-	    		;	//TODO
-	    	}
+							"        $i = 0;\n" +
+							"        $pop_num = 0;\n" +
+							"        $b = \"\";\n" +
+							php_str1 +
+							"        while($row = pg_fetch_row($result)){\n" +
+							"              $i++;\n" +
+							((dynamicRowFlg)? "              if($i>=$start && $i<=$end){	//New\n":"") +
+							php_str2 +
+//							"              foreach($row as $key => $value) {\n" +
+//							"              		$b .=  str_replace('"+dynamicFuncCountLabel+"', '_'.$i, $value);\n" +	//For function's count
+//							"              }\n" +
+							"              for($j=0; $j<$dynamic_col_num; $j++){\n" +
+							"              		$b .= str_replace('"+dynamicFuncCountLabel+"', '_'.$i, $row[$j]);\n" +	//For function's count
+							"              }\n" +
+							php_str3 +
+							((dynamicRowFlg)? "              }\n":"") +
+							"        }\n" +
+							php_str4 +
+//							"    }\n" +
+							"    pg_close($dynamic_db"+dynamicCount+");\n\n";
+    		}
+    		php +=
+    					((dynamicRowFlg)? "}\n":"") +
+    					"$ret['result'] = $b;\n";
+    		if(dynamicRowFlg){
+    			php += 
+						"$ret['start'] = $start;\n" +
+						"$ret['end'] = ($end<$i)? $end:$i;\n" +
+						"$ret['all'] = $i;\n" +
+						"$ret['info'] = (($ret['start']!=$ret['end'])? ($ret['start'].\" - \") : (\"\")) .$ret['end'].\" / \".$ret['all'];\n" +
+						"$ret['currentItems'] = ceil($i/$r);\n";
+    		}
+    		php += 
+						"\n" +
+						"header(\"Content-Type: application/json; charset=utf-8\");\n" +
+						"echo json_encode($ret);\n" +
+						"\n" +
+						"//XSS対策\n" +
+						"function checkHTMLsc($str){\n" +
+						"	return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');\n" +
+						"}\n" +
+						"?>\n";
+	    	//End of php
 
 	    	
 	    	// 各引数毎に処理した結果をHTMLに書きこむ
@@ -1656,7 +1556,6 @@ public class Mobile_HTML5 {
 	    	
 	    	if(!dynamicRowFlg){
 	    		createFile(html_env, dynamicPHPfileName, php);//PHPファイルの作成
-//    			Mobile_HTML5Env.PHP += php;
 	    		dynamicCount++;
     		}else{
 				createFile(html_env, dynamicPHPfileName, php);//PHPファイルの作成
@@ -1673,14 +1572,34 @@ public class Mobile_HTML5 {
         }
 		return false;
 	}
-	private static String getDynamicHTML(int num, String phpFileName){
+	
+	//getOrderByString
+	private static String getOrderByString(int DynamicCount) {
+		String s = "";
+		Asc_Desc ad = new Asc_Desc();
+		//System.out.println(dynamicCount-1);
+		ad.asc_desc = ad.asc_desc_Array.get(dynamicCount-1);
+		ad.sorting();
+		
+		Iterator<AscDesc> it = Asc_Desc.asc_desc.iterator();
+		while (it.hasNext()) {
+			AscDesc data = it.next();
+			s += data.getAscDesc()+", ";
+			//Log.info(data.getNo() + " : " + data.getAscDesc());
+		}
+        if(!s.isEmpty() && s.contains(","))	s = s.substring(0, s.lastIndexOf(","));
+		//System.out.println("s="+s);
+		return s;
+	}
+	
+	private static String getDynamicHTML(String tfeID, int num, String phpFileName){
 		phpFileName = new File(phpFileName).getName();
 		String s =
 				"\n" +
 				"<!-- SSQL Dynamic"+num+" start -->\n" +
 				"<!-- SSQL Dynamic"+num+" DIV start -->\n" +
 				"<div id=\"SSQL_DynamicDisplay"+num+"_Panel\" style=\"\" data-role=\"none\">\n" +
-				"<div id=\"SSQL_DynamicDisplay"+num+"\" data-role=\"none\"><!-- SSQL Dynamic Display Data"+num+" --></div>\n" +
+				"<div id=\"SSQL_DynamicDisplay"+num+"\" class=\""+tfeID+"\" data-role=\"none\"><!-- SSQL Dynamic Display Data"+num+" --></div>\n" +
 				"</div>\n" +
 				"<!-- SSQL Dynamic"+num+" DIV end -->\n" +
 				"\n" +
@@ -1718,14 +1637,13 @@ public class Mobile_HTML5 {
 				"<!-- SSQL Dynamic"+num+" end -->\n\n";
 		return s;
 	}
-	private static String getDynamicPagingHTML(int row, int num, String phpFileName){
+	private static String getDynamicPagingHTML(String tfeID, int row, int num, String phpFileName){
 		phpFileName = new File(phpFileName).getName();
 		String s =
 				"\n" +
 				"<!-- SSQL DynamicPaging"+num+" start -->\n" +
 				"<!-- SSQL DynamicPaging"+num+" DIV start -->\n" +
-				//"<div id=\"SSQL_DynamicDisplayPaging"+num+"_Buttons\"></div>\n" +
-				"<div id=\"SSQL_DynamicDisplayPaging"+num+"\" data-role=\"none\"><!-- SSQL Dynamic Display Data"+num+" --></div>\n" +
+				"<div id=\"SSQL_DynamicDisplayPaging"+num+"\" class=\""+tfeID+"\" data-role=\"none\"><!-- SSQL Dynamic Display Data"+num+" --></div>\n" +
 				"<div id=\"SSQL_DynamicDisplayPaging"+num+"_Buttons\"></div>\n" +
 				"<!-- SSQL DynamicPaging"+num+" DIV end -->\n" +
 				"\n" +
@@ -1736,8 +1654,6 @@ public class Mobile_HTML5 {
 				"\n" +
 				"var SSQL_DynamicDisplayPaging"+num+"_currentItems = 1;		//グローバル変数\n" +
 				"function SSQL_DynamicDisplayPaging"+num+"_echo(str){\n" +
-				//"  var textArea = document.getElementById(\"SSQL_DynamicDisplayPaging"+num+"\");\n" +
-				//"  textArea.innerHTML = str;\n" +
 				"  $(\"#SSQL_DynamicDisplayPaging"+num+"\").html(str).trigger(\"create\");\n" +
 				"}\n";
 		if(ajax_loadInterval>0){

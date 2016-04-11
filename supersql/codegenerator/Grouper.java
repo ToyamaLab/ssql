@@ -5,7 +5,7 @@ import supersql.extendclass.ExtList;
 
 public class Grouper extends Operator {
 
-    public TFE tfe; // °ú¿ôTFE
+    public TFE tfe; // å¼•æ•°TFE
 
     public Grouper() {
     	super();

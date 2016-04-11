@@ -66,7 +66,7 @@ public void doPost(HttpServletRequest req,
             break;
 
 		//changed by goto 20130412
-		if(line!=null && line.contains("/*"))
+    	while(line!=null && line.contains("/*"))
         {
           	int s = line.indexOf("/*");
           	String line1 = line.substring(0,s);

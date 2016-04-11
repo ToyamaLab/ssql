@@ -4,6 +4,7 @@
  */
 package supersql.parser;
 
+import supersql.codegenerator.Asc_Desc;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
 
@@ -73,14 +74,25 @@ public class Preprocessor {
     	StringBuffer order_by_string = new StringBuffer();
 
     	TFEtokenizer st = new TFEtokenizer(tmp.toString());
+    	
+    	Asc_Desc ascDesc = new Asc_Desc();
+//    	ascDesc.preProcess();
 
     	while (st.hasMoreTokens()) {
 
     		token = st.nextToken();
+    		
+    		
+    		if(token.equals("dynamic")){
+    			ascDesc.add_asc_desc_Array();
+    			ascDesc.dynamicCount++;
+    			
+    			//TODO (asc)@{static}! (asc)@{dynamic}! 
+    		}
 
     		/* 3. convert if there exist "order by" */
     		if (order_flag) {
-
+    			ascDesc.addOrderBy(order, token);
     			/* decoration exists originally */
     			if (st.lookToken().equals("@")) {
     					token = token + st.nextToken();

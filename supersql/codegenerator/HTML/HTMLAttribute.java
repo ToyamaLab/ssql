@@ -21,7 +21,7 @@ public class HTMLAttribute extends Attribute {
 	private HTMLEnv htmlEnv2;
 	private int whichForm;
 
-	// ���󥹥ȥ饯��
+	// 鐃緒申鐃藷ストラク鐃緒申
 	public HTMLAttribute(Manager manager, HTMLEnv henv, HTMLEnv henv2) {
 		super();
 		this.htmlEnv = henv;
@@ -394,7 +394,7 @@ public class HTMLAttribute extends Attribute {
 		return ret;
 	}
 
-	// Attribute��work�᥽�å�
+	// Attribute鐃緒申work鐃潤ソ鐃獣ワ申
 	@Override
 	public String work(ExtList data_info) {
 		/*
@@ -415,7 +415,7 @@ public class HTMLAttribute extends Attribute {
 				// tk
 				// start/////////////////////////////////////////////////////////
 				if (htmlEnv.writtenClassId.contains(HTMLEnv.getClassID(this))) {
-					// class���äƤ���Ȥ�ex.TFE10000)�Τ߻���
+					// class鐃緒申鐃獣てわ申鐃緒申箸鐃x.TFE10000)�Τ߻���
 					htmlEnv.code.append(" " + HTMLEnv.getClassID(this));
 				}
 				if (decos.containsKey("class")) {

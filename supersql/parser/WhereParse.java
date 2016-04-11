@@ -30,7 +30,7 @@ public class WhereParse {
 			String ch = st.nextToken();
 			StringTokenizer st1 = new StringTokenizer(ch, ".");
 			if (st1.countTokens() == 2) {
-				//Â°À­¤¬Íè¤¿
+				//å±æ€§ãŒæ¥ãŸ
 				//		Log.out("[parseString] ch : "+ch);
 				useatts.add(new String(ch));
 				String tbl = new String(st1.nextToken());

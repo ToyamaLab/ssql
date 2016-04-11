@@ -4,10 +4,7 @@ import java.io.File;
 
 import supersql.codegenerator.Attribute;
 import supersql.codegenerator.Connector;
-import supersql.codegenerator.DecorateList;
-import supersql.codegenerator.ITFE;
 import supersql.codegenerator.Manager;
-import supersql.codegenerator.TFE;
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
 import supersql.extendclass.ExtList;
@@ -32,6 +29,9 @@ public class Mobile_HTML5Attribute extends Attribute {
 	static String alias;	//add oka
 
 	int colum_num;			//add oka
+	
+    public static String attributeDivWidth = "", attributeDivWidth2 = "";
+    public static boolean attributeHasWidth = false;
 
 	//���󥹥ȥ饯��
 	public Mobile_HTML5Attribute(Manager manager, Mobile_HTML5Env henv, Mobile_HTML5Env henv2) {
@@ -61,7 +61,21 @@ public class Mobile_HTML5Attribute extends Attribute {
 		
 		html_env.code = Embed.preProcess(html_env.code, decos);	//goto 20130915-2  "<$  $>"
 		
-		html_env.append_css_def_td(Mobile_HTML5Env.getClassID(this), this.decos);
+		//TODO
+        if(!this.decos.containsKey("width") && (!attributeDivWidth.equals("") || !attributeDivWidth2.equals(""))){
+        	//attributeDivWidth, attributeDivWidth2
+        	if(!attributeDivWidth2.equals("") && !attributeHasWidth){
+        		html_env.css.append(attributeDivWidth2);
+        	}else if(!attributeDivWidth.equals("")){
+        		this.decos.put("width", attributeDivWidth);
+        	}
+        	attributeDivWidth2 = "";
+        }
+		attributeDivWidth = "";
+		String classid = Mobile_HTML5Env.getClassID(this);
+		if(this.decos.containsKey("width"))	attributeHasWidth = true;
+		else								attributeHasWidth = false;
+		html_env.append_css_def_td(classid, this.decos);
 
 		if(GlobalEnv.isOpt()){
 			work_opt(data_info);
@@ -73,24 +87,18 @@ public class Mobile_HTML5Attribute extends Attribute {
 				Mobile_HTML5.preProcess("Mobile_HTML5Attribute", decos, html_env);	//Pre-process (前処理)	//TODO この位置でOK?
 				
 				//20130309
-				//html_env.code.append("	");
-				//x html_env.code.append("	<div claSS=\"ui-grid-a\"><div claSS=\"ui-block-a\">");
 				//20130309
 				//20130314 table
-//				Log.info("Before table!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	decos="+decos
-//						+"	"+HTMLC1.tableFlg+" "+HTMLC2.tableFlg+" "+HTMLG1.tableFlg);
 				//20130409
 				if((Mobile_HTML5C1.tableFlg||Mobile_HTML5C1.table0Flg||Mobile_HTML5G1.tableFlg||Mobile_HTML5G1.table0Flg||
 						Mobile_HTML5C2.tableFlg||Mobile_HTML5C2.table0Flg||Mobile_HTML5G2.tableFlg||Mobile_HTML5G2.table0Flg||
 						decos.containsKey("table") || decos.containsKey("table0"))
 						&& (!Mobile_HTML5C1.divFlg&&!Mobile_HTML5C2.divFlg&&!Mobile_HTML5G1.divFlg&&!Mobile_HTML5G2.divFlg)){
-					//Log.info("table!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 					html_env.code.append("<table width=\"100%\"" + html_env.getOutlineModeAtt() + " ");
 					html_env.code.append("class=\"att");
-					//tk start/////////////////////////////////////////////////////////
-					if(html_env.written_classid.contains(Mobile_HTML5Env.getClassID(this))){
+					if(html_env.written_classid.contains(classid)){
 						//classを持っているとき(ex.TFE10000)のみ指定 
-						html_env.code.append(" " + Mobile_HTML5Env.getClassID(this));
+						html_env.code.append(" " + classid);
 					}
 					if(decos.containsKey("class")){ 
 						//classを持っているとき(ex.TFE10000)のみ指定 
@@ -233,7 +241,7 @@ public class Mobile_HTML5Attribute extends Attribute {
 			}
 			
 			Mobile_HTML5.whileProcess2("Mobile_HTML5Attribute", decos, html_env, null, data_info, null, null, -1);	//TODO ここでOK?
-			Mobile_HTML5.afterWhileProcess("Mobile_HTML5Attribute", decos, html_env);
+			Mobile_HTML5.afterWhileProcess("Mobile_HTML5Attribute", classid, decos, html_env);
 			
 			
 			if (html_env.link_flag > 0 || html_env.sinvoke_flag) {
@@ -277,34 +285,33 @@ public class Mobile_HTML5Attribute extends Attribute {
 			}
 
 
-			Mobile_HTML5.postProcess("Mobile_HTML5Attribute", decos, html_env);	//Post-process (後処理)
+			Mobile_HTML5.postProcess("Mobile_HTML5Attribute", classid, decos, html_env);	//Post-process (後処理)
 			
-			
-			Log.out("TFEId = " + Mobile_HTML5Env.getClassID(this));
-			//html_env.append_css_def_td(HTMLEnv.getClassID(this), this.decos);
+			Log.out("TFEId = " + classid);
 		}
 		return null;
 	}
 
 	//optimizer
 	public void work_opt(ExtList data_info){
+		String classid = Mobile_HTML5Env.getClassID(this);
 		StringBuffer string_tmp = new StringBuffer();
 		string_tmp.append("<VALUE");
-		if(html_env.written_classid.contains(Mobile_HTML5Env.getClassID(this))){
+		if(html_env.written_classid.contains(classid)){
 			//class���äƤ���Ȥ�(ex.TFE10000)�Τ߻��� 
 			string_tmp.append(" class=\"");
-			string_tmp.append(Mobile_HTML5Env.getClassID(this));
+			string_tmp.append(classid);
 		}
 
 		if(decos.containsKey("class")){ 
 			//class����(ex.class=menu)������Ȥ�
-			if(!html_env.written_classid.contains(Mobile_HTML5Env.getClassID(this))){
+			if(!html_env.written_classid.contains(classid)){
 				string_tmp.append(" class=\"");
 			}else{
 				string_tmp.append(" ");
 			}
 			string_tmp.append(decos.getStr("class") + "\"");
-		}else if(html_env.written_classid.contains(Mobile_HTML5Env.getClassID(this))){ 
+		}else if(html_env.written_classid.contains(classid)){ 
 			string_tmp.append("\"");
 		}
 

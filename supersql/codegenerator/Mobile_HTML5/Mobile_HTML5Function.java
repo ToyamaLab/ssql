@@ -18,9 +18,11 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 
+import com.ibm.db2.jcc.am.s;
 
 import supersql.codegenerator.CodeGenerator;
 import supersql.codegenerator.DecorateList;
@@ -523,7 +525,6 @@ public class Mobile_HTML5Function extends Function {
         			html_env.code.append("<ul id=\"Gallery\" class=\"gallery\">\n");
         			slideshowFlg=true;
         		}else
-        			//html_env.code.delete(html_env.code.lastIndexOf("</TD>"),html_env.code.length());
         			html_env.code.delete(html_env.code.lastIndexOf("</ul>"),html_env.code.length());
         		
         		slideshowNum++;
@@ -1235,6 +1236,7 @@ public class Mobile_HTML5Function extends Function {
     	String search_aFlg = "\"";		//Flg
     	String search_mailFlg = "\"";		//Flg
     	String search_popFlg = "\"";	//Flg
+    	String search_pop_imgFlg = "\"";	//Flg
     	int a_pop_count = 0;
     	for(int i=0; i<col_num; i++){
     		a = s_array[i].replaceAll(" ","");
@@ -1242,56 +1244,58 @@ public class Mobile_HTML5Function extends Function {
     		if(a.startsWith("a(") || a.startsWith("anchor(")){
     			search_aFlg += "true\""+((i<col_num-1)?(",\""):(""));
     			if(a.endsWith(")")){
-//    				search_col += s_array[i] +((i<col_num-1)?(","):(""));
-//    	    		search_col_array += s_array[i] +"\""+((i<col_num-1)?(",\""):(""));
-//    	    		search_aFlg += "false\""+((i<col_num-1)?(",\""):(""));
-//    	    		search_popFlg += "false\""+((i<col_num-1)?(",\""):(""));
     				search_col += s_array[i]+",";
     				search_col_array += s_array[i]+"\",\"";
     				search_aFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     				search_mailFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     				search_popFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
+    				search_pop_imgFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     			}else	a_pop_count++;
     		}else
     			search_aFlg += "false\""+((i<col_num-1)?(",\""):(""));
     		if(a.startsWith("mail(")){
     			search_mailFlg += "true\""+((i<col_num-1)?(",\""):(""));
     			if(a.endsWith(")")){
-//    				search_col += s_array[i] +((i<col_num-1)?(","):(""));
-//    	    		search_col_array += s_array[i] +"\""+((i<col_num-1)?(",\""):(""));
-//    	    		search_aFlg += "false\""+((i<col_num-1)?(",\""):(""));
-//    	    		search_popFlg += "false\""+((i<col_num-1)?(",\""):(""));
     	    		search_col += s_array[i]+",";
     				search_col_array += s_array[i]+"\",\"";
     				search_aFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     				search_mailFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     				search_popFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
+    				search_pop_imgFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     			}else	a_pop_count++;
     		}else
     			search_mailFlg += "false\""+((i<col_num-1)?(",\""):(""));
     		if(a.startsWith("pop(") || a.startsWith("popup(")){
     			search_popFlg += "true\""+((i<col_num-1)?(",\""):(""));
     			if(a.endsWith(")")){
-//    				search_col += s_array[i] +((i<col_num-1)?(","):(""));
-//    	    		search_col_array += s_array[i] +"\""+((i<col_num-1)?(",\""):(""));
-//    	    		search_aFlg += "false\""+((i<col_num-1)?(",\""):(""));
-//    	    		search_popFlg += "false\""+((i<col_num-1)?(",\""):(""));
     				search_col += s_array[i]+",";
     				search_col_array += s_array[i]+"\",\"";
     				search_aFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     				search_mailFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     				search_popFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
+    				search_pop_imgFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     			}else	a_pop_count++;
     		}else
     			search_popFlg += "false\""+((i<col_num-1)?(",\""):(""));
+    		if(a.startsWith("popup_image(")){
+    			search_pop_imgFlg += "true\""+((i<col_num-1)?(",\""):(""));
+				if(a.endsWith(")")){
+					search_col += s_array[i]+",";
+					search_col_array += s_array[i]+"\",\"";
+					search_aFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
+					search_mailFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
+					search_popFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
+					search_pop_imgFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
+				}else	a_pop_count++;
+    		}else
+    			search_pop_imgFlg += "false\""+((i<col_num-1)?(",\""):(""));
+    		
     		search_col += s_array[i] +((i<col_num-1)?(","):(""));
     		search_col_array += s_array[i] +"\""+((i<col_num-1)?(",\""):(""));
     	}
     	col_num -= a_pop_count;
-//    	search_col = search_col.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("mail\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("\\)","");
-//    	search_col_array = search_col_array.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("mail\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("\\)","");
-    	search_col = search_col.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("mail\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("count\\(\\*\\)","count[*]").replaceAll("\\)","").replaceAll("count\\[\\*\\]","count(*)");
-    	search_col_array = search_col_array.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("mail\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("count\\(\\*\\)","count[*]").replaceAll("\\)","").replaceAll("count\\[\\*\\]","count(*)");
+    	search_col = search_col.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("mail\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("popup_image\\(","").replaceAll("count\\(\\*\\)","count[*]").replaceAll("\\)","").replaceAll("count\\[\\*\\]","count(*)");
+    	search_col_array = search_col_array.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("mail\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("popup_image\\(","").replaceAll("count\\(\\*\\)","count[*]").replaceAll("\\)","").replaceAll("count\\[\\*\\]","count(*)");
     	
     	//Log.i("	1:"+title+"	2:"+columns+"	col_num:"+col_num);
     	//Log.i("	search_col:"+search_col+"	search_col_array:"+search_col_array);
@@ -1301,6 +1305,13 @@ public class Mobile_HTML5Function extends Function {
     	
     	String DBMS = GlobalEnv.getdbms();										//DBMS
     	String DB = GlobalEnv.getdbname();										//DB
+    	String HOST = "", USER = "", PASSWD = "";
+    	if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+    		HOST = GlobalEnv.gethost();
+    		USER = GlobalEnv.getusername();
+    		PASSWD = GlobalEnv.getpassword();
+    	}
+
     	
     	String query = "";
     	//Log.i(after_from_string);
@@ -1341,253 +1352,296 @@ public class Mobile_HTML5Function extends Function {
     	}
     	if(query.contains(" where ")){
     		where = query.substring(query.lastIndexOf(" where ")+" where ".length());
-			where = where.replaceAll("\\'","\\\\'");		// ' -> \'
+    		where = where.replaceAll("\\'","\\\\'");		// ' -> \'
+    		if(where.contains("$session")){
+    			//if WHERE phrase contains $session(XX)
+    			where = where.replaceAll("\\$session","'\".\\$_SESSION").replaceAll("\\(","[\"").replaceAll("\\)","\"].\"'");
+    			//if it contains $_SESSION [""attribute""] or $_SESSION [" "attribute" "]
+    			where = where.replace("[\"\"","[\"").replace("\"\"]","\"]").replace("[\" \"","[\"").replace("\" \"]","\"]");
+    		}
     		query = query.substring(0,query.lastIndexOf(" where "));
     	}
     	from = query.trim();
     	//Log.i("	FROM: "+from+"\n	WHERE: "+where+"\n	GROUP: "+groupby+"\n	HAVING: "+having);
     	//Log.i("	ORDER: "+orderby+"\n	LIMIT: "+limit+"\n	Query: "+query);
     	
-    	if(!groupbyFlg){
-    		groupby = "";
-    		having = "";
-    	}
+//    	if(!groupbyFlg){
+//    		groupby = "";
+//    		having = "";
+//    	}
     	
 
     	String statement = "";
-    	//sqlite3 php
-    	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
-    		statement += 
-    				"<!-- Search start -->\n" +
-    				"<!-- Search Panel start -->\n" +
-    				"<br>\n" +
-    				//"<div id=\"SEARCH"+searchCount+"panel\" style=\"background-color:whitesmoke; width:99%; border:0.1px gray solid;\" data-role=\"none\">\n" +
-    				//"<div style=\"padding:3px 5px;border-color:darkgreen;border-width:0 0 1px 7px;border-style:solid;background:#F8F8F8; font-size:30;\" id=\"SearchTitle"+searchCount+"\">"+title+"</div>\n" +
-    				"<div id=\"SEARCH"+searchCount+"panel\" style=\"\" data-role=\"none\">\n" +
-    				"<hr>\n<div style=\"font-size:30;\" id=\"SearchTitle"+searchCount+"\">"+title+"</div>\n<hr>\n" +
-    				"<br>\n" +
-    				"<form method=\"post\" action=\"\" target=\"dummy_ifr\">\n" +
-    				//"<form method=\"post\" action=\"\" target=\"search"+searchCount+"_ifr\">\n" +
-    				"    <input type=\"search\" name=\"search_words"+searchCount+"\" placeholder=\"Search keywords\">\n" +
-    				"    <input type=\"submit\" value=\"Search&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"search"+searchCount+"\" id=\"search"+searchCount+"\" data-icon=\"search\" data-mini=\"false\" data-inline=\"false\">\n" +
-    				"</form>\n" +
-    				//"<iframe name=\"search"+searchCount+"_ifr\" style=\"display:none;\"></iframe>\n" +
-    				"\n" +
-    				"<div id=\"Search"+searchCount+"_text0\" data-role=\"none\"><!-- 件数 --></div>\n" +
-    				"\n" +
-    				"<table style=\"table-layout:fixed;\" data-role=\"table\" id=\"table-column-toggle"+searchCount+"\" data-mode=\"columntoggle\" class=\"ui-responsive table-stroke\">\n" +
-    				"  <thead>\n" +
-    				"    <tr id=\"Search"+searchCount+"_text_th\">\n";
-    		for(int i=0; i<col_num; i++){
-    			statement += 
-    					"        <th data-priority=\"1\">"+s_name_array[i]+"</th>\n";
-        	}
-//			statement += 
-//					"        <th data-priority=\"1\">名前</th>\n" +
-//    				"        <th data-priority=\"1\">県名</th>\n" +
-//    				"        <th data-priority=\"1\">個数</th>\n" +
-//    				"        <th data-priority=\"1\">年</th>\n" +
-//    				"        <th data-priority=\"1\">種類</th>\n";
+		statement += 
+				"<!-- Search start -->\n" +
+				"<!-- Search Panel start -->\n" +
+				"<br>\n" +
+				"<div id=\"SEARCH"+searchCount+"panel\" style=\"\" data-role=\"none\">\n" +
+				"<hr>\n<div style=\"font-size:30;\" id=\"SearchTitle"+searchCount+"\">"+title+"</div>\n<hr>\n" +
+				"<br>\n" +
+				"<form method=\"post\" action=\"\" target=\"dummy_ifr\">\n" +
+				"    <input type=\"search\" name=\"search_words"+searchCount+"\" placeholder=\"Search keywords\">\n" +
+				"    <input type=\"submit\" value=\"Search&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"search"+searchCount+"\" id=\"search"+searchCount+"\" data-icon=\"search\" data-mini=\"false\" data-inline=\"false\">\n" +
+				"</form>\n" +
+				"\n" +
+				"<div id=\"Search"+searchCount+"_text0\" data-role=\"none\"><!-- 件数 --></div>\n" +
+				"\n" +
+				"<table style=\"table-layout:fixed;\" data-role=\"table\" id=\"table-column-toggle"+searchCount+"\" data-mode=\"columntoggle\" class=\"ui-responsive table-stroke\">\n" +
+				"  <thead>\n" +
+				"    <tr id=\"Search"+searchCount+"_text_th\">\n";
+		for(int i=0; i<col_num; i++){
 			statement += 
-					"    </tr>\n" +
-    				"  </thead>\n" +
-    				"  <tbody>\n" +
-    				"    <tr>\n";
-			for(int i=0; i<col_num; i++){
-    			statement +=
-    					"        <td id=\"Search"+searchCount+"_text"+(i+1)+"\" style=\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\"></td>\n";
-        	}
-//			statement += 
-//					"        <td id=\"Search"+searchCount+"_text1\" style=\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\"></td>\n" +
-//    				"        <td id=\"Search"+searchCount+"_text2\" style=\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\"></td>\n" +
-//    				"        <td id=\"Search"+searchCount+"_text3\" style=\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\"></td>\n" +
-//    				"        <td id=\"Search"+searchCount+"_text4\" style=\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\"></td>\n" +
-//    				"        <td id=\"Search"+searchCount+"_text5\" style=\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\"></td>\n";
-			statement += 
-					"    </tr>\n" +
-    				"  </tbody>\n" +
-    				"</table>\n" +
-    				"\n" +
-    				"<br>\n" +
-    				"</div>\n" +
-    				"<script type=\"text/javascript\"> $('#Search"+searchCount+"_text_th').hide(); </script>\n" +
-    				"<!-- Search Panel end -->\n" +
-    				"\n";
-			
-			Mobile_HTML5Env.PHP +=
-    				"<?php\n" +
-    				"if($_POST['search"+searchCount+"'] || $_POST['search_words"+searchCount+"']){\n" +
-    				"    echo '<script type=\"text/javascript\">window.parent.Search"+searchCount+"_refresh();</script>';    //表示をリフレッシュ\n" +
-    				"\n" +
-    				"    //ユーザ定義\n" +
-//    				"    $sqlite3_DB = '/Users/goto/Desktop/SQLite_DB/sample2.db';\n" +
-//    				"    $search_col = \"w.name, pr.name, count(*), w.r_year, ko.kind\";\n" +
-//    				"    $col_num = 5;                          //カラム数(Java側で指定)\n" +
-//    				"    $table = 'world_heritage w, prefectures pr, wh_prefectures wpr, kind_of_wh ko';\n" +
-//    				"    $where0 = 'w.wh_id=wpr.wh_id and wpr.p_id=pr.p_id and w.k_id=ko.k_id';\n" +
-//    				"    $search_col_array = array(\"w.name\",\"pr.name\", \"count(*)\", \"w.r_year\", \"ko.kind\");\n" +
-//    				"    $groupby = \" pr.name \"; 	           //null => WHERE句にlikeを書く／ not null => HAVING句に～    //[要] Java側で、列名に予約語から始まるものがあるかチェック\n" +
-//    				"    $having0 = \" count(*)>1 \";\n" +
-//    				"    $orderby = \" ORDER BY w.name asc \";\n" +
-//    				"    $limit = \" LIMIT 10 \";\n" +
-//    				"\n" +
-    				"    $sqlite3_DB = '"+DB+"';\n" +
-    				"    $search_col = \""+search_col+"\";\n" +
-    				"    $col_num = "+col_num+";                          //カラム数(Java側で指定)\n" +
-    				"    $table = '"+from+"';\n" +
-    				"    $where0 = '"+where+"';\n" +
-    				"    $search_col_array = array("+search_col_array+");\n" +
-    				"    $search_col_num = count($search_col_array);\n" +
-    				"    $search_a_Flg = array("+search_aFlg+");\n" +
-    				"    $search_mail_Flg = array("+search_mailFlg+");\n" +
-    				"    $search_pop_Flg = array("+search_popFlg+");\n" +
-    				"    $groupby = \""+groupby+"\"; 	           //null => WHERE句にlikeを書く／ not null => HAVING句に～    //[要] Java側で、列名に予約語から始まるものがあるかチェック\n" +
-    				"    $having0 = \""+having+"\";\n" +
-//    				"    $orderby = \" ORDER BY "+orderby+" \";\n" +
-    				"    $orderby = \""+((orderby!="")?(" ORDER BY "+orderby+" "):("")) +"\";\n" +
-//    				"    $limit = \" LIMIT "+limit+" \";\n" +
-    				"    $limit = \""+((limit!="")?(" LIMIT "+limit+" "):("")) +"\";\n" +
-    				"\n" +
-    				"    $searchWord"+searchCount+" = checkHTMLsc($_POST['search_words"+searchCount+"']);\n" +
-    				"    $searchWord"+searchCount+" = preg_replace('/　/', ' ', $searchWord"+searchCount+");       //全角スペースを半角スペースへ\n" +
-    				"    $searchWord"+searchCount+" = preg_replace('/\\s+/', ' ', $searchWord"+searchCount+");      //連続する半角スペースを1つの半角スペースへ\n" +
-    				"    $searchWord"+searchCount+" = trim($searchWord"+searchCount+");                            //trim\n" +
-    				"    $searchWord"+searchCount+" = preg_replace('/\\s/', '%', $searchWord"+searchCount+");       //半角スペースを%へ変換\n" +
-    				"\n" +
-    				"    if($searchWord"+searchCount+" != \"\"){\n" +
-    				"        $db"+searchCount+" = new SQLite3($sqlite3_DB);\n" +
-    				//"        $sql = \"SELECT DISTINCT \".$search_col.\" FROM \".$table;\n" +
-    				"        $sql = \"SELECT \".$search_col.\" FROM \".$table;\n" +
-    				"        if($where0 != \"\")    $sql .= \" WHERE \".$where0.\" \";\n" +
-    				"    \n" +
-    				"    	//左辺の作成（※Java側でOK?)\n" +
-    				"        $sw = $searchWord"+searchCount+";\n" +
-    				"        $sw_buf = \"\";\n" +
-    				"        $l_str = \"\";\n" +
-    				"        foreach($search_col_array as $val)    $l_str .= \"ifnull(\".$val.\",'')||\";\n" +
-    				"        $l_str = substr($l_str, 0, -2);      //substring   最後の||をカット\n" +
-    				"        $l_str .= \" LIKE '%\";\n" +
-    				"        //右辺の作成\n" +
-    				"        while(strpos($sw,'%')){		//%を含んでいる間\n" +
-    				"            $pos = strpos($sw,'%');          //indxOf  		%が最初に現れる位置\n" +
-    				"            $rest = substr($sw, 0, $pos);    //substring    最初の%以降をカット\n" +
-    				"            $sw = substr($sw, $pos+1);       //substring    最初の%までカット\n" +
-    				"            $sw_buf .= $l_str.$rest.\"%' AND \";\n" +
-    				"        }\n" +
-    				"        $sw_buf .= $l_str.$sw.\"%' \";         //最後のswを結合\n" +
-    				"        \n" +
-    				"        if($groupby == \"\"){    //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
-    				"            /*** WHERE句の作成 start ***/\n" +
-    				"            //WHERE  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
-    				"            //   AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
-    				"            \n" +
-    				"            $WHERE = \"\";\n" +
-    				"            if($where0 == \"\")   $WHERE = \" WHERE \";\n" +
-    				"            else                $WHERE = \" AND \";\n" +
-    				"            $WHERE .= $sw_buf;\n" +
-    				"            \n" +
-    				"            $sql .= \" \".$WHERE.\" \";\n" +
-    				"            //$sql .= $WHERE.\" \".$groupby.\" \";\n" +
-    				"            /*** WHERE句の作成 end ***/\n" +
-    				"        }else{                        //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
-    				"            /*** HAVING句の作成 start ***/\n" +
-    				"            //HAVING  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
-    				"            //    AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
-    				"            \n" +
-    				"            $HAVING = \"\";\n" +
-    				"            if($having0 == \"\")  $HAVING = \" HAVING \";\n" +
-    				"            else	            $HAVING = \" HAVING \".$having0.\" AND \";\n" +
-    				"    		$HAVING .= $sw_buf;\n" +
-    				"            \n" +
-    				"            $sql .= \" GROUP BY \".$groupby.\" \".$HAVING;\n" +
-    				"            /*** HAVING句の作成 end ***/\n" +
-    				"        }\n" +
-    				"        $sql .= \" \".$orderby.\" \".$limit;	//order by句とlimitを結合\n" +
-    				"        search"+searchCount+"_p1('<font color=red>SQL error: '.$sql.\";</font>\");	//エラー時\n" +
-    				"\n" +
-    				"        $result = $db"+searchCount+"->query($sql);\n" +
-    				"\n" +
-    				"        $i = 0;\n" +
-    				"        $pop_num = 0;\n" +
-    				"        while($row = $result->fetchArray()){\n" +
-    				"              $i++;\n" +
-    				"              $k=0;\n" +
-    				"              for($j=0; $j<$search_col_num; $j++){\n" +
-    				//"                    search"+searchCount+"_p2($row[$j], $j+1);     //tdに結果を埋め込む\n" +
-    				"					if($search_a_Flg[$j]=='true' || $search_mail_Flg[$j]=='true' || $search_pop_Flg[$j]=='true')	;\n" +
-    				"                    else if($j>0 && $search_a_Flg[$j-1]=='true')	search"+searchCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
-    				"                    else if($j>0 && $search_mail_Flg[$j-1]=='true')	search"+searchCount+"_p2('<a href=\\\"mailto:'.$row[$j].'\\\" target=\\\"_self\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     				//tdに結果を埋め込む\n" +
-    				"                    //else if($j>0 && $search_pop_Flg[$j-1]=='true')	search"+searchCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
-    				"                    else if($j>0 && $search_pop_Flg[$j-1]=='true' && !is_null($row[$j])){\n" +
-    				"                    	$pop_str = '<a href=\\\"#search_popup1_'.(++$pop_num).'\\\" data-rel=\\\"popup\\\" data-icon=\\\"arrow-r\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>'\n" +
-    				"							.'<div data-role=\\\"popup\\\" id=\\\"search_popup1_'.($pop_num).'\\\" data-transition=\\\"slideup\\\" style=\\\"width:95%;\\\" data-overlay-theme=\\\"a\\\">'\n" +
-    				"								.'<a href=\\\"#\\\" data-rel=\\\"back\\\" data-role=\\\"button\\\" data-theme=\\\"a\\\" data-icon=\\\"delete\\\" data-iconpos=\\\"notext\\\" class=\\\"ui-btn-right\\\">Close</a>'\n" +
-    				"								.'<h2>'.$row[$j-1].'</h2>'\n" +
-    				"								.'<p>'.$row[$j].'</p>'\n" +
-    				"							.'</div>';\n" +
-    				"                    	search"+searchCount+"_p2($pop_str, ++$k);     	//tdに結果を埋め込む\n" +
-    				"                    }else									search"+searchCount+"_p2($row[$j], ++$k);     //tdに結果を埋め込む\n" +
-    				"              }\n" +
-    				"        }\n" +
-    				"		 if($i>0)	echo \"<script type=\\\"text/javascript\\\">window.parent.$('#Search"+searchCount+"_text_th').show();</script>\";    //カラム名を表示\n" +
-    				"        search"+searchCount+"_p1($i.' result'.(($i != 1)?('s'):('')));    //件数表示\n" +
-    				"    }else{\n" +
-    				"        search"+searchCount+"_p1('0 results');\n" +
-    				"    }\n" +
-    				"    \n" +
-    				"    unset($db"+searchCount+");\n" +
-    				"}\n" +
-    				"function search"+searchCount+"_p1($str){\n" +
-    				"    echo '<script type=\"text/javascript\">window.parent.Search"+searchCount+"_echo1(\"'.$str.'\");</script>';\n" +
-    				"}\n" +
-    				"function search"+searchCount+"_p2($str,$num){\n" +
-    				"    echo '<script type=\"text/javascript\">window.parent.Search"+searchCount+"_echo2(\"'.$str.'\",\"'.$num.'\");</script>';\n" +
-    				"}\n" +
-    				"?>\n";
-    				
-			statement += 
-    				"\n" +
-    				"<script type=\"text/javascript\">\n" +
-    				"function Search"+searchCount+"_echo1(str){\n" +
-    				"  var textArea = document.getElementById(\"Search"+searchCount+"_text0\");\n" +
-    				"  textArea.innerHTML = str;\n" +
-    				"}\n" +
-    				"function Search"+searchCount+"_echo2(str,num){\n" +
-    				"  var textArea = document.getElementById(\"Search"+searchCount+"_text\"+num);\n" +
-    				//"  textArea.innerHTML += str+\"<br>\";\n" +
-    				"  $(\"#Search"+searchCount+"_text\"+num).html(textArea.innerHTML+str+\"<br>\").trigger(\"create\");\n" +
-    				"}\n" +
-    				"\n" +
-    				"function Search"+searchCount+"_refresh(){\n";
-
-    		for(int i=0; i<col_num; i++){
-    			statement +=
-    					"  document.getElementById(\"Search"+searchCount+"_text"+(i+1)+"\").innerHTML = \"\";\n";
-    				
-    		}
-//    		"  document.getElementById(\"Search"+searchCount+"_text1\").innerHTML = \"\";\n" +
-//			"  document.getElementById(\"Search"+searchCount+"_text2\").innerHTML = \"\";\n" +
-//			"  document.getElementById(\"Search"+searchCount+"_text3\").innerHTML = \"\";\n" +
-//			"  document.getElementById(\"Search"+searchCount+"_text4\").innerHTML = \"\";\n" +
-//			"  document.getElementById(\"Search"+searchCount+"_text5\").innerHTML = \"\";\n";
-    		statement +=
-    				"}\n" +
-    				"</script>\n" +
-    				"<!-- Search end -->\n";
-    		
-    		
-    		
-    		
-    		
+					"        <th data-priority=\"1\">"+s_name_array[i]+"</th>\n";
     	}
-    	//else if(DBMS.equals("postgresql")){
-    	//	;
-    	//}
-    	
-    	
+		statement += 
+				"    </tr>\n" +
+				"  </thead>\n" +
+				"  <tbody>\n" +
+				"    <tr>\n";
+		for(int i=0; i<col_num; i++){
+			statement +=
+					"        <td id=\"Search"+searchCount+"_text"+(i+1)+"\" style=\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\"></td>\n";
+    	}
+		statement += 
+				"    </tr>\n" +
+				"  </tbody>\n" +
+				"</table>\n" +
+				"\n" +
+				"<br>\n" +
+				"</div>\n" +
+				"<script type=\"text/javascript\"> $('#Search"+searchCount+"_text_th').hide(); </script>\n" +
+				"<!-- Search Panel end -->\n" +
+				"\n";
+		
+		//php
+		Mobile_HTML5Env.PHP +=
+				"<?php\n" +
+				"error_reporting(E_ALL & ~E_NOTICE);\n" +
+				"if($_POST['search"+searchCount+"'] || $_POST['search_words"+searchCount+"']){\n" +
+				"    echo '<script type=\"text/javascript\">window.parent.Search"+searchCount+"_refresh();</script>';    //表示をリフレッシュ\n" +
+				"\n" +
+				"    //ユーザ定義\n" +
+				((DBMS.equals("sqlite") || DBMS.equals("sqlite3"))? ("    $sqlite3_DB = '"+DB+"';\n"):"") +
+				"    $search_col = \""+search_col+"\";\n" +
+				"    $col_num = "+col_num+";                          //カラム数(Java側で指定)\n" +
+				"    $table = '"+from+"';\n" +
+				"    $where0 = '"+where+"';\n" +
+				"    $search_col_array = array("+search_col_array+");\n" +
+				"    $search_col_num = count($search_col_array);\n" +
+				"    $search_a_Flg = array("+search_aFlg+");\n" +
+				"    $search_mail_Flg = array("+search_mailFlg+");\n" +
+				"    $search_pop_Flg = array("+search_popFlg+");\n" +
+				"    $search_pop_img_Flg = array("+search_pop_imgFlg+");\n" +
+				"    $groupby = \""+groupby+"\"; 	           //null => WHERE句にlikeを書く／ not null => HAVING句に～    //[要] Java側で、列名に予約語から始まるものがあるかチェック\n" +
+				"    $having0 = \""+having+"\";\n" +
+				"    $orderby = \""+((orderby!="")?(" ORDER BY "+orderby+" "):("")) +"\";\n" +
+				"    $limit = \""+((limit!="")?(" LIMIT "+limit+" "):("")) +"\";\n" +
+				"\n" +
+				"    $searchWord"+searchCount+" = checkHTMLsc($_POST['search_words"+searchCount+"']);\n" +
+				"    $searchWord"+searchCount+" = preg_replace('/　/', ' ', $searchWord"+searchCount+");       //全角スペースを半角スペースへ\n" +
+				"    $searchWord"+searchCount+" = preg_replace('/\\s+/', ' ', $searchWord"+searchCount+");      //連続する半角スペースを1つの半角スペースへ\n" +
+				"    $searchWord"+searchCount+" = trim($searchWord"+searchCount+");                            //trim\n" +
+				"    $searchWord"+searchCount+" = preg_replace('/\\s/', '%', $searchWord"+searchCount+");       //半角スペースを%へ変換\n" +
+				"\n" +
+				"    if($searchWord"+searchCount+" != \"\"){\n";
+		if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
+			Mobile_HTML5Env.PHP +=
+					"        $db"+searchCount+" = new SQLite3($sqlite3_DB);\n" +
+					"        $sql = \"SELECT \".$search_col.\" FROM \".$table;\n" +
+					"        if($where0 != \"\")    $sql .= \" WHERE \".$where0.\" \";\n" +
+					"    \n" +
+					"    	//左辺の作成（※Java側でOK?)\n" +
+					"        $sw = $searchWord"+searchCount+";\n" +
+					"        $sw_buf = \"\";\n" +
+					"        $l_str = \"\";\n" +
+					"        foreach($search_col_array as $val)    $l_str .= \"ifnull(\".$val.\",'')||\";\n" +
+					"        $l_str = substr($l_str, 0, -2);      //substring   最後の||をカット\n" +
+					"        $l_str .= \" LIKE '%\";\n" +
+					"        //右辺の作成\n" +
+					"        while(strpos($sw,'%')){		//%を含んでいる間\n" +
+					"            $pos = strpos($sw,'%');          //indxOf  		%が最初に現れる位置\n" +
+					"            $rest = substr($sw, 0, $pos);    //substring    最初の%以降をカット\n" +
+					"            $sw = substr($sw, $pos+1);       //substring    最初の%までカット\n" +
+					"            $sw_buf .= $l_str.$rest.\"%' AND \";\n" +
+					"        }\n" +
+					"        $sw_buf .= $l_str.$sw.\"%' \";         //最後のswを結合\n" +
+					"        \n" +
+					"        if($groupby == \"\"){    //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
+					"            /*** WHERE句の作成 start ***/\n" +
+					"            //WHERE  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
+					"            //   AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
+					"            \n" +
+					"            $WHERE = \"\";\n" +
+					"            if($where0 == \"\")   $WHERE = \" WHERE \";\n" +
+					"            else                $WHERE = \" AND \";\n" +
+					"            $WHERE .= $sw_buf;\n" +
+					"            \n" +
+					"            $sql .= \" \".$WHERE.\" \";\n" +
+					"            //$sql .= $WHERE.\" \".$groupby.\" \";\n" +
+					"            /*** WHERE句の作成 end ***/\n" +
+					"        }else{                        //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
+					"            /*** HAVING句の作成 start ***/\n" +
+					"            //HAVING  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
+					"            //    AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
+					"            \n" +
+					"            $HAVING = \"\";\n" +
+					"            if($having0 == \"\")  $HAVING = \" HAVING \";\n" +
+					"            else	            $HAVING = \" HAVING \".$having0.\" AND \";\n" +
+					"    		$HAVING .= $sw_buf;\n" +
+					"            \n" +
+					"            $sql .= \" GROUP BY \".$groupby.\" \".$HAVING;\n" +
+					"            /*** HAVING句の作成 end ***/\n" +
+					"        }\n" +
+					"        $sql .= \" \".$orderby.\" \".$limit;	//order by句とlimitを結合\n" +
+					"        search"+searchCount+"_p1('<font color=red>SQL error: '.$sql.\";</font>\");	//エラー時\n" +
+					"\n" +
+					"        $result = $db"+searchCount+"->query($sql);\n" +
+					"\n" +
+					"        $i = 0;\n" +
+					"        $pop_num = 0;\n" +
+					"        $t = date('YmdHis');\n" +
+					"        while($row = $result->fetchArray()){\n";
 
-//    	// 各引数毎に処理した結果をHTMLに書きこむ
-//    	html_env.code.append(statement);
+		} else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+			Mobile_HTML5Env.PHP +=
+					"        $db"+searchCount+" = pg_connect (\"host="+HOST+" dbname="+DB+" user="+USER+""+(!PASSWD.isEmpty()? (" password="+PASSWD):"")+"\");\n" +
+					"        $sql = \"SELECT \".$search_col.\" FROM \".$table;\n" +
+					"        if($where0 != \"\")    $sql .= \" WHERE \".$where0.\" \";\n" +
+					"    \n" +
+					"    	//左辺の作成（※Java側でOK?)\n" +
+					"        $sw = $searchWord"+searchCount+";\n" +
+					"        $sw_buf = \"\";\n" +
+					"        $l_str = \"\";\n" +
+					"        foreach($search_col_array as $val)    $l_str .= $val.\"||\";\n" +
+					"        $l_str = substr($l_str, 0, -2);      //substring   最後の||をカット\n" +
+					"        $l_str .= \" LIKE '%\";\n" +
+					"        //右辺の作成\n" +
+					"        while(strpos($sw,'%')){		//%を含んでいる間\n" +
+					"            $pos = strpos($sw,'%');          //indxOf  		%が最初に現れる位置\n" +
+					"            $rest = substr($sw, 0, $pos);    //substring    最初の%以降をカット\n" +
+					"            $sw = substr($sw, $pos+1);       //substring    最初の%までカット\n" +
+					"            $sw_buf .= $l_str.$rest.\"%' AND \";\n" +
+					"        }\n" +
+					"        $sw_buf .= $l_str.$sw.\"%' \";         //最後のswを結合\n" +
+					"        \n" +
+					"        if($groupby == \"\"){    //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
+					"            /*** WHERE句の作成 start ***/\n" +
+					"            //WHERE  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
+					"            //   AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
+					"            \n" +
+					"            $WHERE = \"\";\n" +
+					"            if($where0 == \"\")   $WHERE = \" WHERE \";\n" +
+					"            else                $WHERE = \" AND \";\n" +
+					"            $WHERE .= $sw_buf;\n" +
+					"            \n" +
+					"            $sql .= \" \".$WHERE.\" \";\n" +
+					"            //$sql .= $WHERE.\" \".$groupby.\" \";\n" +
+					"            /*** WHERE句の作成 end ***/\n" +
+					"        }else{                        //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
+					"            /*** HAVING句の作成 start ***/\n" +
+					"            //HAVING  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
+					"            //    AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
+					"            \n" +
+					"            $HAVING = \"\";\n" +
+					"            if($having0 == \"\")  $HAVING = \" HAVING \";\n" +
+					"            else	            $HAVING = \" HAVING \".$having0.\" AND \";\n" +
+					"    		$HAVING .= $sw_buf;\n" +
+					"            \n" +
+					"            $sql .= \" GROUP BY \".$groupby.\" \".$HAVING;\n" +
+					"            /*** HAVING句の作成 end ***/\n" +
+					"        }\n" +
+					"        $sql .= \" \".$orderby.\" \".$limit;	//order by句とlimitを結合\n" +
+					"        search"+searchCount+"_p1('<font color=red>SQL error: '.$sql.\";</font>\");	//エラー時\n" +
+					"\n" +
+					"        $result = pg_query($db"+searchCount+", $sql);\n" +
+					"\n" +
+					"        $i = 0;\n" +
+					"        $pop_num = 0;\n" +
+					"        $t = date('YmdHis');\n" +
+					"        while($row = pg_fetch_row($result)){\n";
+		}
+		Mobile_HTML5Env.PHP +=
+				"              $i++;\n" +
+				"              $k=0;\n" +
+				"              for($j=0; $j<$search_col_num; $j++){\n" +
+				"					if($search_a_Flg[$j]=='true' || $search_mail_Flg[$j]=='true' || $search_pop_Flg[$j]=='true' || $search_pop_img_Flg[$j]=='true')	;\n" +
+				"                    else if($j>0 && $search_a_Flg[$j-1]=='true')	search"+searchCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+				"                    else if($j>0 && $search_mail_Flg[$j-1]=='true')	search"+searchCount+"_p2('<a href=\\\"mailto:'.$row[$j].'\\\" target=\\\"_self\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     				//tdに結果を埋め込む\n" +
+				"                    //else if($j>0 && $search_pop_Flg[$j-1]=='true')	search"+searchCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+//				"                    else if($j>0 && $search_pop_Flg[$j-1]=='true' && !is_null($row[$j])){\n" +
+//				"                    	$pop_str = '<a href=\\\"#search_popup1_'.(++$pop_num).'\\\" data-rel=\\\"popup\\\" data-icon=\\\"arrow-r\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>'\n" +
+//				"							.'<div data-role=\\\"popup\\\" id=\\\"search_popup1_'.($pop_num).'\\\" data-transition=\\\"slideup\\\" style=\\\"width:95%;\\\" data-overlay-theme=\\\"a\\\">'\n" +
+//				"								.'<a href=\\\"#\\\" data-rel=\\\"back\\\" data-role=\\\"button\\\" data-theme=\\\"a\\\" data-icon=\\\"delete\\\" data-iconpos=\\\"notext\\\" class=\\\"ui-btn-right\\\">Close</a>'\n" +
+//				"								.'<h2>'.$row[$j-1].'</h2>'\n" +
+//				"								.'<p>'.$row[$j].'</p>'\n" +
+//				"							.'</div>';\n" +
+				"                    else if($j>0 && ($search_pop_Flg[$j-1]=='true' || $search_pop_img_Flg[$j-1]=='true') && !is_null($row[$j])){\n" +
+				"                    	$pop_str = '<a href=\\\"#search_popup"+searchCount+"_'.(++$pop_num).'_'.$t.'\\\" data-rel=\\\"popup\\\" data-icon=\\\"arrow-r\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\"';\n" +
+				"                    	if($search_pop_img_Flg[$j-1] == 'true'){\n" +
+				"                    		$pop_str .= ' class=\\\"ui-li-inside\\\"';\n" +
+				"                    	}\n" +
+				"                    	$pop_str .= '>'.$row[$j-1].'</a>'\n" +
+				"                    		.'<div data-role=\\\"popup\\\" id=\\\"search_popup"+searchCount+"_'.($pop_num).'_'.$t.'\\\" data-transition=\\\"';\n"+
+				"                    	if($search_pop_Flg[$j-1]=='true'){\n" +
+				"                    		$pop_str .= 'slideup';\n"+
+				"                    	}else{\n" +
+				"                    		$pop_str .= 'pop';\n"+
+				"                    	}\n" +
+				"                    	$pop_str .= '\\\" style=\\\"width:95%;\\\" data-overlay-theme=\\\"a\\\">'\n" +
+				"                    		.'<a href=\\\"#\\\" data-rel=\\\"back\\\" data-role=\\\"button\\\" data-theme=\\\"a\\\" data-icon=\\\"delete\\\" data-iconpos=\\\"notext\\\" class=\\\"ui-btn-right\\\">Close</a>'\n" +
+				"                    		.'<h2>'.$row[$j-1].'</h2>';\n" +
+				"                    	if($search_pop_Flg[$j-1]=='true'){\n" +
+				"                    		$pop_str .= '<p>'.$row[$j].'</p>';\n" +
+				"                    	}else{\n" +
+				"                    		$pop_str .= '<img src=\\\"'.$row[$j].'\\\">';\n" +
+				"                    	}\n" +
+				"                    	$pop_str .= '</div>';\n" +
+				"                    	search"+searchCount+"_p2($pop_str, ++$k);     	//tdに結果を埋め込む\n" +
+				"                    }else									search"+searchCount+"_p2($row[$j], ++$k);     //tdに結果を埋め込む\n" +
+				"              }\n" +
+				"        }\n" +
+				"		 if($i>0)	echo \"<script type=\\\"text/javascript\\\">window.parent.$('#Search"+searchCount+"_text_th').show();</script>\";    //カラム名を表示\n" +
+				"        search"+searchCount+"_p1($i.' result'.(($i != 1)?('s'):('')));    //件数表示\n" +
+				"    }else{\n" +
+				"        search"+searchCount+"_p1('0 results');\n" +
+				"    }\n" +
+				((DBMS.equals("sqlite") || DBMS.equals("sqlite3"))?      ("    unset($db"+searchCount+");\n"):"") +
+				((DBMS.equals("postgresql") || DBMS.equals("postgres"))? ("    pg_close($db"+searchCount+");\n"):"") +
+				"}\n\n" +
+				"function search"+searchCount+"_p1($str){\n" +
+				"    echo '<script type=\"text/javascript\">window.parent.Search"+searchCount+"_echo1(\"'.$str.'\");</script>';\n" +
+				"}\n" +
+				"function search"+searchCount+"_p2($str,$num){\n" +
+				"    echo '<script type=\"text/javascript\">window.parent.Search"+searchCount+"_echo2(\"'.$str.'\",\"'.$num.'\");</script>';\n" +
+				"}\n" +
+				"?>\n";
+		//End of php
+		
+		statement += 
+				"\n" +
+				"<script type=\"text/javascript\">\n" +
+				"function Search"+searchCount+"_echo1(str){\n" +
+				"  var textArea = document.getElementById(\"Search"+searchCount+"_text0\");\n" +
+				"  textArea.innerHTML = str;\n" +
+				"}\n" +
+				"function Search"+searchCount+"_echo2(str,num){\n" +
+				"  var textArea = document.getElementById(\"Search"+searchCount+"_text\"+num);\n" +
+				//"  textArea.innerHTML += str+\"<br>\";\n" +
+				"  $(\"#Search"+searchCount+"_text\"+num).html(textArea.innerHTML+str+\"<br>\").trigger(\"create\");\n" +
+				"}\n" +
+				"\n" +
+				"function Search"+searchCount+"_refresh(){\n";
+
+		for(int i=0; i<col_num; i++){
+			statement +=
+					"  document.getElementById(\"Search"+searchCount+"_text"+(i+1)+"\").innerHTML = \"\";\n";
+				
+		}
+		statement +=
+				"}\n" +
+				"</script>\n" +
+				"<!-- Search end -->\n";
+
     	
     	searchCount++;
     	return statement;
@@ -1726,6 +1780,12 @@ public class Mobile_HTML5Function extends Function {
     	
     	String DBMS = GlobalEnv.getdbms();										//DBMS
     	String DB = GlobalEnv.getdbname();										//DB
+    	String HOST = "", USER = "", PASSWD = "";
+    	if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+    		HOST = GlobalEnv.gethost();
+    		USER = GlobalEnv.getusername();
+    		PASSWD = GlobalEnv.getpassword();
+    	}
     	
     	String query = "";
     	//Log.i(after_from_string);
@@ -1768,226 +1828,354 @@ public class Mobile_HTML5Function extends Function {
     	if(query.contains(" where ")){
     		where = query.substring(query.lastIndexOf(" where ")+" where ".length());
     		where = where.replaceAll("\\'","\\\\'");		// ' -> \'
+    		if(where.contains("$session")){
+    			//if WHERE phrase contains $session(XX)
+    			where = where.replaceAll("\\$session","'\".\\$_SESSION").replaceAll("\\(","[\"").replaceAll("\\)","\"].\"'");
+    			//if it contains $_SESSION [""attribute""] or $_SESSION [" "attribute" "]
+    			where = where.replace("[\"\"","[\"").replace("\"\"]","\"]").replace("[\" \"","[\"").replace("\" \"]","\"]");
+    		}
     		query = query.substring(0,query.lastIndexOf(" where "));
     	}
     	from = query.trim();
     	//Log.i("	FROM: "+from+"\n	WHERE: "+where+"\n	GROUP: "+groupby+"\n	HAVING: "+having);
     	//Log.i("	ORDER: "+orderby+"\n	LIMIT: "+limit+"\n	Query: "+query);
     	
-    	if(!groupbyFlg){
-    		groupby = "";
-    		having = "";
-    	}
+//    	if(!groupbyFlg){
+//    		groupby = "";
+//    		having = "";
+//    	}
     	
     	
     	String statement = "";
-    	//sqlite3 php
-    	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
-    		statement += 
-    				"<!-- Select start -->\n" +
-					"<!-- Select Panel start -->\n" +
-					"<br>\n" +
-					//"<div id=\"SELECT"+selectCount+"panel\" style=\"background-color:whitesmoke; width:99%; border:0.1px gray solid;\" data-role=\"none\">\n" +
-					//"<div style=\"padding:3px 5px;border-color:slateblue;border-width:0 0 1px 7px;border-style:solid;background:#F8F8F8; font-size:30;\" id=\"SelectTitle"+selectCount+"\">"+title+"</div>\n" +
-					"<div id=\"SELECT"+selectCount+"panel\" style=\"\" data-role=\"none\">\n" +
-					"<hr>\n<div style=\"font-size:30;\" id=\"SelectTitle"+selectCount+"\">"+title+"</div>\n<hr>\n" +
-					"<br>\n" +
-//							"<form method=\"post\" action=\"\" target=\"select"+selectCount+"_ifr\">\n" +
-//							"    <input type=\"select\" name=\"select_words"+selectCount+"\" placeholder=\"Select keywords\">\n" +
-//							"    <input type=\"submit\" value=\"Select&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"select"+selectCount+"\" id=\"select"+selectCount+"\" data-icon=\"select\" data-mini=\"false\" data-inline=\"false\">\n" +
-//							"</form>\n" +
-//							"<iframe name=\"select"+selectCount+"_ifr\" style=\"display:none;\"></iframe>\n" +
+    	//php
+		statement += 
+				"<!-- Select start -->\n" +
+				"<!-- Select Panel start -->\n" +
+				"<br>\n" +
+				"<div id=\"SELECT"+selectCount+"panel\" style=\"\" data-role=\"none\">\n" +
+				"<hr>\n<div style=\"font-size:30;\" id=\"SelectTitle"+selectCount+"\">"+title+"</div>\n<hr>\n" +
+				"<br>\n" +
+				"\n" +
+				"<div id=\"Select"+selectCount+"_text0\" data-role=\"none\"><!-- 件数 --></div>\n" +
+				"\n" +
+				"<table style=\"table-layout:fixed;\" data-role=\"table\" id=\"table-column-toggle"+selectCount+"\" data-mode=\"columntoggle\" class=\"ui-responsive table-stroke\">\n" +
+				"  <thead>\n" +
+				"    <tr id=\"Select"+selectCount+"_text_th\">\n";
+		for(int i=0; i<col_num; i++){
+			statement += 
+				"        <th data-priority=\"1\">"+s_name_array[i]+"</th>\n";
+		}
+		statement += 
+				"    </tr>\n" +
+				"  </thead>\n" +
+				"  <tbody>\n" +
+				"    <tr>\n";
+		for(int i=0; i<col_num; i++){
+			statement +=
+				"        <td id=\"Select"+selectCount+"_text"+(i+1)+"\" style=\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\"></td>\n";
+		}
+		statement += 
+				"    </tr>\n" +
+						"  </tbody>\n" +
+						"</table>\n" +
+						"\n" +
+						"<br>\n" +
+						"</div>\n" +
+						"<script type=\"text/javascript\"> $('#Select"+selectCount+"_text_th').hide(); </script>\n" +
+						"<!-- Select Panel end -->\n" +
+						"\n";
+		
+		Mobile_HTML5Env.PHP +=
+				"<?php\n" +
+						"    echo '<script type=\"text/javascript\">window.parent.Select"+selectCount+"_refresh();</script>';    //表示をリフレッシュ\n" +
+						"\n" +
+						"    //ユーザ定義\n" +
+						((DBMS.equals("sqlite") || DBMS.equals("sqlite3"))? ("    $sqlite3_DB = '"+DB+"';\n"):"") +
+						"    $select_col = \""+select_col+"\";\n" +
+						"    $col_num = "+col_num+";                          //カラム数(Java側で指定)\n" +
+						"    $table = '"+from+"';\n" +
+						"    $where0 = '"+where+"';\n" +
+						"    $select_col_array = array("+select_col_array+");\n" +
+						"    $select_col_num = count($select_col_array);\n" +
+						"    $select_a_Flg = array("+select_aFlg+");\n" +
+						"    $select_mail_Flg = array("+select_mailFlg+");\n" +
+						"    $select_pop_Flg = array("+select_popFlg+");\n" +
+						"    $groupby = \""+groupby+"\"; 	           //null => WHERE句にlikeを書く／ not null => HAVING句に～    //[要] Java側で、列名に予約語から始まるものがあるかチェック\n" +
+						"    $having0 = \""+having+"\";\n" +
+						"    $orderby = \""+((orderby!="")?(" ORDER BY "+orderby+" "):("")) +"\";\n" +
+						"    $limit = \""+((limit!="")?(" LIMIT "+limit+" "):("")) +"\";\n" +
+						"\n" +
+						"    $selectWord"+selectCount+" = checkHTMLsc('%');\n" +
+						"    $selectWord"+selectCount+" = preg_replace('/　/', ' ', $selectWord"+selectCount+");       //全角スペースを半角スペースへ\n" +
+						"    $selectWord"+selectCount+" = preg_replace('/\\s+/', ' ', $selectWord"+selectCount+");      //連続する半角スペースを1つの半角スペースへ\n" +
+						"    $selectWord"+selectCount+" = trim($selectWord"+selectCount+");                            //trim\n" +
+						"    $selectWord"+selectCount+" = preg_replace('/\\s/', '%', $selectWord"+selectCount+");       //半角スペースを%へ変換\n" +
+						"\n" +
+						"    if($selectWord"+selectCount+" != \"\"){\n";
+		if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
+			Mobile_HTML5Env.PHP +=
+					"        $select_db"+selectCount+" = new SQLite3($sqlite3_DB);\n" +
+					"        $sql = \"SELECT \".$select_col.\" FROM \".$table;\n" +
+					"        if($where0 != \"\")    $sql .= \" WHERE \".$where0.\" \";\n" +
+					"    \n" +
+					"    	//左辺の作成（※Java側でOK?)\n" +
+					"        $sw = $selectWord"+selectCount+";\n" +
+					"        $sw_buf = \"\";\n" +
+					"        $l_str = \"\";\n" +
+					"        foreach($select_col_array as $val)    $l_str .= \"ifnull(\".$val.\",'')||\";\n" +
+					"        $l_str = substr($l_str, 0, -2);      //substring   最後の||をカット\n" +
+					"        $l_str .= \" LIKE '%\";\n" +
+					"        //右辺の作成\n" +
+					"        while(strpos($sw,'%')){		//%を含んでいる間\n" +
+					"            $pos = strpos($sw,'%');          //indxOf  		%が最初に現れる位置\n" +
+					"            $rest = substr($sw, 0, $pos);    //substring    最初の%以降をカット\n" +
+					"            $sw = substr($sw, $pos+1);       //substring    最初の%までカット\n" +
+					"            $sw_buf .= $l_str.$rest.\"%' AND \";\n" +
+					"        }\n" +
+					"        $sw_buf .= $l_str.$sw.\"%' \";         //最後のswを結合\n" +
+					"        \n" +
+					"        if($groupby == \"\"){    //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
+					"            /*** WHERE句の作成 start ***/\n" +
+					"            //WHERE  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
+					"            //   AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
+					"            \n" +
+					"            $WHERE = \"\";\n" +
+					"            if($where0 == \"\")   $WHERE = \" WHERE \";\n" +
+					"            else                $WHERE = \" AND \";\n" +
+					"            $WHERE .= $sw_buf;\n" +
+					"            \n" +
+					"            $sql .= \" \".$WHERE.\" \";\n" +
+					"            //$sql .= $WHERE.\" \".$groupby.\" \";\n" +
+					"            /*** WHERE句の作成 end ***/\n" +
+					"        }else{                        //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
+					"            /*** HAVING句の作成 start ***/\n" +
+					"            //HAVING  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
+					"            //    AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
+					"            \n" +
+					"            $HAVING = \"\";\n" +
+					"            if($having0 == \"\")  $HAVING = \" HAVING \";\n" +
+					"            else	            $HAVING = \" HAVING \".$having0.\" AND \";\n" +
+					"    		$HAVING .= $sw_buf;\n" +
+					"            \n" +
+					"            $sql .= \" GROUP BY \".$groupby.\" \".$HAVING;\n" +
+					"            /*** HAVING句の作成 end ***/\n" +
+					"        }\n" +
+					"        $sql .= \" \".$orderby.\" \".$limit;	//order by句とlimitを結合\n" +
+					"        select"+selectCount+"_p1('<font color=red>SQL error: '.$sql.\";</font>\");	//エラー時\n" +
 					"\n" +
-					"<div id=\"Select"+selectCount+"_text0\" data-role=\"none\"><!-- 件数 --></div>\n" +
+					"        $result = $select_db"+selectCount+"->query($sql);\n" +
 					"\n" +
-					"<table style=\"table-layout:fixed;\" data-role=\"table\" id=\"table-column-toggle"+selectCount+"\" data-mode=\"columntoggle\" class=\"ui-responsive table-stroke\">\n" +
-					"  <thead>\n" +
-					"    <tr id=\"Select"+selectCount+"_text_th\">\n";
-    		for(int i=0; i<col_num; i++){
-    			statement += 
-					"        <th data-priority=\"1\">"+s_name_array[i]+"</th>\n";
-    		}
-    		statement += 
-    				"    </tr>\n" +
-					"  </thead>\n" +
-					"  <tbody>\n" +
-					"    <tr>\n";
-    		for(int i=0; i<col_num; i++){
-    			statement +=
-					"        <td id=\"Select"+selectCount+"_text"+(i+1)+"\" style=\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\"></td>\n";
-    		}
-    		statement += 
-    				"    </tr>\n" +
-    						"  </tbody>\n" +
-    						"</table>\n" +
-    						"\n" +
-    						"<br>\n" +
-    						"</div>\n" +
-    						"<script type=\"text/javascript\"> $('#Select"+selectCount+"_text_th').hide(); </script>\n" +
-    						"<!-- Select Panel end -->\n" +
-    						"\n";
-    		
-    		Mobile_HTML5Env.PHP +=
-    				"<?php\n" +
-//    						"if($_POST['select"+selectCount+"'] || $_POST['select_words"+selectCount+"']){\n" +
-    						"    echo '<script type=\"text/javascript\">window.parent.Select"+selectCount+"_refresh();</script>';    //表示をリフレッシュ\n" +
-    						"\n" +
-    						"    //ユーザ定義\n" +
-							"    $sqlite3_DB = '"+DB+"';\n" +
-							"    $select_col = \""+select_col+"\";\n" +
-							"    $col_num = "+col_num+";                          //カラム数(Java側で指定)\n" +
-							"    $table = '"+from+"';\n" +
-							"    $where0 = '"+where+"';\n" +
-							"    $select_col_array = array("+select_col_array+");\n" +
-							"    $select_col_num = count($select_col_array);\n" +
-							"    $select_a_Flg = array("+select_aFlg+");\n" +
-							"    $select_mail_Flg = array("+select_mailFlg+");\n" +
-							"    $select_pop_Flg = array("+select_popFlg+");\n" +
-							"    $groupby = \""+groupby+"\"; 	           //null => WHERE句にlikeを書く／ not null => HAVING句に～    //[要] Java側で、列名に予約語から始まるものがあるかチェック\n" +
-							"    $having0 = \""+having+"\";\n" +
-							"    $orderby = \""+((orderby!="")?(" ORDER BY "+orderby+" "):("")) +"\";\n" +
-							"    $limit = \""+((limit!="")?(" LIMIT "+limit+" "):("")) +"\";\n" +
-							"\n" +
-							//"    $selectWord"+selectCount+" = checkHTMLsc($_POST['select_words"+selectCount+"']);\n" +
-							"    $selectWord"+selectCount+" = checkHTMLsc('%');\n" +
-							"    $selectWord"+selectCount+" = preg_replace('/　/', ' ', $selectWord"+selectCount+");       //全角スペースを半角スペースへ\n" +
-							"    $selectWord"+selectCount+" = preg_replace('/\\s+/', ' ', $selectWord"+selectCount+");      //連続する半角スペースを1つの半角スペースへ\n" +
-							"    $selectWord"+selectCount+" = trim($selectWord"+selectCount+");                            //trim\n" +
-							"    $selectWord"+selectCount+" = preg_replace('/\\s/', '%', $selectWord"+selectCount+");       //半角スペースを%へ変換\n" +
-							"\n" +
-							"    if($selectWord"+selectCount+" != \"\"){\n" +
-							"        $select_db"+selectCount+" = new SQLite3($sqlite3_DB);\n" +
-							//"        $sql = \"SELECT DISTINCT \".$select_col.\" FROM \".$table;\n" +
-							"        $sql = \"SELECT \".$select_col.\" FROM \".$table;\n" +
-							"        if($where0 != \"\")    $sql .= \" WHERE \".$where0.\" \";\n" +
-							"    \n" +
-							"    	//左辺の作成（※Java側でOK?)\n" +
-							"        $sw = $selectWord"+selectCount+";\n" +
-							"        $sw_buf = \"\";\n" +
-							"        $l_str = \"\";\n" +
-							"        foreach($select_col_array as $val)    $l_str .= \"ifnull(\".$val.\",'')||\";\n" +
-							"        $l_str = substr($l_str, 0, -2);      //substring   最後の||をカット\n" +
-							"        $l_str .= \" LIKE '%\";\n" +
-							"        //右辺の作成\n" +
-							"        while(strpos($sw,'%')){		//%を含んでいる間\n" +
-							"            $pos = strpos($sw,'%');          //indxOf  		%が最初に現れる位置\n" +
-							"            $rest = substr($sw, 0, $pos);    //substring    最初の%以降をカット\n" +
-							"            $sw = substr($sw, $pos+1);       //substring    最初の%までカット\n" +
-							"            $sw_buf .= $l_str.$rest.\"%' AND \";\n" +
-							"        }\n" +
-							"        $sw_buf .= $l_str.$sw.\"%' \";         //最後のswを結合\n" +
-							"        \n" +
-							"        if($groupby == \"\"){    //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
-							"            /*** WHERE句の作成 start ***/\n" +
-							"            //WHERE  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
-							"            //   AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
-							"            \n" +
-							"            $WHERE = \"\";\n" +
-							"            if($where0 == \"\")   $WHERE = \" WHERE \";\n" +
-							"            else                $WHERE = \" AND \";\n" +
-							"            $WHERE .= $sw_buf;\n" +
-							"            \n" +
-							"            $sql .= \" \".$WHERE.\" \";\n" +
-							"            //$sql .= $WHERE.\" \".$groupby.\" \";\n" +
-							"            /*** WHERE句の作成 end ***/\n" +
-							"        }else{                        //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
-							"            /*** HAVING句の作成 start ***/\n" +
-							"            //HAVING  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
-							"            //    AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
-							"            \n" +
-							"            $HAVING = \"\";\n" +
-							"            if($having0 == \"\")  $HAVING = \" HAVING \";\n" +
-							"            else	            $HAVING = \" HAVING \".$having0.\" AND \";\n" +
-							"    		$HAVING .= $sw_buf;\n" +
-							"            \n" +
-							"            $sql .= \" GROUP BY \".$groupby.\" \".$HAVING;\n" +
-							"            /*** HAVING句の作成 end ***/\n" +
-							"        }\n" +
-							"        $sql .= \" \".$orderby.\" \".$limit;	//order by句とlimitを結合\n" +
-							"        select"+selectCount+"_p1('<font color=red>SQL error: '.$sql.\";</font>\");	//エラー時\n" +
-							"\n" +
-							"        $result = $select_db"+selectCount+"->query($sql);\n" +
-							"\n" +
-							"        $i = 0;\n" +
-							"        $pop_num = 0;\n" +
-							"        while($row = $result->fetchArray()){\n" +
-							"              $i++;\n" +
-							"              $k=0;\n" +
-							"              for($j=0; $j<$select_col_num; $j++){\n" +
-							//"                    select"+selectCount+"_p2($row[$j], $j+1);     //tdに結果を埋め込む\n" +
-							"					if($select_a_Flg[$j]=='true' || $select_mail_Flg[$j]=='true' || $select_pop_Flg[$j]=='true')	;\n" +
-							"                    else if($j>0 && $select_a_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
-							"                    else if($j>0 && $select_mail_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"mailto:'.$row[$j].'\\\" target=\\\"_self\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
-							"                    //else if($j>0 && $select_pop_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
-							"                    else if($j>0 && $select_pop_Flg[$j-1]=='true' && !is_null($row[$j])){\n" +
-							"                    	$pop_str = '<a href=\\\"#select_popup1_'.(++$pop_num).'\\\" data-rel=\\\"popup\\\" data-icon=\\\"arrow-r\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>'\n" +
-							"							.'<div data-role=\\\"popup\\\" id=\\\"select_popup1_'.($pop_num).'\\\" data-transition=\\\"slideup\\\" style=\\\"width:95%;\\\" data-overlay-theme=\\\"a\\\">'\n" +
-							"								.'<a href=\\\"#\\\" data-rel=\\\"back\\\" data-role=\\\"button\\\" data-theme=\\\"a\\\" data-icon=\\\"delete\\\" data-iconpos=\\\"notext\\\" class=\\\"ui-btn-right\\\">Close</a>'\n" +
-							"								.'<h2>'.$row[$j-1].'</h2>'\n" +
-							"								.'<p>'.$row[$j].'</p>'\n" +
-							"							.'</div>';\n" +
-							"                    	select"+selectCount+"_p2($pop_str, ++$k);     	//tdに結果を埋め込む\n" +
-							"                    }else									select"+selectCount+"_p2($row[$j], ++$k);     //tdに結果を埋め込む\n" +
-							"              }\n" +
-							"        }\n" +
-							"		 if($i>0)	echo \"<script type=\\\"text/javascript\\\">window.parent.$('#Select"+selectCount+"_text_th').show();</script>\";    //カラム名を表示\n" +
-							"        select"+selectCount+"_p1($i.' result'.(($i != 1)?('s'):('')));    //件数表示\n" +
-							"    }else{\n" +
-							"        select"+selectCount+"_p1('0 results');\n" +
-							"    }\n" +
-							"    \n" +
-							"    unset($select_db"+selectCount+");\n" +
-//							"}\n" +
-							"function select"+selectCount+"_p1($str){\n" +
-							"    echo '<script type=\"text/javascript\">window.parent.Select"+selectCount+"_echo1(\"'.$str.'\");</script>';\n" +
-							"}\n" +
-							"function select"+selectCount+"_p2($str,$num){\n" +
-							"    echo '<script type=\"text/javascript\">window.parent.Select"+selectCount+"_echo2(\"'.$str.'\",\"'.$num.'\");</script>';\n" +
-							"}\n" +
-							"?>\n";
-    		
-    		statement += 
-    						"\n" +
-    						"<script type=\"text/javascript\">\n" +
-    						"function Select"+selectCount+"_echo1(str){\n" +
-    						"  var textArea = document.getElementById(\"Select"+selectCount+"_text0\");\n" +
-    						"  textArea.innerHTML = str;\n" +
-    						"}\n" +
-    						"function Select"+selectCount+"_echo2(str,num){\n" +
-    						"  var textArea = document.getElementById(\"Select"+selectCount+"_text\"+num);\n" +
-    						//"  textArea.innerHTML += str+\"<br>\";\n" +
-    						//"  $(\"#Select"+selectCount+"_text\"+num).html(textArea.innerHTML+str+\"<br>\").trigger(\"create\");\n" +
-    						"  $(\"#Select"+selectCount+"_text\"+num).html(textArea.innerHTML+str+\"<br>\");\n" +
-    						"}\n" +
-    						"\n" +
-    						"function Select"+selectCount+"_refresh(){\n";
-    		
-    		for(int i=0; i<col_num; i++){
-    			statement +=
-    					"  document.getElementById(\"Select"+selectCount+"_text"+(i+1)+"\").innerHTML = \"\";\n";
-    		}
-    		statement +=
-    				"}\n" +
-					"</script>\n" +
-					"<!-- Select end -->\n";
-    		
-    		
-    		
-    		
-    		
-    	}
-    	else if(DBMS.equals("sqlite")){
-    		Log.e("<Warning> select() for 'sqlite' is not implemented yet.");
-    		;	//TODO
-    	}
-    	else if(DBMS.equals("postgresql")){
-    		Log.e("<Warning> select() for 'postgresql' is not implemented yet.");
-    		;	//TODO
-    	}
-    	
-    	
-//    	// 各引数毎に処理した結果をHTMLに書きこむ
-//    	html_env.code.append(statement);
+					"        $i = 0;\n" +
+					"        $pop_num = 0;\n" +
+					"        $t = date('YmdHis');\n" +
+					"        while($row = $result->fetchArray()){\n";
+//					"              $i++;\n" +
+//					"              $k=0;\n" +
+//					"              for($j=0; $j<$select_col_num; $j++){\n" +
+//					"					if($select_a_Flg[$j]=='true' || $select_mail_Flg[$j]=='true' || $select_pop_Flg[$j]=='true')	;\n" +
+//					"                    else if($j>0 && $select_a_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+//					"                    else if($j>0 && $select_mail_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"mailto:'.$row[$j].'\\\" target=\\\"_self\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+//					"                    //else if($j>0 && $select_pop_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+//					"                    else if($j>0 && $select_pop_Flg[$j-1]=='true' && !is_null($row[$j])){\n" +
+//					"                    	$pop_str = '<a href=\\\"#select_popup1_'.(++$pop_num).'\\\" data-rel=\\\"popup\\\" data-icon=\\\"arrow-r\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>'\n" +
+//					"							.'<div data-role=\\\"popup\\\" id=\\\"select_popup1_'.($pop_num).'\\\" data-transition=\\\"slideup\\\" style=\\\"width:95%;\\\" data-overlay-theme=\\\"a\\\">'\n" +
+//					"								.'<a href=\\\"#\\\" data-rel=\\\"back\\\" data-role=\\\"button\\\" data-theme=\\\"a\\\" data-icon=\\\"delete\\\" data-iconpos=\\\"notext\\\" class=\\\"ui-btn-right\\\">Close</a>'\n" +
+//					"								.'<h2>'.$row[$j-1].'</h2>'\n" +
+//					"								.'<p>'.$row[$j].'</p>'\n" +
+//					"							.'</div>';\n" +
+//					"                    	select"+selectCount+"_p2($pop_str, ++$k);     	//tdに結果を埋め込む\n" +
+//					"                    }else									select"+selectCount+"_p2($row[$j], ++$k);     //tdに結果を埋め込む\n" +
+//					"              }\n" +
+//					"        }\n" +
+//					"		 if($i>0)	echo \"<script type=\\\"text/javascript\\\">window.parent.$('#Select"+selectCount+"_text_th').show();</script>\";    //カラム名を表示\n" +
+//					"        select"+selectCount+"_p1($i.' result'.(($i != 1)?('s'):('')));    //件数表示\n" +
+//					"    }else{\n" +
+//					"        select"+selectCount+"_p1('0 results');\n" +
+//					"    }\n" +
+//					"    unset($select_db"+selectCount+");\n\n" +
+//					"function select"+selectCount+"_p1($str){\n" +
+//					"    echo '<script type=\"text/javascript\">window.parent.Select"+selectCount+"_echo1(\"'.$str.'\");</script>';\n" +
+//					"}\n" +
+//					"function select"+selectCount+"_p2($str,$num){\n" +
+//					"    echo '<script type=\"text/javascript\">window.parent.Select"+selectCount+"_echo2(\"'.$str.'\",\"'.$num.'\");</script>';\n" +
+//					"}\n" +
+//					"?>\n";
+		} else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+			Mobile_HTML5Env.PHP +=
+    				"        $select_db"+selectCount+" = pg_connect (\"host="+HOST+" dbname="+DB+" user="+USER+""+(!PASSWD.isEmpty()? (" password="+PASSWD):"")+"\");\n" +
+					"        $sql = \"SELECT \".$select_col.\" FROM \".$table;\n" +
+					"        if($where0 != \"\")	$sql .= \" WHERE \".$where0.\" \";\n" +
+					"        if($groupby != \"\")	$sql .= \" GROUP BY \".$groupby.\" \";\n" +
+					"        if($having0 != \"\")	$sql .= \" HAVING \".$having0.\" \";\n" +
+//					"    \n" +
+//					"    	//左辺の作成（※Java側でOK?)\n" +
+//					"        $sw = $selectWord"+selectCount+";\n" +
+//					"        $sw_buf = \"\";\n" +
+//					"        $l_str = \"\";\n" +
+//					"        foreach($select_col_array as $val)    $l_str .= \""+IFNULL+"(\".$val.\",'')||\";\n" +
+//					"        $l_str = substr($l_str, 0, -2);      //substring   最後の||をカット\n" +
+//					"        $l_str .= \" LIKE '%\";\n" +
+//					"        //右辺の作成\n" +
+//					"        while(strpos($sw,'%')){		//%を含んでいる間\n" +
+//					"            $pos = strpos($sw,'%');          //indxOf  		%が最初に現れる位置\n" +
+//					"            $rest = substr($sw, 0, $pos);    //substring    最初の%以降をカット\n" +
+//					"            $sw = substr($sw, $pos+1);       //substring    最初の%までカット\n" +
+//					"            $sw_buf .= $l_str.$rest.\"%' AND \";\n" +
+//					"        }\n" +
+//					"        $sw_buf .= $l_str.$sw.\"%' \";         //最後のswを結合\n" +
+//					"        \n" +
+//					"        if($groupby == \"\"){    //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
+//					"            /*** WHERE句の作成 start ***/\n" +
+//					"            //WHERE  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
+//					"            //   AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
+//					"            \n" +
+//					"            $WHERE = \"\";\n" +
+//					"            if($where0 == \"\")   $WHERE = \" WHERE \";\n" +
+//					"            else                $WHERE = \" AND \";\n" +
+//					"            $WHERE .= $sw_buf;\n" +
+//					"            \n" +
+//					"            $sql .= \" \".$WHERE.\" \";\n" +
+//					"            //$sql .= $WHERE.\" \".$groupby.\" \";\n" +
+//					"            /*** WHERE句の作成 end ***/\n" +
+//					"        }else{                        //null => WHERE句にlikeを書く／ not null => HAVING句に～\n" +
+//					"            /*** HAVING句の作成 start ***/\n" +
+//					"            //HAVING  ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[1]%'\n" +
+//					"            //    AND ifnull(id,'')||ifnull(name,'')||ifnull(r_year,'') LIKE '%sw[2]%'...\n" +
+//					"            \n" +
+//					"            $HAVING = \"\";\n" +
+//					"            if($having0 == \"\")  $HAVING = \" HAVING \";\n" +
+//					"            else	            $HAVING = \" HAVING \".$having0.\" AND \";\n" +
+//					"    		$HAVING .= $sw_buf;\n" +
+//					"            \n" +
+//					"            $sql .= \" GROUP BY \".$groupby.\" \".$HAVING;\n" +
+//					"            /*** HAVING句の作成 end ***/\n" +
+//					"        }\n" +
+					"        $sql .= \" \".$orderby.\" \".$limit;\n" +
+					"        select"+selectCount+"_p1('<font color=red>SQL error: '.$sql.\";</font>\");	//エラー時\n" +
+					"\n" +
+					"        $result = pg_query($select_db"+selectCount+", $sql);\n" +
+					"\n" +
+					"        $i = 0;\n" +
+					"        $pop_num = 0;\n" +
+					"        $t = date('YmdHis');\n" +
+					"        while($row = pg_fetch_row($result)){\n";
+////					"              $i++;\n" +
+////					"              $j=0;\n" +
+////					"              $k=0;\n" +
+////					"              $a=array();\n" +
+////					"              foreach($row as $key => $val) {\n" +
+////					"					$a[$j]=$val;\n" +
+////					"					if($select_a_Flg[$j]=='true' || $select_mail_Flg[$j]=='true' || $select_pop_Flg[$j]=='true')	;\n" +
+////					"                    else if($j>0 && $select_a_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"'.$a[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$a[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+////					"                    else if($j>0 && $select_mail_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"mailto:'.$a[$j].'\\\" target=\\\"_self\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$a[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+////					"                    //else if($j>0 && $select_pop_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"'.$a[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$a[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+////					"                    else if($j>0 && $select_pop_Flg[$j-1]=='true' && !is_null($a[$j])){\n" +
+////					"                    	$pop_str = '<a href=\\\"#select_popup1_'.(++$pop_num).'\\\" data-rel=\\\"popup\\\" data-icon=\\\"arrow-r\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$a[$j-1].'</a>'\n" +
+////					"							.'<div data-role=\\\"popup\\\" id=\\\"select_popup1_'.($pop_num).'\\\" data-transition=\\\"slideup\\\" style=\\\"width:95%;\\\" data-overlay-theme=\\\"a\\\">'\n" +
+////					"								.'<a href=\\\"#\\\" data-rel=\\\"back\\\" data-role=\\\"button\\\" data-theme=\\\"a\\\" data-icon=\\\"delete\\\" data-iconpos=\\\"notext\\\" class=\\\"ui-btn-right\\\">Close</a>'\n" +
+////					"								.'<h2>'.$a[$j-1].'</h2>'\n" +
+////					"								.'<p>'.$a[$j].'</p>'\n" +
+////					"							.'</div>';\n" +
+////					"                    	select"+selectCount+"_p2($pop_str, ++$k);     	//tdに結果を埋め込む\n" +
+////					"                    }else									select"+selectCount+"_p2($a[$j], ++$k);     //tdに結果を埋め込む\n" +
+////					"                    $j++;\n" +
+////					"              }\n" +
+////					"        }\n" +
+////					"		 if($i>0)	echo \"<script type=\\\"text/javascript\\\">window.parent.$('#Select"+selectCount+"_text_th').show();</script>\";    //カラム名を表示\n" +
+////					"        select"+selectCount+"_p1($i.' result'.(($i != 1)?('s'):('')));    //件数表示\n" +
+////					"    }else{\n" +
+//					"              $i++;\n" +
+//					"              $k=0;\n" +
+//					"              for($j=0; $j<$select_col_num; $j++){\n" +
+//					"					if($select_a_Flg[$j]=='true' || $select_mail_Flg[$j]=='true' || $select_pop_Flg[$j]=='true')	;\n" +
+//					"                    else if($j>0 && $select_a_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+//					"                    else if($j>0 && $select_mail_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"mailto:'.$row[$j].'\\\" target=\\\"_self\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+//					"                    //else if($j>0 && $select_pop_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+//					"                    else if($j>0 && $select_pop_Flg[$j-1]=='true' && !is_null($row[$j])){\n" +
+//					"                    	$pop_str = '<a href=\\\"#select_popup1_'.(++$pop_num).'\\\" data-rel=\\\"popup\\\" data-icon=\\\"arrow-r\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>'\n" +
+//					"							.'<div data-role=\\\"popup\\\" id=\\\"select_popup1_'.($pop_num).'\\\" data-transition=\\\"slideup\\\" style=\\\"width:95%;\\\" data-overlay-theme=\\\"a\\\">'\n" +
+//					"								.'<a href=\\\"#\\\" data-rel=\\\"back\\\" data-role=\\\"button\\\" data-theme=\\\"a\\\" data-icon=\\\"delete\\\" data-iconpos=\\\"notext\\\" class=\\\"ui-btn-right\\\">Close</a>'\n" +
+//					"								.'<h2>'.$row[$j-1].'</h2>'\n" +
+//					"								.'<p>'.$row[$j].'</p>'\n" +
+//					"							.'</div>';\n" +
+//					"                    	select"+selectCount+"_p2($pop_str, ++$k);     	//tdに結果を埋め込む\n" +
+//					"                    }else									select"+selectCount+"_p2($row[$j], ++$k);     //tdに結果を埋め込む\n" +
+//					"              }\n" +
+//					"        }\n" +
+//					"		 if($i>0)	echo \"<script type=\\\"text/javascript\\\">window.parent.$('#Select"+selectCount+"_text_th').show();</script>\";    //カラム名を表示\n" +
+//					"        select"+selectCount+"_p1($i.' result'.(($i != 1)?('s'):('')));    //件数表示\n" +
+//					"    }else{\n" +
+//					"        select"+selectCount+"_p1('0 results');\n" +
+//					"    }\n" +
+//					"    pg_close($select_db"+selectCount+");\n\n" +
+//					"function select"+selectCount+"_p1($str){\n" +
+//					"    echo '<script type=\"text/javascript\">window.parent.Select"+selectCount+"_echo1(\"'.$str.'\");</script>';\n" +
+//					"}\n" +
+//					"function select"+selectCount+"_p2($str,$num){\n" +
+//					"    echo '<script type=\"text/javascript\">window.parent.Select"+selectCount+"_echo2(\"'.$str.'\",\"'.$num.'\");</script>';\n" +
+//					"}\n" +
+//					"?>\n";
+		}
+		Mobile_HTML5Env.PHP +=
+				"              $i++;\n" +
+				"              $k=0;\n" +
+				"              for($j=0; $j<$select_col_num; $j++){\n" +
+				"					if($select_a_Flg[$j]=='true' || $select_mail_Flg[$j]=='true' || $select_pop_Flg[$j]=='true')	;\n" +
+				"                    else if($j>0 && $select_a_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+				"                    else if($j>0 && $select_mail_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"mailto:'.$row[$j].'\\\" target=\\\"_self\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+				"                    //else if($j>0 && $select_pop_Flg[$j-1]=='true')	select"+selectCount+"_p2('<a href=\\\"'.$row[$j].'\\\" target=\\\"_blank\\\" rel=\\\"external\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>', ++$k);     //tdに結果を埋め込む\n" +
+				"                    else if($j>0 && $select_pop_Flg[$j-1]=='true' && !is_null($row[$j])){\n" +
+				"                    	$pop_str = '<a href=\\\"#select_popup"+selectCount+"_'.(++$pop_num).'_'.$t.'\\\" data-rel=\\\"popup\\\" data-icon=\\\"arrow-r\\\" style=\\\"white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\\\">'.$row[$j-1].'</a>'\n" +
+				"							.'<div data-role=\\\"popup\\\" id=\\\"select_popup"+selectCount+"_'.($pop_num).'_'.$t.'\\\" data-transition=\\\"slideup\\\" style=\\\"width:95%;\\\" data-overlay-theme=\\\"a\\\">'\n" +
+				"								.'<a href=\\\"#\\\" data-rel=\\\"back\\\" data-role=\\\"button\\\" data-theme=\\\"a\\\" data-icon=\\\"delete\\\" data-iconpos=\\\"notext\\\" class=\\\"ui-btn-right\\\">Close</a>'\n" +
+				"								.'<h2>'.$row[$j-1].'</h2>'\n" +
+				"								.'<p>'.$row[$j].'</p>'\n" +
+				"							.'</div>';\n" +
+				"                    	select"+selectCount+"_p2($pop_str, ++$k);     	//tdに結果を埋め込む\n" +
+				"                    }else									select"+selectCount+"_p2($row[$j], ++$k);     //tdに結果を埋め込む\n" +
+				"              }\n" +
+				"        }\n" +
+				"		 if($i>0)	echo \"<script type=\\\"text/javascript\\\">window.parent.$('#Select"+selectCount+"_text_th').show();</script>\";    //カラム名を表示\n" +
+				"        select"+selectCount+"_p1($i.' result'.(($i != 1)?('s'):('')));    //件数表示\n" +
+				"    }else{\n" +
+				"        select"+selectCount+"_p1('0 results');\n" +
+				"    }\n" +
+				((DBMS.equals("sqlite") || DBMS.equals("sqlite3"))?      ("    unset($select_db"+selectCount+");\n\n"):"") +
+				((DBMS.equals("postgresql") || DBMS.equals("postgres"))? ("    pg_close($select_db"+selectCount+");\n\n"):"") +
+				"function select"+selectCount+"_p1($str){\n" +
+				"    echo '<script type=\"text/javascript\">window.parent.Select"+selectCount+"_echo1(\"'.$str.'\");</script>';\n" +
+				"}\n" +
+				"function select"+selectCount+"_p2($str,$num){\n" +
+				"    echo '<script type=\"text/javascript\">window.parent.Select"+selectCount+"_echo2(\"'.$str.'\",\"'.$num.'\");</script>';\n" +
+				"}\n" +
+				"?>\n";
+		//End of php
+
+		
+		statement += 
+						"\n" +
+						"<script type=\"text/javascript\">\n" +
+						"function Select"+selectCount+"_echo1(str){\n" +
+						"  var textArea = document.getElementById(\"Select"+selectCount+"_text0\");\n" +
+						"  textArea.innerHTML = str;\n" +
+						"}\n" +
+						"function Select"+selectCount+"_echo2(str,num){\n" +
+						"  var textArea = document.getElementById(\"Select"+selectCount+"_text\"+num);\n" +
+						"  $(\"#Select"+selectCount+"_text\"+num).html(textArea.innerHTML+str+\"<br>\");\n" +
+						"}\n" +
+						"\n" +
+						"function Select"+selectCount+"_refresh(){\n";
+		
+		for(int i=0; i<col_num; i++){
+			statement +=
+					"  document.getElementById(\"Select"+selectCount+"_text"+(i+1)+"\").innerHTML = \"\";\n";
+		}
+		statement +=
+				"}\n" +
+				"</script>\n" +
+				"<!-- Select end -->\n";
+		//End of php
+		
     	
     	selectCount++;
     	return statement;
@@ -2025,10 +2213,6 @@ public class Mobile_HTML5Function extends Function {
     		//title（第一引数）
     		FuncArg fa1 = (FuncArg) this.Args.get(0);
     		if(!fa1.getStr().isEmpty())	title = fa1.getStr();
-//    		else{
-//    			if(update || insert_update)	title = "Update";
-//    			else						title = "Insert";
-//    		}
     		//columns（第二引数）
     		FuncArg fa2 = (FuncArg) this.Args.get(1);
     		columns += fa2.getStr();
@@ -2059,8 +2243,6 @@ public class Mobile_HTML5Function extends Function {
     		return "";
 		}
 		if(after_from.toLowerCase().startsWith("from "))	after_from = after_from.substring("from".length()).trim();
-//		if(insert_update)	insertFlag = "true";	//20130721
-		//Log.info(title);
 		
 		//Check options
 		boolean noresult = false;
@@ -2082,40 +2264,62 @@ public class Mobile_HTML5Function extends Function {
 		//Log.e(buttonName+" "+noresult+" "+noreset+" "+reloadAfterInsert+" "+reloadAfterInsertTime+"  "+decos);
     	
     	
-    	//置換 ( @ { , }  ->  @ { ; } )
-		//Log.i("Before: "+columns);
-    	int inAtFlg = 0;
+//    	//置換 ( @ { , }  ->  @ { ; } )
+//		//Log.i("Before: "+columns);
+//    	int inAtFlg = 0;
+//    	for(int i=0; i<columns.length();i++){
+//    		//Log.i(columns.charAt(i));
+//    		if(inAtFlg==0){
+//    			if(columns.charAt(i)=='@')		inAtFlg=1;
+//    		}else if(inAtFlg==1){
+//	    		if(columns.charAt(i)==' ')		inAtFlg=1;
+//	    		else if(columns.charAt(i)=='{')	inAtFlg=2;
+//    		}else if(inAtFlg==2){
+//    			if(columns.charAt(i)==',')
+//    				columns = columns.substring(0,i)+";"+columns.substring(i+1);	//置換
+//    			else if(columns.charAt(i)=='}')	inAtFlg=0;
+//    		}
+//    	}
+//    	//Log.i("After:  "+columns);
+    	
+    	
+		int col_num = 0;
+    	String[] s_array = new String[columns.length()-columns.replace(",", "").length()];
+    	boolean sq = false, dq = false;
+    	int braces/*{}*/ = 0;
+    	int lastIndex = 0;
+    	columns += ",";
     	for(int i=0; i<columns.length();i++){
-    		//Log.i(columns.charAt(i));
-    		if(inAtFlg==0){
-    			if(columns.charAt(i)=='@')		inAtFlg=1;
-    		}else if(inAtFlg==1){
-	    		if(columns.charAt(i)==' ')		inAtFlg=1;
-	    		else if(columns.charAt(i)=='{')	inAtFlg=2;
-    		}else if(inAtFlg==2){
-    			if(columns.charAt(i)==',')
-    				columns = columns.substring(0,i)+";"+columns.substring(i+1);	//置換
-    			else if(columns.charAt(i)=='}')	inAtFlg=0;
+    		char c = columns.charAt(i);
+    		
+    		if(c=='\'' && !dq && braces==0)		sq = !sq;
+    		else if(c=='"' && !sq && braces==0)	dq = !sq;
+    		else if(c=='{' && !sq && !dq)		braces++;
+    		else if(c=='}' && !sq && !dq)		braces--;
+    		else if(c==',' && !dq && !sq && braces==0){
+    			s_array[col_num++] = columns.substring(lastIndex, i);
+    			lastIndex = i+1;
     		}
     	}
-    	//Log.i("After:  "+columns);
+    	//System.out.println("col_num: "+col_num);
+    	//for(int i=0; i<col_num; i++)	System.out.println(i+": "+s_array[i]);
     	
     	
-    	int col_num=1;
-    	String columns0 = columns;
-    	while(columns0.contains(",")){
-    		columns0 = columns0.substring(columns0.indexOf(",")+1);
-    		col_num++;		//カウント
-    	}
+//    	int col_num=1;
+//    	String columns0 = columns;
+//    	while(columns0.contains(",")){
+//    		columns0 = columns0.substring(columns0.indexOf(",")+1);
+//    		col_num++;		//カウント
+//    	}
     	String[] s_name_array = new String[col_num];
-    	String[] s_array = new String[col_num];
-    	columns0 = columns;
-    	for(int i=0; i<col_num-1; i++){
-    		s_array[i] = columns0.substring(0,columns0.indexOf(","));
-    		columns0 = columns0.substring(columns0.indexOf(",")+1);
-    		//Log.i( "s_array["+i+"] = "+s_array[i]+"	"+columns0);
-    	}
-    	s_array[col_num-1] = columns0;
+//    	String[] s_array = new String[col_num];
+//    	columns0 = columns;
+//    	for(int i=0; i<col_num-1; i++){
+//    		s_array[i] = columns0.substring(0,columns0.indexOf(","));
+//    		columns0 = columns0.substring(columns0.indexOf(",")+1);
+//    		//Log.i( "s_array["+i+"] = "+s_array[i]+"	"+columns0);
+//    	}
+//    	s_array[col_num-1] = columns0;
 		//Log.i( "s_array["+(col_num-1)+"] = "+s_array[col_num-1]);
     	int j=0;
 		for(int i=0; i<col_num; i++){
@@ -2143,18 +2347,25 @@ public class Mobile_HTML5Function extends Function {
     	String[] validationType = new String[col_num];
     	boolean[] notnullFlg = new boolean[col_num];
     	String[] uploadFile = new String[col_num];
+    	String[] at_array = new String[col_num];
+    	String[] radioButton_array = new String[col_num];
+    	String[] selectbox_array = new String[col_num];
+    	String[] checkbox_array = new String[col_num];
+    	Arrays.fill(radioButton_array, "");
+    	Arrays.fill(selectbox_array, "");
+    	Arrays.fill(checkbox_array, "");
     	String notnullFlg_array = "";
+    	String checkboxFlg_array = "";
     	String[] $session_array = new String[col_num];
     	String[] $time_array = new String[col_num];
     	String[] $gps_array = new String[col_num];
-    	String[] button_array = new String[col_num];
+    	String[] text_array = new String[col_num];
     	String buttonSubmit = "";
     	String insert_aFlg = "\"";	//Flg
     	String insert_popFlg = "\"";	//Flg
     	int noinsert_count = 0;
     	int a_pop_count = 0;
     	for(int i=0; i<col_num; i++){
-    		
     		//Log.i(s_array[i]);
     		//Check: @textarea, @hidden, @noinsert, @notnull, @date, @date1-5, @time	//TODO:リファクタリング
     		textareaFlg[i] = false;
@@ -2163,9 +2374,11 @@ public class Mobile_HTML5Function extends Function {
     		validationType[i] = "";
     		notnullFlg[i] = false;
     		uploadFile[i] = "";
+    		at_array[i] = "";
     		String str = "";
     		if(s_array[i].replaceAll(" ","").contains("@{")){
     			str = s_array[i].substring(s_array[i].lastIndexOf("@")+1);	//@以下の文字列
+    			at_array[i] = str;
     			//Log.e(str);
 	    		if(str.contains("='")){
 	    			//image='', file=''
@@ -2197,7 +2410,7 @@ public class Mobile_HTML5Function extends Function {
 	    		if(str.contains("notnull"))	notnullFlg[i] = true;
 	    		validationType[i] = Mobile_HTML5.checkFormValidationType(str);	//form validation
 	    		
-	    		s_array[i] = s_array[i].substring(0,s_array[i].indexOf("@"));
+	    		s_array[i] = s_array[i].substring(0,s_array[i].lastIndexOf("@"));
 	    		//Log.i(s_array[i]);
     		}else{
     			if(i==(col_num-1))	notnullFlg_array += "FALSE";
@@ -2213,32 +2426,29 @@ public class Mobile_HTML5Function extends Function {
     				$session_array[i] = a.substring(a.indexOf("$session(")+"$session(".length(),a.indexOf(")"));
     				$time_array[i] = "";
     				$gps_array[i] = "";
-    				button_array[i] = "";
+    				text_array[i] = "";
     				a = a.substring(0,a.indexOf("=")).trim() + a.substring(a.indexOf(")")+1).trim();
         			s_array[i] = s_array[i].substring(0,s_array[i].indexOf("=")).trim() + s_array[i].substring(s_array[i].indexOf(")")+1).trim();
     			}else if(a_right.startsWith("time(") || a_right.startsWith("date(")){
     				String d = s_array[i].substring(s_array[i].indexOf("(")+1,s_array[i].lastIndexOf(")")).trim(); 
-//    				$time_array[i] = "date(\"Y-m-d H:i:s\")";	//"date(\"Y/m/d(D) H:i:s\")";
     				$time_array[i] = "date(\""+( (d.equals(""))? ("Y-m-d H:i:s") : (d) )+"\")";	//"date(\"Y/m/d(D) H:i:s\")";
     				$session_array[i] = "";
     				$gps_array[i] = "";
-    				button_array[i] = "";
+    				text_array[i] = "";
     				a = a.substring(0,a.indexOf("=")).trim() + a.substring(a.indexOf(")")+1).trim();
     				s_array[i] = s_array[i].substring(0,s_array[i].indexOf("=")).trim() + s_array[i].substring(s_array[i].indexOf(")")+1).trim();
     			}else if(a_right.startsWith("gps_info(")){
     				//gps_info()の取得
-    				//String d = s_array[i].substring(s_array[i].indexOf("(")+1,s_array[i].lastIndexOf(")")).trim(); 
-    				//$gps_array[i] = "date(\""+( (d.equals(""))? ("Y-m-d H:i:s") : (d) )+"\")";	//"date(\"Y/m/d(D) H:i:s\")";
     				$gps_array[i] = "gps_info";
     				
     				$session_array[i] = "";
     				$time_array[i] = "";
-    				button_array[i] = "";
+    				text_array[i] = "";
     				a = a.substring(0,a.indexOf("=")).trim() + a.substring(a.indexOf(")")+1).trim();
     				s_array[i] = s_array[i].substring(0,s_array[i].indexOf("=")).trim() + s_array[i].substring(s_array[i].indexOf(")")+1).trim();
-    			}else if(a.contains("{")){
-    				String ss = a.substring(a.indexOf("{")+"{".length(),a.indexOf("}"));
-    				button_array[i] = ss;
+    			}else if(a.contains("{") && a.contains("}")){
+    				String x = s_array[i];
+    				text_array[i] = x.substring(x.indexOf("{")+"{".length(), x.indexOf("}"));
     				$session_array[i] = "";
     				$time_array[i] = "";
     				$gps_array[i] = "";
@@ -2248,13 +2458,13 @@ public class Mobile_HTML5Function extends Function {
     				$session_array[i] = "";
     				$time_array[i] = "";
     				$gps_array[i] = "";
-    				button_array[i] = "";
+    				text_array[i] = "";
     			}
     		}else{
     			$session_array[i] = "";
     			$time_array[i] = "";
     			$gps_array[i] = "";
-    			button_array[i] = "";
+    			text_array[i] = "";
     		}
     		//Log.i(s_array[i]+"	"+$session_array[i]);
     		//Log.i(button_array[i]+"	"+button_array[i]);
@@ -2263,12 +2473,7 @@ public class Mobile_HTML5Function extends Function {
     		if(a.startsWith("a(") || a.startsWith("anchor(")){
     			insert_aFlg += "true\""+((i<col_num-1)?(",\""):(""));
     			if(a.endsWith(")")){
-//    				insert_col += s_array[i] +((i<col_num-1)?(","):(""));
-//    	    		insert_col_array += s_array[i] +"\""+((i<col_num-1)?(",\""):(""));
-//    	    		insert_aFlg += "false\""+((i<col_num-1)?(",\""):(""));
-//    	    		insert_popFlg += "false\""+((i<col_num-1)?(",\""):(""));
     	    		insert_col += s_array[i]+",";
-//    				insert_col_array += s_array[i]+"\",\"";
     				insert_aFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     				insert_popFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     			}else	a_pop_count++;
@@ -2277,18 +2482,12 @@ public class Mobile_HTML5Function extends Function {
     		if(a.startsWith("pop(") || a.startsWith("popup(")){
     			insert_popFlg += "true\""+((i<col_num-1)?(",\""):(""));
     			if(a.endsWith(")")){
-//    				insert_col += s_array[i] +((i<col_num-1)?(","):(""));
-//    	    		insert_col_array += s_array[i] +"\""+((i<col_num-1)?(",\""):(""));
-//    	    		insert_aFlg += "false\""+((i<col_num-1)?(",\""):(""));
-//    	    		insert_popFlg += "false\""+((i<col_num-1)?(",\""):(""));
     				insert_col += s_array[i]+",";
-//    				insert_col_array += s_array[i]+"\",\"";
     				insert_aFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     				insert_popFlg += ((i<col_num-1)?(""):(",\""))+"false\""+((i<col_num-1)?(",\""):(""));
     			}else	a_pop_count++;
     		}else
     			insert_popFlg += "false\""+((i<col_num-1)?(",\""):(""));
-    		
     		
     		if(!noinsertFlg[i]){
     			insert_col += s_array[i] +((i<col_num-1)?(","):(""));
@@ -2297,7 +2496,6 @@ public class Mobile_HTML5Function extends Function {
     	}
     	col_num -= a_pop_count;
     	insert_col = insert_col.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("\\)","");
-//    	insert_col_array = insert_col_array.replaceAll("a\\(","").replaceAll("anchor\\(","").replaceAll("pop\\(","").replaceAll("popup\\(","").replaceAll("\\)","");
     	
     	
     	//Log.i("	1:"+title+"	2:"+columns+"	col_num:"+col_num);
@@ -2308,6 +2506,12 @@ public class Mobile_HTML5Function extends Function {
     	
     	String DBMS = GlobalEnv.getdbms();										//DBMS
     	String DB = GlobalEnv.getdbname();										//DB
+    	String HOST = "", USER = "", PASSWD = "";
+    	if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+    		HOST = GlobalEnv.gethost();
+    		USER = GlobalEnv.getusername();
+    		PASSWD = GlobalEnv.getpassword();
+    	}
     	
     	String query = "";
     	//Log.i(after_from_string);
@@ -2337,7 +2541,7 @@ public class Mobile_HTML5Function extends Function {
     			}
     		}
     		if(update_where.contains("$session")){
-    			update_where = update_where.replaceAll("\\$session","'\".\\$_SESSION").replaceAll("\\(","[").replaceAll("\\)","].\"'");
+    			update_where = update_where.replaceAll("\\$session","'\".\\$_SESSION").replaceAll("\\(","['").replaceAll("\\)","'].\"'");
     		}
     		if(from.indexOf(" where ") > 1){
     			from = from.substring(0,from.indexOf(" where ")).trim();
@@ -2368,63 +2572,59 @@ public class Mobile_HTML5Function extends Function {
     	if(update){
     		//update()
     		formPHPfileName = html_env.getFileName2()+"_SSQLupdateform_"+insertCount+".php";
-//    	}else if(insert_update){
-//			formPHPfileName = html_env.getFileName2()+"_SSQLinsertupdate_"+insertCount+".php";
     	}else{
     		//insert(), form()=insert_update()
     		formPHPfileName = html_env.getFileName2()+"_SSQLform_"+insertCount+".php";
     	}
-    	//sqlite3 php
-    	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
-    		statement += 
-    				"\n" +
-    				"<!-- SSQL Insert"+insertCount+" start -->\n" +
-    				"<!-- SSQL Insert"+insertCount+" FORM start -->\n" +
-    				"<br>\n" +
-    				//"<div id=\"SSQL_INSERT"+insertCount+"panel\" style=\"background-color:whitesmoke; width:99%; border:0.1px gray solid;\" data-role=\"none\">\n" +
-    				//"<div style=\"padding:3px 5px;border-color:hotpink;border-width:0 0 1px 7px;border-style:solid;background:#F8F8F8; font-size:30;\" id=\"SSQL_InsertTitle"+insertCount+"\">"+title+"</div>\n" +
-    				"<div id=\"SSQL_INSERT"+insertCount+"panel\" style=\"\" data-role=\"none\">\n";
-    		if(!title.isEmpty()){
-    			statement += 
-    				"<hr>\n<div style=\"font-size:30;\" id=\"SSQL_InsertTitle"+insertCount+"\">"+title+"</div>\n<hr>\n" +
-    				"<br>\n";
-    		}
-			statement += "<form method=\"post\" action=\"\" target=\"dummy_ifr\""+getFormFileUploadHTML1()+">\n";
-    		
-    		int insertWordCount = 0;
-    		for(int i=0; i<col_num; i++){
-//    			if(!textareaFlg[i]){
-    			String updateFromValue = "";
-    			if(update){
-    				updateFromValue = "'.$row['"+cols[i]+"'].'";
-    			}
-				if($session_array[i].equals("") && $time_array[i].equals("") && $gps_array[i].equals("")){
-					if(!button_array[i].equals("")){
-						//Log.i("bt_array:"+button_array[i]);
-						String ss = button_array[i]+"|";
-						int btRcount = ss.length() - ss.replaceAll("\\|","").length();
-						//Log.i("btRcount:"+btRcount);
-						
-						if(btRcount == 1){				//テキスト ex){2013秋}
-
-							//statement +=
-							//		"    <input type="text" disabled="disabled" value="お名前: 五嶋">";
+    	
+    	//php
+		statement += 
+				"\n" +
+				"<!-- SSQL Insert"+insertCount+" start -->\n" +
+				"<!-- SSQL Insert"+insertCount+" FORM start -->\n" +
+				"<br>\n" +
+				//"<div id=\"SSQL_INSERT"+insertCount+"panel\" style=\"background-color:whitesmoke; width:99%; border:0.1px gray solid;\" data-role=\"none\">\n" +
+				//"<div style=\"padding:3px 5px;border-color:hotpink;border-width:0 0 1px 7px;border-style:solid;background:#F8F8F8; font-size:30;\" id=\"SSQL_InsertTitle"+insertCount+"\">"+title+"</div>\n" +
+				"<div id=\"SSQL_INSERT"+insertCount+"panel\" style=\"\" data-role=\"none\">\n";
+		if(!title.isEmpty()){
+			statement += 
+				"<hr>\n<div style=\"font-size:30;\" id=\"SSQL_InsertTitle"+insertCount+"\">"+title+"</div>\n<hr>\n" +
+				"<br>\n";
+		}
+		statement += "<form method=\"post\" action=\"\" target=\"dummy_ifr\""+getFormFileUploadHTML1()+">\n";
+		
+		int insertWordCount = 0;
+		for(int i=0; i<col_num; i++){
+			String updateFromValue = "";
+			if(update){
+				updateFromValue = "'.$row['"+cols[i]+"'].'";
+			}
+			if($session_array[i].equals("") && $time_array[i].equals("") && $gps_array[i].equals("")){
+				if(!text_array[i].equals("")){
+					//Log.i("text_array:"+text_array[i]);
+					String ss = text_array[i]+"|";
+					String at = at_array[i];
+					int pipeCount = ss.length() - ss.replaceAll("\\|","").length();
+					//Log.i("pipeCount:"+pipeCount);
+					
+					if(!at.contains("radio") && !at.contains("select") && !at.contains("check") && pipeCount==1){
+						//編集不可テキスト ex){2013秋}
+						statement += 
+								"	<"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
+								""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+text_array[i]+"" +
+								""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
+						update_statement += 	//TODO: button
+								"	<"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" " +
+										"value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
+								""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+text_array[i]+"" +
+								""+((!textareaFlg[i])?("\">"):(updateFromValue+"</textarea>"))+"\n";
+						if(!noinsertFlg[i]){
 							statement += 
-									"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
-									""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+button_array[i]+"" +
-									""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
-							update_statement += 	//TODO: button
-									"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" " +
-											"value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
-									""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+button_array[i]+"" +
-									""+((!textareaFlg[i])?("\">"):(updateFromValue+"</textarea>"))+"\n";
-							if(!noinsertFlg[i]){
-								statement += 
-										"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(++insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\""+button_array[i]+"\">\n";
-								update_statement += //TODO: button
-										"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\""+button_array[i]+"\">\n";
-							}
-						//TODO 以下を「@button」時のみに変更
+									"	<input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(++insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\""+text_array[i]+"\">\n";
+							update_statement += //TODO: button
+									"	<input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\""+text_array[i]+"\">\n";
+						}
+					//TODO 以下を「@button」時のみに変更
 //						}else if(btRcount == 2){		//ボタン ex){出席|欠席}
 //							String bt1=ss.substring(0,ss.indexOf("|")).trim();
 //							String bt2=ss.substring(ss.indexOf("|")+1,ss.length()-1).trim();
@@ -2439,313 +2639,464 @@ public class Mobile_HTML5Function extends Function {
 //									"		</div>\n" +
 //									"	</div>\n";
 //							buttonSubmit += " || $_POST['SSQL_insert"+insertCount+"_words"+(insertWordCount)+"']";
-							
-						}else{							//ラジオボタン ex){出席|欠席|その他}
-							statement += "   <div data-role=\"controlgroup\">\n" + 
-										 "		<div style=\"text-align:left; font-size:16.5px\">"+s_name_array[i]+"</div>\n";
-							update_statement += "   <div data-role=\"controlgroup\">\n" + 
-										 "		<div style=\"text-align:left; font-size:16.5px\">"+s_name_array[i]+"</div>\n";
-							insertWordCount++;
-							for(int k=1; k<=btRcount; k++){
-								String val = ss.substring(0,ss.indexOf("|")).trim();
-								statement += 
-										"		<input type=\"radio\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"_"+k+"\" value=\""+val+"\""+( (k>1)? (""):(" checked=\"checked\"") )+">\n" +
-										"		<label for=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"_"+k+"\">"+val+"</label>\n";
-								update_statement += //TODO radio button
-										"		<input type=\"radio\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"_"+k+"\" value=\""+val+"\""+( (k>1)? (""):(" checked=\"checked\"") )+">\n" +
-										"		<label for=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"_"+k+"\">"+val+"</label>\n";
-								ss = ss.substring(ss.indexOf("|")+1);
-							}
-							statement += "   </div>\n";
-							update_statement += "   </div>\n";
-						}
+						
 					}else{
-						if(validationType[i].isEmpty()){
-							statement += 
-									"    "+( (!textareaFlg[i])? "" : "<span>" )+"<span>" +
-									"<"+((!textareaFlg[i])?("input"):("textarea"))+"" +
-									" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\"" +
-									" id=\"SSQL_insert"+insertCount+"_words"+(++insertWordCount)+"\"" +
-									" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\"" +
-									" placeholder=\""+s_name_array[i]+"\""+Mobile_HTML5.getFormClass(notnullFlg[i], "")+">" +
-									""+((!textareaFlg[i])?(""):("</textarea>")) +
-									"</span>"+( (!textareaFlg[i])? "" : "</span>" )+"\n";
-							update_statement += 
-									"    "+( (!textareaFlg[i])? "" : "<span>" )+"<span>" +
-									"<"+((!textareaFlg[i])?("input"):("textarea"))+"" +
-									" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\"" +
-									" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\"" +
-									" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\"" +
-									" "+((!textareaFlg[i])?("value=\""+updateFromValue+"\""):(""))+
-									" placeholder=\""+s_name_array[i]+"\""+Mobile_HTML5.getFormClass(notnullFlg[i], "")+">" +
-									""+((!textareaFlg[i])?(""):(updateFromValue+"</textarea>")) +
-									"</span>"+( (!textareaFlg[i])? "" : "</span>" )+"\n";
-							//statement += "    <input type=\"text\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\">\n";
-						}else{
-							statement += Mobile_HTML5.getFormValidationString(validationType[i], notnullFlg[i], "SSQL_insert"+insertCount+"_words"+(++insertWordCount), s_name_array[i], updateFromValue);
-							update_statement
-							          += Mobile_HTML5.getFormValidationString(validationType[i], notnullFlg[i], "SSQL_insert"+insertCount+"_words"+(insertWordCount), s_name_array[i], updateFromValue);
+						//ラジオボタン, セレクトボックス, チェックボックス
+						//System.out.println("ss : "+ss);
+						//System.out.println("at : "+at);
+						
+						String inputType = "radio";		//Default: input type="radio"
+						if(at.contains("select"))		inputType = "select";
+						else if(at.contains("check"))	inputType = "checkbox";
+						boolean isSQL = !at.contains("sql")? false : true;
+						
+						//ラジオボタン ex){出席|欠席|その他}@{radio}, {★☆☆=1|★★☆=2|★★★=3}など (2個以上の選択項目がある場合、@{radio}はあってもなくてもOK)
+						//セレクトボックス ex){出席|欠席|その他}@{selectbox もしくは select}
+						//チェックボックス ex){出席|欠席|その他}@{checkbox もしくは check}
+						//※ DBから値を取得する場合の記述例：{select name, id from movie}@{sql, selectbox}
+						statement += "   <div data-role=\"controlgroup\">\n" + 
+									 "		<div style=\"text-align:left; font-size:16.5px\">"+s_name_array[i]+"</div>\n";
+						update_statement += "   <div data-role=\"controlgroup\">\n" + 
+									 "		<div style=\"text-align:left; font-size:16.5px\">"+s_name_array[i]+"</div>\n";
+						insertWordCount++;
+						
+						if(inputType.equals("select")){
+							//セレクトボックス
+							String name = "SSQL_insert"+insertCount+"_words"+(insertWordCount);
+							selectbox_array[i] = name;
+//							statement += "		<select name=\""+name+"\" data-native-menu=\"false\">\n";
+//							update_statement += "		<select name=\""+name+"\" data-native-menu=\"false\">\n";	//TODO?
+							statement += "		<select name=\""+name+"\">\n";
+							update_statement += "		<select name=\""+name+"\">\n";	//TODO?
 						}
+						for(int k=1; k<=pipeCount; k++){
+							String val = ss.substring(0,ss.indexOf("|")).trim();
+							String insert_val = val;
+							if(val.contains("=")){
+								insert_val = val.substring(val.indexOf("=")+1).trim();
+								val = val.substring(0, val.indexOf("=")).trim();
+							}
+							
+							String id = "SSQL_insert"+insertCount+"_words"+insertWordCount;
+							String fn = html_env.getFileName2()+"_"+id+".php";
+							String name = id;
+							String checked = (k>1)? "" : " checked=\"checked\"" ;
+							String php_echo = "";
+							if(inputType.equals("radio") || inputType.equals("checkbox")){
+								//ラジオボタン, チェックボックス
+								if(inputType.equals("checkbox")){
+									//チェックボックス
+									checkbox_array[i] = name;
+									name += "[]";
+									checked = "";
+								}else
+									radioButton_array[i] = name;
+								
+								if(!isSQL){
+									statement += 
+											"		<input type=\""+inputType+"\" name=\""+name+"\" id=\""+id+"_"+k+"\" value=\""+insert_val+"\""+checked+">\n" +
+											"		<label for=\""+id+"_"+k+"\">"+val+"</label>\n";
+									update_statement += //TODO radio button
+											"		<input type=\""+inputType+"\" name=\""+name+"\" id=\""+id+"_"+k+"\" value=\""+insert_val+"\""+checked+">\n" +
+											"		<label for=\""+id+"_"+k+"\">"+val+"</label>\n";
+								}else{
+									//DBから値を取得する処理 ex){select name, id from movie}@{sql, selectbox}
+									php_echo += 
+											"			echo '		<input type=\""+inputType+"\" name=\"'.$name.'\" id=\"'.$id.'_'.$i.'\" value=\"'.$insert_val.'\"'.(($i != $checked_num)? '' : '"+checked+"').\">\n\";\n" +
+											"	    	echo '		<label for=\"'.$id.'_'.$i.'\">'.$val.\"</label>\n\";\n";
+								}
+							}
+							else if(inputType.equals("select")){
+								//セレクトボックス
+								if(!isSQL){
+									statement += "			<option value=\""+insert_val+"\""+((k>1)? (""):(" selected"))+">"+val+"</option>\n";
+									update_statement += "			<option value=\""+insert_val+"\""+((k>1)? (""):(" selected"))+">"+val+"</option>\n";	//TODO?
+								}else{
+									//DBから値を取得する処理 ex){select name, id from movie}@{sql, selectbox}
+									php_echo += 
+											"			echo '			<option value=\"'.$insert_val.'\"'.(($i != $checked_num)? '' : ' selected').'>'.$val.'</option>\n';\n";
+								}
+							}
+							
+							if(isSQL){
+								//DBから値を取得する処理
+								statement += "<?php	require_once '"+fn+"'; ?>\n";
+								update_statement += "<?php	require_once '"+fn+"'; ?>\n";
+								
+								//php作成
+								int checked_num = 1;
+								String sql = val;
+								String php2 =	Mobile_HTML5.getSessionStartString() +
+										"<?php\n" +
+										"	$checked_num = "+checked_num+";\n" +
+										"	$name = '"+name+"';\n" +
+										"	$id = '"+id+"';\n" +
+										"   \n" +
+										"   $sql = '"+sql+"';\n" +
+										"	try{\n";
+								if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
+									php2 += 
+											"		$db = new SQLite3('"+DB+"');\n" +
+											"		$results = $db->query($sql);\n" +
+											"		$i = 1;\n" +
+											"		while ($row = $results->fetchArray()) {\n";
+								}
+								else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+									php2 +=
+						    				"		$db = pg_connect(\"host="+HOST+" dbname="+DB+" user="+USER+""+(!PASSWD.isEmpty()? (" password="+PASSWD):"")+"\");\n" +
+						    				"		$results = pg_query($db, $sql);\n" +
+											"		$i = 1;\n" +
+											"		while ($row = pg_fetch_row($results)) {\n";
+								}
+								php2 +=
+										"			$val = $row[0];\n" +
+										"			$insert_val = $row[1];\n" +
+										"			if(is_null($insert_val))	$insert_val = $val;\n" +
+										php_echo +
+										"	    	$i++;\n" +
+										"		}\n" +
+										"	}catch(Exception $e){\n" +
+										"		echo '<font color=red>Select failed.<br>'.$e.'</font>';\n" +
+										"	}\n";
+								if(DBMS.equals("sqlite") || DBMS.equals("sqlite3"))
+									php2 += "	$db->close();";
+								else if(DBMS.equals("postgresql") || DBMS.equals("postgres"))
+									php2 += "	pg_close($db);\n";
+								php2 += "?>\n";
+								
+								Mobile_HTML5.createFile(html_env, fn, php2);//PHPファイルの作成
+							}
+							
+							ss = ss.substring(ss.indexOf("|")+1);
+						}
+						if(inputType.equals("select")){
+							//セレクトボックス
+							statement += "		</select>\n";
+							update_statement += "		</select>\n";
+						}
+						statement += "   </div>\n";
+						update_statement += "   </div>\n";
 					}
 				}else{
-					String echo = "", echo2 = "";
-					if(!$session_array[i].equals("")){
-						echo += "	echo $_SESSION['"+$session_array[i]+"'];\n";
-						echo2 += "'.$_SESSION['"+$session_array[i]+"'].'";
+					String at = at_array[i];
+					boolean isOutTitle = (at.contains("outtitle") || at.contains("outlabel") || at.contains("noplaceholder"))? true : false;	//placeholderにタイトルをセットしない
+					String outTitle = "";
+					if(isOutTitle){
+						outTitle = "<div style=\"text-align:left; font-size:16.5px; margin-top:15px;\">"+s_name_array[i]+"</div>\n";
+						s_name_array[i] = "";
 					}
-					else if(!$time_array[i].equals("")){
-						echo += "	echo "+$time_array[i]+";\n";
-						echo2 += "'."+$time_array[i]+".'";
+
+					if(validationType[i].isEmpty()){
+						statement += 
+								outTitle +
+								"	"+( (!textareaFlg[i])? "" : "<span>" )+"<span>" +
+								"<"+((!textareaFlg[i])?("input"):("textarea"))+"" +
+								" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\"" +
+								" id=\"SSQL_insert"+insertCount+"_words"+(++insertWordCount)+"\"" +
+								" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\"" +
+								" placeholder=\""+s_name_array[i]+"\""+Mobile_HTML5.getFormClass(notnullFlg[i], "")+">" +
+								""+((!textareaFlg[i])?(""):("</textarea>")) +
+								"</span>"+( (!textareaFlg[i])? "" : "</span>" )+"\n";
+						update_statement += 
+								outTitle +
+								"	"+( (!textareaFlg[i])? "" : "<span>" )+"<span>" +
+								"<"+((!textareaFlg[i])?("input"):("textarea"))+"" +
+								" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\"" +
+								" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\"" +
+								" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\"" +
+								" "+((!textareaFlg[i])?("value=\""+updateFromValue+"\""):(""))+
+								" placeholder=\""+s_name_array[i]+"\""+Mobile_HTML5.getFormClass(notnullFlg[i], "")+">" +
+								""+((!textareaFlg[i])?(""):(updateFromValue+"</textarea>")) +
+								"</span>"+( (!textareaFlg[i])? "" : "</span>" )+"\n";
+						//statement += "    <input type=\"text\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" placeholder=\""+s_name_array[i]+"\">\n";
+					}else{
+						statement += Mobile_HTML5.getFormValidationString(validationType[i], notnullFlg[i], "SSQL_insert"+insertCount+"_words"+(++insertWordCount), s_name_array[i], updateFromValue, outTitle);
+						update_statement
+						          += Mobile_HTML5.getFormValidationString(validationType[i], notnullFlg[i], "SSQL_insert"+insertCount+"_words"+(insertWordCount), s_name_array[i], updateFromValue, outTitle);
 					}
-					//else if(!$gps_array[i].equals(""))	echo += "	echo \"<script> getGPSinfo(); </script>\";\n";
-					//else if(!$gps_array[i].equals(""))	echo += "	echo\"<script> getGPSinfo(); </script>\";\n";
-					else if(!$gps_array[i].equals("")){
-						Mobile_HTML5Env.addJsCss("jscss/googleMap.js");
-						echo += "	echo \"位置情報(緯度・経度)\";\n";
-						gps_js +=
-								"\n<!-- getGPSinfo() -->\n" +
-//								"<script src=\"http://maps.google.com/maps/api/js?sensor=false&libraries=geometry\"></script>\n" +
-								//"<script src=\"jscss/googleMap.js\"></script>\n" +
-								"<script type=\"text/javascript\">\n" +
-								"<!--\n" +
-								//"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +	//←　$(function(){の方が良いかも
-								"$(function(){\n" +
-								"  	// Geolocation APIのオプション設定\n" +
-								"  	var geolocationOptions = {\n" +
-								"    	\"enableHighAccuracy\" : true, // 高精度位置情報の取得\n" +
-								"    	\"maximumAge\" : 0, // キャッシュの無効化\n" +
-								"    	\"timeout\" : 30000 // タイムアウトは30秒\n" +
-								"  	};\n" +
-								"    navigator.geolocation.getCurrentPosition(function(pos) {\n" +
-								"      	// 経度、緯度を取得 //\n" +
-								"		document.getElementsByName('SSQL_insert"+insertCount+"_words"+(insertWordCount+1)+"')[0].value=pos.coords.latitude+\",\"+pos.coords.longitude;\n" +
-								"    }, function(e) {\n" +
-								"		gpsInfo = \"\";\n" +
-								"    }, geolocationOptions);\n" +
-								"});\n" +
-								"// -->\n" +
-								"</script>\n";
-					}
-					
+				}
+			}else{
+				String echo = "", echo2 = "";
+				if(!$session_array[i].equals("")){
+					echo += "	echo $_SESSION['"+$session_array[i]+"'];\n";
+					echo2 += "'.$_SESSION['"+$session_array[i]+"'].'";
+				}
+				else if(!$time_array[i].equals("")){
+					echo += "	echo "+$time_array[i]+";\n";
+					echo2 += "'."+$time_array[i]+".'";
+				}
+				else if(!$gps_array[i].equals("")){
+					Mobile_HTML5Env.addJsCss("jscss/googleMap.js");
+					echo += "	echo \"位置情報(緯度・経度)\";\n";
+					gps_js +=
+							"\n<!-- getGPSinfo() -->\n" +
+							"<script type=\"text/javascript\">\n" +
+							"<!--\n" +
+							//"$(document).on(\"pageinit\", \"#p-top1\", function(e) {\n" +	//←　$(function(){の方が良いかも
+							"$(function(){\n" +
+							"  	// Geolocation APIのオプション設定\n" +
+							"  	var geolocationOptions = {\n" +
+							"    	\"enableHighAccuracy\" : true, // 高精度位置情報の取得\n" +
+							"    	\"maximumAge\" : 0, // キャッシュの無効化\n" +
+							"    	\"timeout\" : 30000 // タイムアウトは30秒\n" +
+							"  	};\n" +
+							"    navigator.geolocation.getCurrentPosition(function(pos) {\n" +
+							"      	// 経度、緯度を取得 //\n" +
+							"		document.getElementsByName('SSQL_insert"+insertCount+"_words"+(insertWordCount+1)+"')[0].value=pos.coords.latitude+\",\"+pos.coords.longitude;\n" +
+							"    }, function(e) {\n" +
+							"		gpsInfo = \"\";\n" +
+							"    }, geolocationOptions);\n" +
+							"});\n" +
+							"// -->\n" +
+							"</script>\n";
+				}
+				
+				statement += 
+						"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
+						""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+"\n" +
+						"EOF;\n" +
+						echo +
+						"		echo <<<EOF\n" +
+						""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
+				update_statement += 
+						"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
+						""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+"" +
+						echo2 +
+						""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
+				if(!noinsertFlg[i]){
 					statement += 
-							"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
-							""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+"\n" +
+							"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(++insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\"\n" +
 							"EOF;\n" +
 							echo +
 							"		echo <<<EOF\n" +
-							""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
+							"\">\n";
 					update_statement += 
-							"    <"+((!textareaFlg[i])?("input"):("textarea"))+" type=\""+((!hiddenFlg[i])?("text"):("hidden"))+"\" disabled=\"disabled\" value=\""+( (!s_name_array[i].equals(""))? (s_name_array[i]+": "):("") )+"" +
-							""+( (!textareaFlg[i])? ("\n") : ((!s_name_array[i].equals(""))? ("\">"+s_name_array[i]+": "):("")) )+"" +
+							"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\"" +
 							echo2 +
-							""+((!textareaFlg[i])?("\">"):("</textarea>"))+"\n";
-					if(!noinsertFlg[i]){
-						statement += 
-								"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(++insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\"\n" +
-								"EOF;\n" +
-								echo +
-								"		echo <<<EOF\n" +
-								"\">\n";
-						update_statement += 
-								"    <input type=\"hidden\" id=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" name=\"SSQL_insert"+insertCount+"_words"+(insertWordCount)+"\" value=\"" +
-								echo2 +
-								"\">\n";
-					}
+							"\">\n";
 				}
-    		}
-    		if(buttonSubmit.equals("")){
-    			if(buttonName.isEmpty()){
-					statement += 
-						"    <input type=\"submit\" value=\""+( (!update)? ("登録"):("更新") )+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-icon=\"insert\" data-mini=\"false\" data-inline=\"false\">\n";
-    			}else{
-	    			statement += 
-	    				"    <input type=\"submit\" value=\""+buttonName+"\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-mini=\"false\" data-inline=\"false\">\n";
-    			}
-    		}
-    		statement += 
-    				"</form>\n" +
-    				"\n";
-    		if(!noresult){
-    			statement += 
-    				"<div id=\"SSQL_Insert"+insertCount+"_result\" data-role=\"none\"><!-- SSQL Insert"+insertCount+" Result"+insertCount+" --></div>\n" +
-    				"\n" +
-    	    		//added by goto 20141128 form confirm  start
-    				"<div id=\"SSQL_Insert"+insertCount+"_confirmButton\">\n" +
-    				"	<input type=\"button\" value=\"戻る&emsp;\" data-icon=\"arrow-l\" data-inline=\"true\" onClick=\"javascript:SSQL_Insert"+insertCount+"_showButton(0);\" >\n" +
-    				"	<input type=\"button\" value=\"&emsp;登録&emsp;&emsp;&emsp;&emsp;\" data-icon=\"insert\" data-inline=\"true\" data-theme=\"a\" onClick=\"javascript:SSQL_Insert"+insertCount+"();\" >\n" +
-    				"</div>\n" +
-    				"\n" +
-    	    		//added by goto 20141128 form confirm  end
-    				"<br>\n";
-    		}
-    		statement += 
-    				"</div>\n\n";
-    		//getGPSinfo()
-    		statement += gps_js;
-    		statement += 
-    				"<!-- SSQL Insert"+insertCount+" FORM end -->\n" +
-    				"\n" +
-    				"<!-- SSQL Insert"+insertCount+" JS start -->\n" +
-    				"<script type=\"text/javascript\">\n" +
-    				//added by goto 20141128 form confirm  start
-    				"SSQL_Insert"+insertCount+"_showButton(0);\n" +
-    				"function SSQL_Insert"+insertCount+"_showButton(num){\n" +
-    				"	$(function () {\n" +
-    				"		if(num != 1){\n" +
-    				"			$(\"#SSQL_INSERT"+insertCount+"panel form\").show();\n" +
-    				"			$(\"#SSQL_Insert"+insertCount+"_registButton\").show();\n" +
-    				"			$(\"#SSQL_Insert"+insertCount+"_confirmButton\").hide();\n" +
-    				"			document.getElementById(\"SSQL_Insert"+insertCount+"_result\").innerHTML = '';\n" +
-    				"		}else{\n" +
-    				"			$(\"#SSQL_INSERT"+insertCount+"panel form\").hide();\n" +
-    				"			$(\"#SSQL_Insert"+insertCount+"_registButton\").hide();\n" +
-    				"			$(\"#SSQL_Insert"+insertCount+"_confirmButton\").show();\n" +
-    				"		}\n" +
-    				"	});\n" +
-    				"}\n" +
-					//added by goto 20141128 form confirm  end
-    				"function SSQL_Insert"+insertCount+"_echo(str){\n";
-			if(!noresult){
-				statement += 
-	    				"	var textArea = document.getElementById(\"SSQL_Insert"+insertCount+"_result\");\n" +
-	    				"	textArea.innerHTML = str;\n" +
-						"	$(\"#SSQL_Insert"+insertCount+"_confirmButton\").hide();\n";	//added by goto 20141128 form confirm
 			}
-			if(!noreset){
+		}
+		if(buttonSubmit.equals("")){
+			if(buttonName.isEmpty()){
 				statement += 
-						"	if(str.indexOf(\"completed\") !== -1) {\n" +
-						"		$(\"#SSQL_insert"+insertCount+"panel form\")[0].reset();\n" +
-						"	}\n";
-			}
-			if(reloadAfterInsert){
-				statement += 
-						"	setInterval(function(){\n" +
-						"		location.reload();\n" +
-						"	}, "+(reloadAfterInsertTime*1000)+");\n";
+					"    <input type=\"submit\" value=\""+( (!update)? ("登録"):("更新") )+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-icon=\"insert\" data-mini=\"false\" data-inline=\"false\">\n";
 			}else{
-				//3秒後に結果をクリア
+    			statement += 
+    				"    <input type=\"submit\" value=\""+buttonName+"\" name=\"SSQL_insert"+insertCount+"\" id=\"SSQL_insert"+insertCount+"\" data-mini=\"false\" data-inline=\"false\">\n";
+			}
+		}
+		statement += 
+				"</form>\n" +
+				"\n";
+		if(!noresult){
+			statement += 
+				"<div id=\"SSQL_Insert"+insertCount+"_result\" data-role=\"none\"><!-- SSQL Insert"+insertCount+" Result"+insertCount+" --></div>\n" +
+				"\n" +
+	    		//added by goto 20141128 form confirm  start
+				"<div id=\"SSQL_Insert"+insertCount+"_confirmButton\">\n" +
+				"	<input type=\"button\" value=\"戻る&emsp;\" data-icon=\"arrow-l\" data-inline=\"true\" onClick=\"javascript:SSQL_Insert"+insertCount+"_showButton(0);\" >\n" +
+				"	<input type=\"button\" value=\"&emsp;登録&emsp;&emsp;&emsp;&emsp;\" data-icon=\"insert\" data-inline=\"true\" data-theme=\"a\" onClick=\"javascript:SSQL_Insert"+insertCount+"();\" >\n" +
+				"</div>\n" +
+				"\n" +
+	    		//added by goto 20141128 form confirm  end
+				"<br>\n";
+		}
+		statement += 
+				"</div>\n\n";
+		//getGPSinfo()
+		statement += gps_js;
+		statement += 
+				"<!-- SSQL Insert"+insertCount+" FORM end -->\n" +
+				"\n" +
+				"<!-- SSQL Insert"+insertCount+" JS start -->\n" +
+				"<script type=\"text/javascript\">\n" +
+				//added by goto 20141128 form confirm  start
+				"SSQL_Insert"+insertCount+"_showButton(0);\n" +
+				"function SSQL_Insert"+insertCount+"_showButton(num){\n" +
+				"	$(function () {\n" +
+				"		if(num != 1){\n" +
+				"			$(\"#SSQL_INSERT"+insertCount+"panel form\").show();\n" +
+				"			$(\"#SSQL_Insert"+insertCount+"_registButton\").show();\n" +
+				"			$(\"#SSQL_Insert"+insertCount+"_confirmButton\").hide();\n" +
+				"			document.getElementById(\"SSQL_Insert"+insertCount+"_result\").innerHTML = '';\n" +
+				"		}else{\n" +
+				"			$(\"#SSQL_INSERT"+insertCount+"panel form\").hide();\n" +
+				"			$(\"#SSQL_Insert"+insertCount+"_registButton\").hide();\n" +
+				"			$(\"#SSQL_Insert"+insertCount+"_confirmButton\").show();\n" +
+				"		}\n" +
+				"	});\n" +
+				"}\n" +
+				//added by goto 20141128 form confirm  end
+				"function SSQL_Insert"+insertCount+"_echo(str){\n";
+		if(!noresult){
+			statement += 
+    				"	var textArea = document.getElementById(\"SSQL_Insert"+insertCount+"_result\");\n" +
+    				"	textArea.innerHTML = str;\n" +
+					"	$(\"#SSQL_Insert"+insertCount+"_confirmButton\").hide();\n";	//added by goto 20141128 form confirm
+		}
+		if(!noreset){
+			statement += 
+					"	if(str.indexOf(\"completed\") !== -1) {\n" +
+					"		$(\"#SSQL_insert"+insertCount+"panel form\")[0].reset();\n" +
+					"	}\n";
+		}
+		if(reloadAfterInsert){
+			statement += 
+					"	setInterval(function(){\n" +
+					"		location.reload();\n" +
+					"	}, "+(reloadAfterInsertTime*1000)+");\n";
+		}else{
+			//3秒後に結果をクリア
+			statement += 
+	    			"	$(function(){\n" +
+	    			"		setTimeout(function(){\n" +
+	    			"			document.getElementById(\"SSQL_Insert"+insertCount+"_result\").innerHTML = '';\n" +
+	    			"			SSQL_Insert"+insertCount+"_showButton(0);\n" +	//added by goto 20141128 form confirm
+	    			"		},3000);\n" +
+	    			"	});\n";
+		}
+		statement += 
+				"}\n" +
+				"$(function(){\n" +
+				"	//validation\n" +
+				"	$(\"#SSQL_INSERT"+insertCount+"panel form\").validate({\n" +
+				"	 	errorPlacement: function(error, element) {\n" +
+				"        	error.appendTo(element.parent().parent().after());\n" +
+				"    	},\n" +
+				"		submitHandler: function(form) {\n" +
+				"		 	SSQL_Insert"+insertCount+"_confirm();\n" +	//added by goto 20141128 form confirm
+				"		    return false;\n" +
+				"		}\n" +
+				"	});\n" +
+				"})\n" +
+				//added by goto 20141128 form confirm  start
+				"function SSQL_Insert"+insertCount+"_confirm(){\n" +
+				"	//confirm form\n" +
+				//"	var SSQL_Insert"+insertCount+"_formVal = $(\"#SSQL_INSERT"+insertCount+"panel form\").serializeArray();\n" +
+				"	var s = \"<div style='background:#FEF9F9;'>\";\n" +
+				"	s += \"<span style='line-height:40px; font-weight:800;'>下記の内容で登録します。</span><br>\";\n" +
+				"	s += \"<table style='width:100%; font-weight:500; line-height:30px;'>\";\n";
+		for(int i=0; i<col_num; i++){
+			String s = "";
+			if(!checkbox_array[i].equals("")){
+				s = checkbox_array[i];
 				statement += 
-		    			"	$(function(){\n" +
-    	    			"		setTimeout(function(){\n" +
-    	    			"			document.getElementById(\"SSQL_Insert"+insertCount+"_result\").innerHTML = '';\n" +
-    	    			"			SSQL_Insert"+insertCount+"_showButton(0);\n" +	//added by goto 20141128 form confirm
-    	    			"		},3000);\n" +
-    	    			"	});\n";
+					"	var "+s+"=[];\n" +
+					"	$('[name=\""+s+"[]\"]:checked').each(function(){\n" +
+					"		//"+s+".push($(this).val());\n" +
+					"		"+s+".push(' '+$('label[for=\"'+this.id+'\"]').text().trim()+' ');\n" +
+					"	});\n";
+				checkboxFlg_array += "TRUE,";
+			}else if(!radioButton_array[i].equals("")){
+				s = radioButton_array[i];
+				statement += "	var "+s+"=$(\"label[for='\"+$(\"input:radio[name='"+s+"']:checked\").attr(\"id\")+\"']\").text().trim();\n";
+				checkboxFlg_array += "FALSE,";
+			}else if(!selectbox_array[i].equals("")){
+				s = selectbox_array[i];
+				statement += "	var "+s+"=$('[name=\""+s+"\"] option:selected').text().trim();\n";
+				checkboxFlg_array += "FALSE,";
+			}else{
+				//s = "SSQL_Insert"+insertCount+"_formVal["+i+"].value";
+				s = "SSQL_insert"+insertCount+"_words"+(i+1);
+				statement += "	var "+s+"=$('#"+s+"').val();\n";
+				checkboxFlg_array += "FALSE,";
 			}
 			statement += 
-    				"}\n" +
-					"$(function(){\n" +
-					"	//validation\n" +
-					"	$(\"#SSQL_INSERT"+insertCount+"panel form\").validate({\n" +
-					"	 	errorPlacement: function(error, element) {\n" +
-					"        	error.appendTo(element.parent().parent().after());\n" +
-					"    	},\n" +
-					"		submitHandler: function(form) {\n" +
-//					"		 	SSQL_Insert"+insertCount+"();\n" +			//added by goto 20141128 form confirm
-					"		 	SSQL_Insert"+insertCount+"_confirm();\n" +	//added by goto 20141128 form confirm
-					"		    return false;\n" +
-					"		}\n" +
-					"	});\n" +
-					"})\n" +
-					//added by goto 20141128 form confirm  start
-					"function SSQL_Insert"+insertCount+"_confirm(){\n" +
-					"	//confirm form\n" +
-					"	var SSQL_Insert"+insertCount+"_formVal = $(\"#SSQL_INSERT"+insertCount+"panel form\").serializeArray();\n" +
-					"	var s = \"<div style='background:#FEF9F9;'>\";\n" +
-					"	s += \"<span style='line-height:40px; font-weight:800;'>下記の内容で登録します。</span><br>\";\n" +
-//					"	s += \"<span style='line-height:30px; font-weight:600;'>\";\n";
-					"	s += \"<table style='width:100%; font-weight:500; line-height:30px;'>\";\n";
-//					"	for(i=0; i<"+inputCount+"+; i++)\n"
-//					"		s += $(\"#SSQL_insert"+insertCount+"_q\"+(i+1)).html() + \" 「\" + SSQL_Insert"+insertCount+"_formVal[i].value+\"」<br>\";\n" +
-			for(int i=0; i<col_num; i++){
-//				statement += "	s += \""+s_name_array[i]+" 「\" + SSQL_Insert"+insertCount+"_formVal["+i+"].value+\"」<br>\";\n";
-				statement += "	s += \"<tr><td style='width:40%; text-align:center;'>"+s_name_array[i]+"</td>" +
-						"<td>「<span style='color:red;'>\" + SSQL_Insert"+insertCount+"_formVal["+i+"].value+\"</span>」</td></tr>\";\n";
-			}
-			statement += 
-//					"	document.getElementById(\"SSQL_Insert"+insertCount+"_result\").innerHTML = s+\"</span></div>\";\n" +
-					"	document.getElementById(\"SSQL_Insert"+insertCount+"_result\").innerHTML = s+\"</table></div>\";\n" +
-					"	SSQL_Insert"+insertCount+"_showButton(1);\n" +
-					"}\n" +
-					//added by goto 20141128 form confirm  end
-					"function SSQL_Insert"+insertCount+"(){\n" +
-					//"	//ajax: PHPへ値を渡して実行\n" +
-					"	$.ajax({\n" +
-					"		type: \"POST\",\n" +
-					"		url: \""+new File(formPHPfileName).getName()+"\",\n" +
-					getFormFileUploadHTML2("#SSQL_INSERT"+insertCount) +
-					"		dataType: \"json\",\n" +
-					"		beforeSend: function(xhr, settings) {\n" +
-					"			$('#SSQL_insert"+insertCount+"').attr('disabled', true);\n" +
-					"		},\n" +
-					"		complete: function(xhr, textStatus) {\n" +
-					"			$('#SSQL_insert"+insertCount+"').attr('disabled', false);\n" +
-					"		},\n" +
-					"		success: function(data, textStatus){\n" +
-					"			if (data.result != \"\") {\n" +
-					"				SSQL_Insert"+insertCount+"_echo(data.result);\n" +
-					"			}\n" +
-					"		},\n" +
-					"		error: function(XMLHttpRequest, textStatus, errorThrown) {\n" +
-					"			SSQL_Insert"+insertCount+"_echo(textStatus+\"<br>\"+errorThrown);\n" +
-					"		}\n" +
-					"	});\n" +
-					"}\n" +
-    				"</script>\n" +
-    				"<!-- SSQL Insert"+insertCount+" JS end -->\n" +
-    				"<!-- SSQL Insert"+insertCount+" end -->\n";
+					"	s += \"<tr><td style='width:40%; text-align:center;'>"+s_name_array[i]+"</td>" +
+					"<td>「<span style='color:red;'>\"+"+s+"+\"</span>」</td></tr>\";\n";
+		}
+		if(checkboxFlg_array.contains(","))	
+			checkboxFlg_array = checkboxFlg_array.substring(0, checkboxFlg_array.lastIndexOf(","));
+		statement += 
+				"	document.getElementById(\"SSQL_Insert"+insertCount+"_result\").innerHTML = s+\"</table></div>\";\n" +
+				"	SSQL_Insert"+insertCount+"_showButton(1);\n" +
+				"}\n" +
+				//added by goto 20141128 form confirm  end
+				"function SSQL_Insert"+insertCount+"(){\n" +
+				//"	//ajax: PHPへ値を渡して実行\n" +
+				"	$.ajax({\n" +
+				"		type: \"POST\",\n" +
+				"		url: \""+new File(formPHPfileName).getName()+"\",\n" +
+				getFormFileUploadHTML2("#SSQL_INSERT"+insertCount) +
+				"		dataType: \"json\",\n" +
+				"		beforeSend: function(xhr, settings) {\n" +
+				"			$('#SSQL_insert"+insertCount+"').attr('disabled', true);\n" +
+				"		},\n" +
+				"		complete: function(xhr, textStatus) {\n" +
+				"			$('#SSQL_insert"+insertCount+"').attr('disabled', false);\n" +
+				"		},\n" +
+				"		success: function(data, textStatus){\n" +
+				"			if (data.result != \"\") {\n" +
+				"				SSQL_Insert"+insertCount+"_echo(data.result);\n" +
+				"			}\n" +
+				"		},\n" +
+				"		error: function(XMLHttpRequest, textStatus, errorThrown) {\n" +
+				"			SSQL_Insert"+insertCount+"_echo(textStatus+\"<br>\"+errorThrown);\n" +
+				"		}\n" +
+				"	});\n" +
+				"}\n" +
+				"</script>\n" +
+				"<!-- SSQL Insert"+insertCount+" JS end -->\n" +
+				"<!-- SSQL Insert"+insertCount+" end -->\n";
 
-			//php
-			String pKeyWhere = "";
-			if(update){
-				if(!update_where.isEmpty()){
-					pKeyWhere += " and ";
-				}else{
-					pKeyWhere += " WHERE ";
-				}
-				pKeyWhere += pKey+"='\".$_POST['SSQL_insert"+insertCount+"_pkey'].\"'";	//New";
+		//php
+		String pKeyWhere = "";
+		if(update){
+			if(!update_where.isEmpty()){
+				pKeyWhere += " and ";
+			}else{
+				pKeyWhere += " WHERE ";
 			}
-			php +=	Mobile_HTML5.getSessionStartString() +
-    				"<?php\n" +
-    				"    $ret = array();\n" +
-    				"    $ret['result'] = \"\";\n" +
-    				"    \n" +
-    				"    //ユーザ定義\n" +
-    				"    $sqlite3_DB = '"+DB+"';\n" +
-    				"    $insert_col = \""+insert_col+"\";\n" +
-    				getFormFileUploadPHP0(uploadFile);
-			if(update || (insert_update && !update_where.isEmpty()) ){
-				//form()=insert_update() with where, update()
-				php += "    $update_col_array = array("+update_col_array+");\n" +
-					   "    $update_where = \""+ update_where + pKeyWhere +"\";\n";
+			
+			if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
+				pKeyWhere += pKey+"='\".$_POST['SSQL_insert"+insertCount+"_pkey'].\"'";
+			} else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+				pKeyWhere += pKey+"='\".$_POST['SSQL_insert"+insertCount+"_pkey'].\"'";
 			}
-			php +=
-    				"    $notnullFlg = array("+notnullFlg_array+");\n" +
-    				"    $col_num = "+(col_num - noinsert_count)+";                          //カラム数(Java側で指定)\n" +
-    				"    $table = '"+from+"';\n" +
-    				"\n" +
-    				"	$insert_str = \"notnull\";\n" +
-    				"	for($k=1; $k<=$col_num; $k++){\n" +
-    				getFormFileUploadPHP1() +
-    				//"    	$var[$k] = checkHTMLsc($_POST['SSQL_insert"+insertCount+"_words'.$k]);\n" +
-    				"    	$var[$k] = str_replace(array(\"\\r\\n\",\"\\r\",\"\\n\"), '<br>', $var[$k]);	//改行コードを<br>へ\n" +
-    				//"    	//$var[$k] = mb_convert_encoding($var[$k], 'UTF-8', 'auto');					//エンコードをUTF-8へ PHP環境によってはうまく動かない？\n" +
-    				"    	if($notnullFlg[$k-1]){\n" +
-    				"    		if(trim($var[$k]) == \"\")	$insert_str = \"\";\n" +
-    				"    	}\n";
-			for(int i=0; i<col_num; i++){
-				if(!$time_array[i].equals(""))
-					php += "		if($k=="+i+")	$var[$k] = "+$time_array[i]+";\n";	//現在時刻
-			}
-			php +=	
-    				"    }\n" +
-    				"\n" +
-    				"	$b = \"\";\n" +
-    				"	if($insert_str == \"\"){\n" +
-    				"        $b = '<font color=\"red\">Please check the value.</font>';\n" +
-    				"	}else{\n";
-			if(!update && (insert_update && update_where.isEmpty())){
-				//insert(), form()=insert_update() with no where
+		}
+		php +=	Mobile_HTML5.getSessionStartString() +
+				"<?php\n" +
+				"    $ret = array();\n" +
+				"    $ret['result'] = \"\";\n" +
+				"    \n" +
+				"    //ユーザ定義\n" +
+				((DBMS.equals("sqlite") || DBMS.equals("sqlite3"))? ("    $sqlite3_DB = '"+DB+"';\n"):"") +
+				"    $insert_col = \""+insert_col+"\";\n" +
+				getFormFileUploadPHP0(uploadFile);
+		if(update || (insert_update && !update_where.isEmpty()) ){
+			//form()=insert_update() with where, update()
+			php += "    $update_col_array = array("+update_col_array+");\n" +
+				   "    $update_where = \""+ update_where + pKeyWhere +"\";\n";
+		}
+		php +=
+				"    $notnullFlg = array("+notnullFlg_array+");\n" +
+				"    $checkboxFlg = array("+checkboxFlg_array+");\n" +
+				"    $col_num = "+(col_num - noinsert_count)+";                          //カラム数(Java側で指定)\n" +
+				"    $table = '"+from+"';\n" +
+				"\n" +
+				"	$insert_str = \"notnull\";\n" +
+				"	for($k=1; $k<=$col_num; $k++){\n" +
+				getFormFileUploadPHP1() +
+				"    	$var[$k] = str_replace(array(\"\\r\\n\",\"\\r\",\"\\n\"), '<br>', $var[$k]);	//改行コードを<br>へ\n" +
+				//"    	//$var[$k] = mb_convert_encoding($var[$k], 'UTF-8', 'auto');					//エンコードをUTF-8へ PHP環境によってはうまく動かない？\n" +
+				"    	if($notnullFlg[$k-1]){\n" +
+				"    		if(trim($var[$k]) == \"\")	$insert_str = \"\";\n" +
+				"    	}\n";
+		for(int i=0; i<col_num; i++){
+			if(!$time_array[i].equals(""))
+				php += "		if($k=="+i+")	$var[$k] = "+$time_array[i]+";\n";	//現在時刻
+		}
+		php +=	
+				"    }\n" +
+				"\n" +
+				"	$b = \"\";\n" +
+				"	if($insert_str == \"\"){\n" +
+				"        $b = '<font color=\"red\">Please check the value.</font>';\n" +
+				"	}else{\n";
+		if(!update && (insert_update && update_where.isEmpty())){
+			//insert(), form()=insert_update() with no where
+			if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
 				php +=
 	    				"		$insert_str = \"\";\n" +
 	    				"		for($k=1; $k<=$col_num; $k++){\n" +
@@ -2753,26 +3104,49 @@ public class Mobile_HTML5Function extends Function {
 	    				"			else		$insert_str .= \",'\".$var[$k].\"'\";\n" +
 	    				"		}\n" +
 	    				"		//DBへ登録\n" +
-	    				"		$insert_db"+insertCount+" = new SQLite3($sqlite3_DB);\n" +
+	    				"        $insert_db"+insertCount+" = new SQLite3($sqlite3_DB);\n" +
 	    				"        $insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES (\".$insert_str.\")\";\n" +
 	    				"        \n" +
 	    				"        try{\n" +
 	    				"			$result2 = $insert_db"+insertCount+"->exec($insert_sql);\n" +
-	    				"			unset($insert_db"+insertCount+");\n" +
 	    				"		 	$b = \"Registration completed.\";\n" +
 	    				"		 	//$b = $insert_sql;\n" +
 	    				"        }catch(Exception $e){\n" +
-	    				"       		unset($insert_db"+insertCount+");\n" +
 	    				"       		$b = '<font color=red>Insert failed.</font>';	//登録失敗\n" +
-	    				"        }\n";
-			}else{
-				//form()=insert_update() with where, update()
+	    				"        }\n" +
+	    				"        unset($insert_db"+insertCount+");\n";
+			} else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+				String pg_prepare_array = "";
+				for(int i=1; i<=(col_num - noinsert_count); i++)
+					pg_prepare_array += "$"+i+",";
+				pg_prepare_array = pg_prepare_array.substring(0, pg_prepare_array.length()-1);
+				//$query = "INSERT INTO member (login_name,pwd) VALUES($1, $2)”;
+				//$result = pg_prepare ($conn, “my_query”, $query);
+				//$result = pg_execute ($conn, “my_query”,array($login_name,$md5pwd));
 				php +=
-						"		$insert_db1 = new SQLite3($sqlite3_DB);\n" +
+	    				"		//DBへ登録\n" +
+	    				"        $insert_db"+insertCount+" = pg_connect (\"host="+HOST+" dbname="+DB+" user="+USER+""+(!PASSWD.isEmpty()? (" password="+PASSWD):"")+"\");\n" +
+	    				"        $insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES ("+pg_prepare_array+")\";\n" +
+	    				"        \n" +
+	    				"        try{\n" +
+	    				"			$result2 = pg_prepare($insert_db"+insertCount+", \"ssql_insert_"+insertCount+"\", $insert_sql);\n" +
+	    				"			$result2 = pg_execute($insert_db"+insertCount+", \"ssql_insert_"+insertCount+"\", $var);\n" +
+	    				"		 	$b = \"Registration completed.\";\n" +
+	    				"		 	//$b = $insert_sql;\n" +
+	    				"        }catch(Exception $e){\n" +
+	    				"       		$b = '<font color=red>Insert failed.</font>';	//登録失敗\n" +
+	    				"        }\n" +
+	    				"        pg_close($insert_db"+insertCount+");\n";
+			}
+		}else{
+			//form()=insert_update() with where, update()
+			if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
+				php +=
+						"		$insert_db"+insertCount+" = new SQLite3($sqlite3_DB);\n" +
 						"		try{\n" +
 						"			//データが存在しているかチェック\n" +
 						"			$select_sql = \"SELECT \".$insert_col.\" FROM \".$table.\" \".$update_where;\n" +
-						"			$result2 = $insert_db1->query($select_sql);\n" +
+						"			$result2 = $insert_db"+insertCount+"->query($select_sql);\n" +
 						"			$j = 0;\n" +
 						"			while($row = $result2->fetchArray()){\n" +
 						"			    $j++;\n" +
@@ -2787,7 +3161,7 @@ public class Mobile_HTML5Function extends Function {
 						"				}\n" +
 						"				\n" +
 						"				$update_sql = \"UPDATE \".$table.\" SET \".$update_str.\" \".$update_where;\n" +
-						"				$result2 = $insert_db1->exec($update_sql);\n" +
+						"				$result2 = $insert_db"+insertCount+"->exec($update_sql);\n" +
 						"				//echo '変更された行の数: ', $db->changes();\n" +
 						"				$b = \"Update completed.\";\n" +
 						"			}else{\n" +
@@ -2799,37 +3173,70 @@ public class Mobile_HTML5Function extends Function {
 						"				}\n" +
 						"				\n" +
 						"				$insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES (\".$insert_str.\")\";\n" +
-						"				$result2 = $insert_db1->exec($insert_sql);\n" +
+						"				$result2 = $insert_db"+insertCount+"->exec($insert_sql);\n" +
 						"				$b = \"Registration completed.\";\n" +
 						"			}\n" +
 						"        }catch(Exception $e){\n" +
-						"       		unset($insert_db1);\n" +
 						"       		$b = '<font color=red>Update failed.</font>';	//更新失敗\n" +
 						"        }\n" +
-						"        unset($insert_db1);\n";
+						"        unset($insert_db"+insertCount+");\n";
+			} else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+				String pg_prepare_array = "";
+				for(int i=1; i<=(col_num - noinsert_count); i++)
+					pg_prepare_array += "$"+i+",";
+				pg_prepare_array = pg_prepare_array.substring(0, pg_prepare_array.length()-1);
+				
+				php +=
+						"		$insert_db"+insertCount+" = pg_connect (\"host="+HOST+" dbname="+DB+" user="+USER+""+(!PASSWD.isEmpty()? (" password="+PASSWD):"")+"\");\n" +
+						"		try{\n" +
+						"			//データが存在しているかチェック\n" +
+						"			$select_sql = \"SELECT \".$insert_col.\" FROM \".$table.\" \".$update_where;\n" +
+						"			$result2 = pg_query($insert_db"+insertCount+", $select_sql);\n" +						//TODO $update_where
+						"			$j = pg_num_rows($result2);\n" +
+						"			\n" +
+						"			if($j>0){\n" +
+						"				//更新(update)\n" +
+						"				$update_str = \"\";\n" +
+						"				for($k=1; $k<=$col_num; $k++){\n" +
+						"					if($k==1)	$update_str .= $update_col_array[$k-1].\"=$\".$k;\n" +
+						"					else		$update_str .= \",\".$update_col_array[$k-1].\"=$\".$k;\n" +
+						"				}\n" +
+						"				\n" +
+						"				$update_sql = \"UPDATE \".$table.\" SET \".$update_str.\" \".$update_where;\n" +	//TODO $update_where
+						"				$result2 = pg_prepare($insert_db"+insertCount+", \"ssql_insert_"+insertCount+"\", $update_sql);\n" +
+						"				$result2 = pg_execute($insert_db"+insertCount+", \"ssql_insert_"+insertCount+"\", $var);\n" +
+						"				$b = \"Update completed.\";\n" +
+						"			}else{\n" +
+						"				//新規登録(insert)\n" +
+						"				$insert_sql = \"INSERT INTO \".$table.\" (\".$insert_col.\") VALUES ("+pg_prepare_array+")\";\n" +
+						"				$result2 = pg_prepare($insert_db"+insertCount+", \"ssql_insert_"+insertCount+"\", $insert_sql);\n" +
+						"				$result2 = pg_execute($insert_db"+insertCount+", \"ssql_insert_"+insertCount+"\", $var);\n" +
+						"				$b = \"Registration completed.\";\n" +
+						"			}\n" +
+						"        }catch(Exception $e){\n" +
+						"       		$b = '<font color=red>Update failed.</font>';	//更新失敗\n" +
+						"        }\n" +
+						"        pg_close($insert_db"+insertCount+");\n";
 			}
-			php +=
-    				"	}\n" +
-    				"	$ret['result'] = $b;\n" +
-    				"	header(\"Content-Type: application/json; charset=utf-8\");\n" +
-					"	echo json_encode($ret);\n" +
-					"\n" +
-					getFormFileUploadPHP2() +
-					"//XSS対策\n" +
-					"function checkHTMLsc($str){\n" +
-					"	return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');\n" +
-					"}\n" +
-    				"?>\n";
-    				
-    	}
-    	//else if(DBMS.equals("postgresql")){
-    	//	;
-    	//}
+		}
+		php +=
+				"	}\n" +
+				"	$ret['result'] = $b;\n" +
+				"	header(\"Content-Type: application/json; charset=utf-8\");\n" +
+				"	echo json_encode($ret);\n" +
+				"\n" +
+				getFormFileUploadPHP2() +
+				"//XSS対策\n" +
+				"function checkHTMLsc($str){\n" +
+				"	return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');\n" +
+				"}\n" +
+				"?>\n";
+		//End of php
 
-    	
+		
     	if(update){
     		String getUpdateFormPJPFileName = html_env.getFileName2()+"_SSQLgetUpdateForm_"+insertCount+".php";
-	    	String getUpdateFormPHP = getSSQLgetUpdateformPHP("sqlite", insertCount, DB, insert_col, update_where, from, pKey, buttonName, update_statement);
+	    	String getUpdateFormPHP = getSSQLgetUpdateformPHP(DBMS, insertCount, DB, insert_col, update_where, from, pKey, buttonName, update_statement);
 	    	Mobile_HTML5.createFile(html_env, getUpdateFormPJPFileName, getUpdateFormPHP);//PHPファイルの作成
 	    	
 	    	statement = getSSQLgetUpdateformJS(insertCount, getUpdateFormPJPFileName)+"\n";
@@ -2878,11 +3285,20 @@ public class Mobile_HTML5Function extends Function {
     }
     //getFormFileUploadPHP1
     private String getFormFileUploadPHP1(){
+    	String r = 
+	    	"		$s = '';\n" +
+			"		if(!$checkboxFlg[$k-1]){\n" +
+			"			$s = $_POST['SSQL_insert"+insertCount+"_words'.$k];\n" +
+	    	"		}else{\n" +
+			"			if(isset($_POST['SSQL_insert"+insertCount+"_words'.$k]))\n" +
+			"				foreach($_POST['SSQL_insert"+insertCount+"_words'.$k] as $val)\n" +
+	        "        			$s .= $val.',';\n" +
+	       	"			if(strstr($s, ','))	$s = substr($s, 0, -1);\n" +
+	    	"		}\n";
     	if(formFileUpload){
-    		//return  "		if(!$fileFlg[$k-1]){\n" +
-    		return  "		if(empty($fileDir[$k-1])){\n" +
-    				"			$var[$k] = checkHTMLsc($_POST['SSQL_insert"+insertCount+"_words'.$k]);\n" +
-    				//"	    	$t .= $var[$k];\n" +
+    		return  r + 
+    				"		if(empty($fileDir[$k-1])){\n" +
+    				"			$var[$k] = checkHTMLsc($s);\n" +
     				"    	}else{\n" +
     				"    		//file\n" +
     				"    		$dir = $fileDir[$k-1];\n" +
@@ -2891,10 +3307,9 @@ public class Mobile_HTML5Function extends Function {
     				"    		$filename = $dir.$file2;\n" +
     				"    		$var[$k] = fileUpload($dir, $file1, $file2, $filename);\n" +
     				"    		$var[$k] = checkHTMLsc($var[$k]);\n" +
-    				//"    		$t .= $filename;\n" +
     				"    	}\n\n";
     	}
-    	return "		$var[$k] = checkHTMLsc($_POST['SSQL_insert"+insertCount+"_words'.$k]);\n";
+    	return r + "		$var[$k] = checkHTMLsc($s);\n";
     }
     //getFormFileUploadPHP2
     private String getFormFileUploadPHP2(){
@@ -2923,65 +3338,72 @@ public class Mobile_HTML5Function extends Function {
     
     /* */
     public static String updateFormJS = "";	//not use?
-    private String getSSQLgetUpdateformPHP(String dbType, int num, String DB, String insert_col, String update_where, String from, String pKey, String buttonName, String update_statement) {
+    private String getSSQLgetUpdateformPHP(String DBMS, int num, String DB, String insert_col, String update_where, String from, String pKey, String buttonName, String update_statement) {
+    	String HOST = "", USER = "", PASSWD = "";
+    	if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+    		HOST = GlobalEnv.gethost();
+    		USER = GlobalEnv.getusername();
+    		PASSWD = GlobalEnv.getpassword();
+    	}
+    	
     	String s = "";
     	//update_statement = update_statement.replace("'", "\\\'");//.replace("\n", "");
-    	if(dbType.contains("sqlite")){
-	    	s += 	Mobile_HTML5.getSessionStartString() +
-	    			"<?php\n" +
-	    			"    $ret = array();\n" +
-	    			"    $ret['result'] = \"\";\n" +
-	    			"    \n" +
-	    			"    //ユーザ定義\n" +
-	    			"    $sqlite3_DB = '"+DB+"';\n" +
-	    			"    $insert_col = \""+pKey+","+insert_col+"\";\n" +
-	    			"    $update_where = \""+update_where+"\";\n" +
-	    			"    $table = '"+from+"';\n" +
-	    			"\n" +
-	    			"	$b = \"\";\n" +
-	    			"	$insert_db"+num+" = new SQLite3($sqlite3_DB);\n" +
+    	s += 	Mobile_HTML5.getSessionStartString() +
+    			"<?php\n" +
+    			"    $ret = array();\n" +
+    			"    $ret['result'] = \"\";\n" +
+    			"    \n" +
+    			"    //ユーザ定義\n" +
+    			((DBMS.equals("sqlite") || DBMS.equals("sqlite3"))? ("    $sqlite3_DB = '"+DB+"';\n"):"") +
+    			"    $insert_col = \""+pKey+","+insert_col+"\";\n" +
+    			"    $update_where = \""+update_where+"\";\n" +
+    			"    $table = '"+from+"';\n" +
+    			"\n" +
+    			"	$b = \"\";\n";
+    	if(DBMS.equals("sqlite") || DBMS.equals("sqlite3")){
+        	s +=
+        			"	$insert_db"+num+" = new SQLite3($sqlite3_DB);\n" +
+        			"	try{\n" +
+        			"		$select_sql = \"SELECT \".$insert_col.\" FROM \".$table.\" \".$update_where;\n" +
+        			"		$result2 = $insert_db"+num+"->query($select_sql);\n" +
+        			"		$j = 0;\n" +
+        			"		while($row = $result2->fetchArray()){\n";
+		} else if(DBMS.equals("postgresql") || DBMS.equals("postgres")){
+	    	s +=
+	    			"	$insert_db"+num+" = pg_connect (\"host="+HOST+" dbname="+DB+" user="+USER+""+(!PASSWD.isEmpty()? (" password="+PASSWD):"")+"\");\n" +
 	    			"	try{\n" +
 	    			"		$select_sql = \"SELECT \".$insert_col.\" FROM \".$table.\" \".$update_where;\n" +
-	    			"		$result2 = $insert_db"+num+"->query($select_sql);\n" +
+	    			"		$result2 = pg_query($insert_db"+num+", $select_sql);\n" +
 	    			"		$j = 0;\n" +
-	    			"		while($row = $result2->fetchArray()){\n" +
-	    			"			$b .= '<div id=\"SSQL_INSERT"+num+"_'.$j.'panel\" style=\"\" data-role=\"none\">';\n" +
-	    			"			$b .= '<form method=\"post\" action=\"\" target=\"dummy_ifr\">';\n" +
-	    			"			\n" +
-	    			"			$b .= '<input type=\"hidden\" disabled=\"disabled\" value=\"'.$row['"+pKey+"'].'\">';	//New\n" +
-	    			"			$b .= '<input type=\"hidden\" id=\"SSQL_insert"+num+"_pkey\" name=\"SSQL_insert"+num+"_pkey\" value=\"'.$row['"+pKey+"'].'\">';	//New\n" +
-	    			"			\n" +
-	    			
-	    			"			$b .= '"+update_statement+"';\n" +
-//	    			"			$b .= '<input type=\"hidden\" disabled=\"disabled\" value=\"'.$_SESSION[id].'\">';\n" +
-//	    			"			$b .= '<input type=\"hidden\" id=\"SSQL_insert"+num+"_words1\" name=\"SSQL_insert"+num+"_words1\" value=\"'.$_SESSION[id].'\">';\n" +
-//	    			"			$b .= '<input type=\"hidden\" disabled=\"disabled\" value=\"2013\">';\n" +
-//	    			"			$b .= '<input type=\"hidden\" id=\"SSQL_insert"+num+"_words2\" name=\"SSQL_insert"+num+"_words2\" value=\"2013\">';\n" +
-//	    			"			$b .= '<span><input type=\"date\" id=\"SSQL_insert"+num+"_words3\" name=\"SSQL_insert"+num+"_words3\" placeholder=\"日付\" value=\"'.$row['date'].'\"  class=\"required \" data-role=\"datebox\" min=\"2016-01-01\" max=\"2016-12-31\" data-options=\\'{\"mode\":\"datebox\", \"useFocus\":true, \"useNewStyle\":true, \"overrideHeaderFormat\": \"%m / %d\",  \"overrideDateFormat\": \"%m/%d\", \"overrideDateFieldOrder\":[\"m\",\"d\"] }\\'></span>';\n" +
-//	    			"			$b .= '<span><input type=\"time\" id=\"SSQL_insert"+num+"_words4\" name=\"SSQL_insert"+num+"_words4\" placeholder=\"開始\" value=\"'.$row['start_time'].'\"  class=\"required \" data-role=\"datebox\" data-options=\\'{\"mode\":\"timebox\", \"useFocus\":true, \"overrideTimeFormat\":24, \"useNewStyle\":true }\\'></span>';\n" +
-//	    			"			$b .= '<span><input type=\"time\" id=\"SSQL_insert"+num+"_words5\" name=\"SSQL_insert"+num+"_words5\" placeholder=\"終了\" value=\"'.$row['end_time'].'\"  class=\"required \" data-role=\"datebox\" data-options=\\'{\"mode\":\"timebox\", \"useFocus\":true, \"overrideTimeFormat\":24, \"useNewStyle\":true }\\'></span>';\n" +
-//	    			"			$b .= '<span><span><textarea type=\"text\" id=\"SSQL_insert"+num+"_words6\" name=\"SSQL_insert"+num+"_words6\" placeholder=\"内容\" class=\"required \" >'.$row['text'].'</textarea></span></span>' ;\n" +
-	    			
-	    			"			\n" +
-	    			"			$b .= '<input type=\"submit\" value=\""+((buttonName.isEmpty())? "更新":buttonName )+"\" name=\"SSQL_insert"+num+"_'.$j.'\" id=\"SSQL_insert"+num+"_'.$j.'\" onclick=\"SSQL_Update"+num+"_vali(\\'SSQL_insert"+num+"_'.$j.'\\');\" data-mini=\"false\" data-inline=\"false\">';\n" +
-	    			"			\n" +
-	    			
-	    			"			$b .= '</form>';\n" +
-	    			"			$b .= '</div>';\n" +
-	    			"			$b .= '<div id=\"SSQL_insert"+num+"_'.$j.'_result\"></div>';\n" +
-	    			"			$b .= '<hr size=\"1\" color=\"silver\" width=\"99%\">';\n" +
-	    			"		    $j++;\n" +
-	    			"		}\n" +
-	    			"    }catch(Exception $e){\n" +
-	    			"   		$b = '<font color=red>Get Update Form failed.</font>';\n" +
-	    			"    }\n" +
-	    			"    unset($insert_db"+num+");\n" +
-	    			"	\n" +
-	    			"	$ret['result'] = $b;\n" +
-	    			"	header(\"Content-Type: application/json; charset=utf-8\");\n" +
-	    			"	echo json_encode($ret);\n" +
-	    			"?>\n";
-    	}
+					"		while($row = pg_fetch_assoc($result2)){\n";
+		}
+    	s +=
+    			"			$b .= '<div id=\"SSQL_INSERT"+num+"_'.$j.'panel\" style=\"\" data-role=\"none\">';\n" +
+    			"			$b .= '<form method=\"post\" action=\"\" target=\"dummy_ifr\">';\n" +
+    			"			\n" +
+    			"			$b .= '<input type=\"hidden\" disabled=\"disabled\" value=\"'.$row['"+pKey+"'].'\">';	//New\n" +
+    			"			$b .= '<input type=\"hidden\" id=\"SSQL_insert"+num+"_pkey\" name=\"SSQL_insert"+num+"_pkey\" value=\"'.$row['"+pKey+"'].'\">';	//New\n" +
+    			"			\n" +
+    			"			$b .= '"+update_statement+"';\n" +
+    			"			\n" +
+    			"			$b .= '<input type=\"submit\" value=\""+((buttonName.isEmpty())? "更新":buttonName )+"\" name=\"SSQL_insert"+num+"_'.$j.'\" id=\"SSQL_insert"+num+"_'.$j.'\" onclick=\"SSQL_Update"+num+"_vali(\\'SSQL_insert"+num+"_'.$j.'\\');\" data-mini=\"false\" data-inline=\"false\">';\n" +
+    			"			\n" +
+    			"			$b .= '</form>';\n" +
+    			"			$b .= '</div>';\n" +
+    			"			$b .= '<div id=\"SSQL_insert"+num+"_'.$j.'_result\"></div>';\n" +
+    			"			$b .= '<hr size=\"1\" color=\"silver\" width=\"99%\">';\n" +
+    			"		    $j++;\n" +
+    			"		}\n" +
+    			"    }catch(Exception $e){\n" +
+    			"   		$b = '<font color=red>Get Update Form failed.</font>';\n" +
+    			"    }\n" +
+    			((DBMS.equals("sqlite") || DBMS.equals("sqlite3"))?      ("    unset($insert_db"+num+");\n"):"") +
+				((DBMS.equals("postgresql") || DBMS.equals("postgres"))? ("    pg_close($insert_db"+num+");\n"):"") +
+    			"	\n" +
+    			"	$ret['result'] = $b;\n" +
+    			"	header(\"Content-Type: application/json; charset=utf-8\");\n" +
+    			"	echo json_encode($ret);\n" +
+    			"?>\n";
     	return s;
     }
     private String getSSQLgetUpdateformJS(int num, String phpFileName) {
@@ -3005,8 +3427,6 @@ public class Mobile_HTML5Function extends Function {
     			"	});\n" +
     			"}\n" +
     			"function SSQL_echo(id, str, clear){\n" +
-    			//"	document.getElementById(id).innerHTML = str;\n" +
-    			//"	$(\"#\"+id).append(str).trigger(\"create\");\n" +
     			"	$(\"#\"+id).html(str).trigger(\"create\");\n" +
     			"	if(clear){\n" +
     			"		$(function(){\n" +
@@ -3350,7 +3770,12 @@ public class Mobile_HTML5Function extends Function {
 	    	String statement = "\n";
 	    	String attribute = "";
 	    	try{
-	    		attribute = ((FuncArg) this.Args.get(0)).getStr();
+	    		if(this.Args.toString().contains("\""))
+	    			// $session("id")
+	    			attribute = ((FuncArg) this.Args.get(0)).getStr();
+	    		else
+	    			// $session(id)
+		    		attribute = this.Args.get(0).toString().replace("[", "").replace("]", "").trim();
 	    	}catch(Exception e){
 	    		Log.info("<Warning> $session関数の引数が不足しています。 ex. $session(\"name\")");
 	    		return "";

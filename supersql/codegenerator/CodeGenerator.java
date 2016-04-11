@@ -3,6 +3,7 @@ package supersql.codegenerator;
 import java.util.ArrayList;
 
 import supersql.codegenerator.HTML.HTMLFactory;
+import supersql.codegenerator.HTML5.HTML5Factory;
 import supersql.codegenerator.HTML_Flexbox.HTML_FlexboxFactory;
 import supersql.codegenerator.Mobile_HTML5.Mobile_HTML5Factory;
 import supersql.codegenerator.PDF.PDFFactory;
@@ -54,7 +55,8 @@ public class CodeGenerator{
 		this.media = media;
 		if (media.toLowerCase().equals("pdf")) {
 			factory = new PDFFactory();
-		} else if (media.toLowerCase().equals("html")) {
+			// add 20141204 masato for ehtml
+		} else if (media.toLowerCase().equals("html") || media.toLowerCase().equals("ehtml")) {
 			factory = new HTMLFactory();			
 		} else if (media.toLowerCase().equals("x3d")) {
 			factory = new X3DFactory();
@@ -68,6 +70,8 @@ public class CodeGenerator{
 			factory = new SWFFactory();
 		}  else if (media.toLowerCase().equals("html_flexbox")) {
 			factory = new HTML_FlexboxFactory();
+		} else if (media.toLowerCase().equals("html5")) { // added by halken 20150805
+			factory = new HTML5Factory();
 		}
 		/*
 		 * else if(media.toLowerCase().equals("xml")){ factory = new

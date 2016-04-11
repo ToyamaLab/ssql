@@ -15,7 +15,7 @@ public class HTML_FlexboxFactory extends Factory {
 	@Override
 	public void createLocalEnv() {
 		HTML_FlexboxEnv.createHTMLDocument();
-		setClassPrefix("supersql.codegenerator.HTML.HTML");
+		setClassPrefix("supersql.codegenerator.HTML_Flexbox.HTML_Flexbox");
 	}
 
 	@Override

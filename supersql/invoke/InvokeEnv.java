@@ -29,10 +29,10 @@ public class InvokeEnv {
 	//filename
 	String filename = "";
 
-	// Invoke､where
+	// Invoke、where
 	String dyna_where = "";
 
-	// Invoke､html
+	// Invoke、html
 	String SSQLhtmlfile;
 
 	// HttpRequest

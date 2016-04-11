@@ -3,16 +3,16 @@ package supersql.codegenerator;
 import supersql.extendclass.ExtList;
 
 /**
- * ?¾İ¥¯¥é¥¹Manager¡£¥½¡¼¥¹À¸À®¤Ë¤¢¤¿¤Ã¤Æ¤Î¶¦ÄÌ¤Êµ¡Ç½¤ò¤Ş¤È¤á¤¿¡£ Á°½è?¡¢¥¹¥­¡¼¥ŞÀ¸À®¡¢¥¤¥ó¥¹¥¿¥ó¥¹°Ü¹Ô¡¢¸å½è?¡£
+ * ?è±¡ã‚¯ãƒ©ã‚¹Managerã€‚ã‚½ãƒ¼ã‚¹ç”Ÿæˆã«ã‚ãŸã£ã¦ã®å…±é€šãªæ©Ÿèƒ½ã‚’ã¾ã¨ã‚ãŸã€‚ å‰å‡¦?ã€ã‚¹ã‚­ãƒ¼ãƒç”Ÿæˆã€ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç§»è¡Œã€å¾Œå‡¦?ã€‚
  */
 public abstract class Manager {
 	/*
-	 * É¬Í×¤Ê¤é¤Ğ¥³¥á¥ó¥È¥¢¥¦¥È¤ò³°¤¹ = Í×?ÃÌ =
+	 * å¿…è¦ãªã‚‰ã°ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆã‚’å¤–ã™ = è¦?è«‡ =
 	 * 
-	 * //Á°½è? public void preProcess(TFE tfe_info, ExtList data_info, LocalEnv
+	 * //å‰å‡¦? public void preProcess(TFE tfe_info, ExtList data_info, LocalEnv
 	 * localenv ){ }
 	 * 
-	 * //¥¯¥é¥¹?µÁ¤ÎÀ¸À® public void createSchema(TFE tfe_info, ExtList data_info,
+	 * //ã‚¯ãƒ©ã‚¹?ç¾©ã®ç”Ÿæˆ public void createSchema(TFE tfe_info, ExtList data_info,
 	 * LocalEnv localenv ){ }
 	 *  
 	 */
@@ -25,7 +25,7 @@ public abstract class Manager {
 		decos.put(key, val);
 	}
 	
-	//¥¤¥ó¥¹¥¿¥ó¥¹°Ü¹Ô¥×?Á°¥é¥à¤ÎÀ¸À®
+	//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç§»è¡Œãƒ—?å‰ãƒ©ãƒ ã®ç”Ÿæˆ
 	public void generateCode(ITFE tfe_info, ExtList data_info) {
 	}
 	
@@ -57,15 +57,15 @@ public abstract class Manager {
 	}
 	
 	/*
-	 * É¬Í×¤Ê¤é¤Ğ¥³¥á¥ó¥È¥¢¥¦¥È¤ò³°¤¹ = Í×?ÃÌ =
+	 * å¿…è¦ãªã‚‰ã°ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆã‚’å¤–ã™ = è¦?è«‡ =
 	 * 
-	 * //¥¤¥ó¥¹¥¿¥ó¥¹°Ü¹Ô¥×?Á°¥é¥à¤ÎÀ¸À® public void generateCode2(TFE tfe_info, ExtList
+	 * //ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç§»è¡Œãƒ—?å‰ãƒ©ãƒ ã®ç”Ÿæˆ public void generateCode2(TFE tfe_info, ExtList
 	 * data_info){ }
 	 * 
 	 *  
 	 */
 
-	//¸å½è?
+	//å¾Œå‡¦?
 	public abstract void finish();
 
 }

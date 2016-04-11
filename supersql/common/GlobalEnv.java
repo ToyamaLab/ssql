@@ -11,7 +11,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Hashtable;
-//added by goto 20120624
 
 public class GlobalEnv {
 	
@@ -104,7 +103,7 @@ public class GlobalEnv {
 		err = new StringBuffer();
 		envs = new Hashtable<String, String>();
 		String key = null;
-
+		
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith("-")) {
 				if (key != null) {
@@ -112,10 +111,41 @@ public class GlobalEnv {
 				}
 				key = args[i];
 			} else {
-				envs.put(key, args[i]);
+				// modifed by masato 20151118 for ehtml
+				if (key.equals("-query")) {
+					String q = "";
+					for (int j = i; j < args.length; j++) {
+						if (!args[j].startsWith("-")) {
+							q += args[j] + " ";
+						} else {
+							envs.put(key, q);
+							i = j;
+							j = args.length - 1;
+						}
+						if (j == args.length - 1) {
+							envs.put(key, q);
+							i = j;
+							j = args.length - 1;
+						}
+					}
+				} else {
+					//
+					envs.put(key, args[i]);
+				}
 				key = null;
 			}
 		}
+//		for (int i = 0; i < args.length; i++) {
+//			if (args[i].startsWith("-")) {
+//				if (key != null) {
+//					envs.put(key, "");
+//				}
+//				key = args[i];
+//			} else {
+//				envs.put(key, args[i]);
+//				key = null;
+//			}
+//		}
 		if (key != null) {
 			envs.put(key, "");
 		}
@@ -810,13 +840,41 @@ public class GlobalEnv {
     	return false;
     }
     
+    //added by goto 20150112
+    public static boolean isCheckquery() {
+    	if(seek("-checkquery") != null || seek("-getparseresult") != null)
+    		return true;
+    	return false;
+    }
+    
+    
     //added by goto 20141201
 	private static String getCurrentPath(){
 		String cp = System.getProperty("java.class.path");
-		if(cp.contains(OS_PS))
-			cp = cp.substring(0,cp.indexOf(OS_PS));
-		if(cp.endsWith(".jar"))
-			cp = new File(cp).getAbsolutePath();
+		if(cp.contains(OS_PS)){
+			String cps[] = cp.split(OS_PS);
+			for(int i=0; i<cps.length; i++){
+				if(cps[i].contains(OS_FS)){
+					cp = cps[i].trim();
+					break;
+				}
+			}
+		}
+		if(cp.endsWith(".jar")){
+			cp = new File(cp).getParent();
+			if(cp.endsWith("libs"))
+				cp = new File(cp).getParent();
+		}
 		return cp;
 	}
+
+    //added by goto 20141209
+	//return the output directory's path
+	public static String getOutputDirPath() {
+		String outdir = GlobalEnv.getoutdirectory();
+		if (outdir == null)
+			outdir = GlobalEnv.getfileparent();
+		return outdir;
+	}
+
 }

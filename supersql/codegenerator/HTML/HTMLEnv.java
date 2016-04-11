@@ -14,6 +14,7 @@ import org.jsoup.parser.Tag;
 import supersql.codegenerator.Connector;
 import supersql.codegenerator.DecorateList;
 import supersql.codegenerator.ITFE;
+import supersql.codegenerator.Jscss;
 import supersql.codegenerator.LocalEnv;
 import supersql.common.GlobalEnv;
 import supersql.common.Log;
@@ -322,13 +323,13 @@ public class HTMLEnv extends LocalEnv {
 	public String ajaxtarget = new String();
 
 	// add 20141203_masato
-	public String code_tmp;
+	public String code_tmp = "";
 	
 	public StringBuffer code;
 
 	public int countFile;
 
-	public StringBuffer css;
+	public static StringBuffer css;
 
 	public StringBuffer cssFile = new StringBuffer();
 
@@ -511,15 +512,16 @@ public class HTMLEnv extends LocalEnv {
 		return elements;
 	}
 
-	protected void commonCSS() {
+	public static String commonCSS() {
+		String s = "";
 		if (!GlobalEnv.isOpt()) {
-			header.append(".att { padding: 0px; margin : 0px;height : 100%; z-index: 2}\n");
-			header.append(".linkbutton {text-align:center; margin-top: 5px; padding:5px;}\n");
-			header.append(".embed { vertical-align : text-top; padding : 0px ; margin : 0px; border: 0px,0px,0px,0px; width: 100%;}");
-			header.append(".noborder { 	border-width : 0px; "
-					+ "margin-top : -1px; padding-top : -1px;	"
-					+ "margin-bottom : -1px;	padding-bottom : -1px;}");
+			s += ".att { padding:0px; margin:0px; height:100%; z-index:2; }\n";
+			s += ".linkbutton { text-align:center; margin-top:5px; padding:5px; }\n";
+			s += ".embed { vertical-align:text-top; padding:0px; margin:0px; border:0px,0px,0px,0px; width:100%; }\n" +
+				".noborder { border-width:0px; margin-top:-1px; padding-top:-1px; "
+					+ "margin-bottom:-1px; padding-bottom:-1px; }\n\n";
 		}
+		return s;
 	}
 
 	public void append_css_def_td(String classid, DecorateList decos) {
@@ -702,6 +704,14 @@ public class HTMLEnv extends LocalEnv {
 		if (decos.containsKey("border-collapse"))
 			cssbuf.append(" border-collapse:" + decos.getStr("border-collapse")
 					+ ";");
+		
+        //added by masato 20141214  "style"
+        if (decos.containsKey("style")){
+        	String style = decos.getStr("style");
+        	cssbuf.append(" " + style);
+        	if(!style.matches(".*;\\s*$"))	cssbuf.append(";");	//���������";"���������������������
+        }
+		
         //added by goto 20130311  "background"
         if (decos.containsKey("background"))
         	bg = decos.getStr("background");
@@ -897,8 +907,8 @@ public class HTMLEnv extends LocalEnv {
 		}
 
 		if (GlobalEnv.getframeworklist() == null) {
-			footer.append("<BR><BR></BODY></HTML>\n");
-			Log.out("</body></html>");
+			footer.append("<BR><BR>\n</BODY>\n</HTML>\n");
+			Log.out("</body>\n</html>");
 		}
 		header_creation();
 	}
@@ -909,14 +919,12 @@ public class HTMLEnv extends LocalEnv {
 			header.insert(index, "<HEAD>\n");
 			header.insert(index, "<HTML>\n");
 			Log.out("<HTML>");
-			Log.out("<head>");
-			header.append(cssFile);
-			header.append("<STYLE TYPE=\"text/css\">\n");
-			header.append("<!--\n");
-			commonCSS();
-			header.append(css);
-			Log.out(css.toString());
-			header.append("\n-->\n</STYLE>\n");
+//			header.append("<STYLE TYPE=\"text/css\">\n");
+//			header.append("<!--\n");
+//			commonCSS();
+//			header.append(css);
+//			Log.out(css.toString());
+//			header.append("\n-->\n</STYLE>\n");
 		}
 	}
 
@@ -1005,87 +1013,42 @@ public class HTMLEnv extends LocalEnv {
 		}
 
 		if (GlobalEnv.getframeworklist() == null) {
-//			CopyJscss.CopyJscss();
 			// 20140528_masato
-			header.append("<!-- JS -->\n" + 
-		"<script type=\"text/javascript\" src=\"jscss/jquery.js\"></script>\n" + 
-		"<script type=\"text/javascript\" src=\"jscss/jquery-p.js\"></script>\n" + 
-//		"<script type=\"text/javascript\" src=\"" + path + "/jscss/jquery.js\"></script>\n" + 
-//		"<script type=\"text/javascript\" src=\"" + path + "/jscss/jquery-p.js\"></script>\n" + 
-//		"<script type=\"text/javascript\" src=\"http://ssql.db.ics.keio.ac.jp/demo/jscss/jquery.js\"></script>\n" + 
-//		"<script type=\"text/javascript\" src=\"http://ssql.db.ics.keio.ac.jp/demo/jscss/jquery-p.js\"></script>\n" + 
-		"<!-- CSS -->\n" + 
-//		"<style type=\"text/css\">\n" + 
-//			".pagination { margin:0 0 5px 0; padding:0; height:2.5em; }\n" + 
-//			".pagination a { text-decoration:none; border:solid 1px black; color:black; }\n" + 
-//			".pagination a, .pagination span { font-weight:bold; display:block; float:left; margin:0 5px 0 0; padding:.3em .5em; }\n" + 
-//			".pagination .current { background:darkorange; color:#fff; border:solid 1px darkorange; }\n" + 
-//			".pagination .current.prev, .pagination .current.next { color:#999; border-color:#999; background:#fff; }\n" + 
-//			"#res { margin:0; padding:0 10px; border:solid 1px #ccc; background:#fff; width:300px; clear:both; }\n" + 
-//			"</style>\n");
-		// 20140701_masato
-		"<link rel=\"stylesheet\" type=\"text/css\" href=\"jscss/ssql-pagination.css\">\n");
-		header.append("<script type=\"text/javascript\" src=\"jscss/ssql-pagination.js\"></script>\n");
-	
+			header.append(
+					// 20140701_masato
+					"<!-- SuperSQL JavaScript & CSS -->\n"
+					+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"jscss/ssql-pagination.css\">\n"
+					+ "<script type=\"text/javascript\" src=\"jscss/jquery.js\"></script>\n"
+					+ "<script type=\"text/javascript\" src=\"jscss/jquery-p.js\"></script>\n"
+					+ "<script type=\"text/javascript\" src=\"jscss/ssql-pagination.js\"></script>\n");
+
+			header.append(cssFile);
+			
 			// 20140704_masato
+			css.append("\n");
 			if (!bg.equals("")){
-	        	header.append("<style type=\"text/css\">");
-	            header.append("body { background-image: url("+bg+"); }");
-	          	header.append("</style>\n");
+	            css.append("body { background-image: url(../"+bg+"); }");
 	        }
+
+			header.append("<!-- Generated CSS -->\n");
+			header.append("<link rel=\"stylesheet\" type=\"text/css\" href=\""+ Jscss.getGenerateCssFileName(0) + "\">\n");
 			header.append("</HEAD>\n");
 
-			code_tmp = "";
+			
+			Log.out("<body>");
 			code_tmp += "<BODY class=\"body\">\n";
-//			code.append("<BODY class=\"body\">\n");
-
-			
-			// 20140528_masato
-//			header.append("<script type=\"text/javascript\">\n" + 
-//			"$(function() {\n" + 
-//			"	function pageselectCallback(page_index, jq){\n" +
-//			"		var new_content = $('#hiddenresult div.result:eq('+page_index+')').clone();\n" +
-//			"		$('#res').empty().append(new_content);\n" +
-//			"		return false;\n" +
-//			"	}\n" +
-//			"	function initPagination() {\n" +
-//			"		var num_entries = $('#hiddenresult div.result').length;\n" +
-//			"		// Create pagination element\n" +
-//			"		$(\"#Pagination\").pagination(num_entries, {\n" +
-//			"			num_edge_entries: 2,\n" +
-//			"			num_display_entries: 8,\n" +
-//			"			callback: pageselectCallback,\n" +
-//			"			items_per_page:1\n" +
-//			"		});\n" +
-//			"	}\n" +
-//			"	$(function(){\n" +
-//			"		initPagination();\n" +
-//			"	});\n" +
-//			"});\n" +
-//		"</script>\n");
-
-			
-			
-			// TODO masato_20140602 ������div���������
 			code_tmp += "<div";
 			code_tmp += div;
 			code_tmp += titleClass;
 			code_tmp += ">";
 			code_tmp += title;
 			code_tmp += "</div>";
-			// tk end///////////////////////////////////////////////////////
-			// chie//
-			
-			Log.out("--></style></head>");
-			Log.out("<body>");
 		}
 
 		if (Connector.loginFlag) {
 			code_tmp += "<form action = \""
 					+ GlobalEnv.getFileDirectory()
 					+ "/servlet/supersql.form.Session\" method = \"post\" name=\"theForm\">\n";
-			// header.append("<form action = \""+ GlobalEnv.getFileDirectory() +
-			// "/supersql.form.Session\" method = \"post\" name=\"theForm\">\n");
 			code_tmp += "<input type=\"hidden\" name=\"tableinfo\" value=\""
 					+ SSQLparser.get_from_info_st() + "\" >";
 			code_tmp += "<input type=\"hidden\" name=\"configfile\" value=\""
@@ -1096,10 +1059,6 @@ public class HTMLEnv extends LocalEnv {
 			code_tmp += "<form action = \""
 					+ GlobalEnv.getFileDirectory()
 					+ "/servlet/supersql.form.Session\" method = \"post\" name=\"theForm\">\n";
-			// header.append("<form action = \""+ GlobalEnv.getFileDirectory() +
-			// "/supersql.form.Session\" method = \"post\" name=\"theForm\">\n");
-			// header.append("<input type=\"hidden\" name=\"tableinfo\" value=\""
-			// + SSQLparser.get_from_info_st() + "\" >");
 			code_tmp += "<input type=\"hidden\" name=\"configfile\" value=\""
 					+ GlobalEnv.getconfigfile() + "\" >";
 		}
@@ -1109,8 +1068,6 @@ public class HTMLEnv extends LocalEnv {
 			code_tmp += "<form action = \""
 					+ GlobalEnv.getFileDirectory()
 					+ "/servlet/supersql.form.Update\" method = \"post\" name=\"theForm\">\n";
-			// header.append("<form action = \""+ GlobalEnv.getFileDirectory() +
-			// "/supersql.form.Update\" method = \"post\" name=\"theForm\">\n");
 			code_tmp += "<input type=\"hidden\" name=\"tableinfo\" value=\""
 					+ SSQLparser.get_from_info_st() + "\" >";
 			code_tmp += "<input type=\"hidden\" name=\"configfile\" value=\""

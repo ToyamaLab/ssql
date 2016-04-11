@@ -254,7 +254,7 @@ public class InvokeServlet2 extends HttpServlet {
 //				if(line.startsWith("//"))
 //					line = in.readLine();
 				//changed by goto 20130412
-				if(line!=null && line.contains("/*"))
+				while(line!=null && line.contains("/*"))
 	            {
 	              	int s = line.indexOf("/*");
 	              	String line1 = line.substring(0,s);
@@ -453,7 +453,7 @@ public class InvokeServlet2 extends HttpServlet {
 //					if(line.startsWith("//"))
 //						line = in.readLine();
 					//changed by goto 20130412
-					if(line!=null && line.contains("/*"))
+					while(line!=null && line.contains("/*"))
 		            {
 		              	int s = line.indexOf("/*");
 		              	String line1 = line.substring(0,s);

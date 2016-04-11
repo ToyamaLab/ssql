@@ -125,11 +125,16 @@ public class SSQLparser {
 	}
 
 	private String getSSQLQuery() {
-
 		String query = GlobalEnv.getQuery();
-		if (query != null) {
-			query = query.trim();
+		if (GlobalEnv.getQuery() != null && GlobalEnv.getoutfilename() != null) {
+			query = GlobalEnv.getQuery();
+			query = replaceQuery_For_HTML_and_MobileHTML5(query);
+			return query;
 		}
+//		String query = GlobalEnv.getQuery();
+//		if (query != null) {
+//			query = query.trim();
+//		}
 
 		String filename = GlobalEnv.getfilename();
 		if (filename == null || filename.isEmpty()) {
@@ -145,12 +150,12 @@ public class SSQLparser {
 		StringBuffer tmp = new StringBuffer();
 		try{
 			//in = new BufferedReader(new FileReader(filename));
-			//TODO: file-encoding鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申鐃夙随申任鐃緒申鐃緒申鐃緒申鐃緒申 鐃緒申鐃緒申JISAutoDetect: 文鐃緒申鐃宿の種申動判鐃緒申鐃�eader鐃緒申鐃初ス鐃塾わ申鐃緒申鐃術可￥申
-			// 鐃緒申鐃緒申鐃瞬ワ申奪箸妊螢�申鐃緒申鐃緒申肇如鐃緒申鐃緒申鐃淑醐申鐃緒申匹鐃銃逸申儡鐃緒申鐃緒申鐃緒申匹濆鐃緒申鐃緒申鐃�			//BufferedReader
+			//TODO: file-encoding��������������������������������������������������������������������������������������������������������������������������� ������������������JISAutoDetect: ������������������������������������������������eader������������������������������������������������������
+			// ������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������			//BufferedReader
 			//InputStream is = getInputStream(filename);
 			//in = new BufferedReader(new InputStreamReader(getInputStream(filename), "JISAutoDetect"));
 			//in = new BufferedReader(new InputStreamReader(res.getInputStream(), "JISAutoDetect"));
-			// 鐃緒申鐃緒申鐃瞬ワ申奪箸妊譽刻申櫂鵐好如鐃緒申鐃緒申鐃�UC鐃緒申鐃緒申鐃宿わ申鐃術器申鐃緒申鐃銃書き刻申鐃緒申鐃緒申
+			// ������������������������������������������������������������������������������������UC���������������������������������������������������������������������������������������
 			//PrintWriter out = new PrintWriter(new OutputStreamWriter(res.getOutputStream(), "EUC-JP"))
 			in = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"));		//changed by goto 20130519 (This is an important change.)
 
@@ -159,7 +164,7 @@ public class SSQLparser {
 				line = in.readLine();
 				if (line == null)	break;
 				
-				if (line.contains("/*")){
+				while (line.contains("/*")){
 					String line1 = line.substring(0, line.indexOf("/*"));
 					while (!line.contains("*/"))
 						line = in.readLine();
@@ -208,8 +213,8 @@ public class SSQLparser {
 				}
 				
 //				//goto 20130915  "<$  $>"
-//				//"内は読み飛ばす
-//				//TODO 下記をもっとスマートに
+//				//"���������������������
+//				//TODO ���������������������������������
 //				boolean onlyTextFlg = false;	//This line has only text string.
 //				while (line.contains("<$") && !onlyTextFlg){
 ////				while ((line.contains("<$") || line.contains("$$")) && !onlyTextFlg){
@@ -231,7 +236,7 @@ public class SSQLparser {
 ////						while(true){
 //						if(line.contains("$$")){
 //							while(!$$endFlg){
-//								//TODO: これを簡略化(このifの下のループで一度に処理する)
+//								//TODO: ������������������(������if������������������������������������������)
 //								//Log.e("	In line.contains($$)!!");
 //	//							boolean $$Flg = false;
 //								for (i=0; i < line.length(); i++){
@@ -264,7 +269,7 @@ public class SSQLparser {
 //								c0 = ' ';
 //								c1 = ' ';
 //								//Log.e("	In line.contains($$)!!: "+line+" "+$$Flg);
-//								if($$Flg){//TODO:　閉じられてないので閉じられるまで改行
+//								if($$Flg){//TODO:���������������������������������������������������������
 //									line = in.readLine();
 //								}else{
 //									$$endFlg = true;
@@ -362,19 +367,15 @@ public class SSQLparser {
 		//goto
 		media = getGenereteMedia(query);
 		if(media.endsWith("{")){
-			//generate MEDIA{　->　generate MEDIA {
+			//generate MEDIA{���->���generate MEDIA {
 			media = media.substring(0,media.length()-1);
 			query = query.replace(media+"{", media+" {");
 		}
 		media = media.toLowerCase();
-		if(
-				media.equals("html") || media.equals("mobile_html5") || 
-				media.equals("html_flexbox")){		//TODO masato
+		if(media.equals("html") || media.equals("mobile_html5")
+		|| media.equals("html_flexbox") || media.equals("ehtml")){		// add 20141204 masato for ehtml
 			query = replaceQuery_For_HTML_and_MobileHTML5(query);
-			while(query.contains(") ] }@{text}"))						//TODO
-				query = query.replace(") ] }@{text}", ") ]! }@{text}");	//TODO
 		}
-		//Log.e("query = "+query);
 		return query;
 	}
 
@@ -390,14 +391,15 @@ public class SSQLparser {
 		}catch(Exception e){ }
 		return "";
 	}
+	
 	// replaceQuery_For_HTML_and_MobileHTML5
 	private String replaceQuery_For_HTML_and_MobileHTML5(String query){
 		
 		//check by one character and replace
 		boolean dqFlg = false;
-		boolean exclamationFlg = false;
-		boolean squareBracketsFlg = false;
-		int exclamationNum = 0;
+//		boolean exclamationFlg = false;
+//		boolean squareBracketsFlg = false;
+//		int exclamationNum = 0;
 		char c;
 		for (int i = 0; i < query.length(); i++) {
 			c = query.charAt(i);
@@ -413,34 +415,34 @@ public class SSQLparser {
 			if (dqFlg && i < query.length() - 2 && (query.charAt(i-1) != '\\' && c == '\\' && query.charAt(i+1) == 'n'))	//exclude '\\n'
 				query = query.substring(0,i) + "<BR>" + query.substring(i+2);
 			
-			//20130915  for last '!'
-			// ! }  ->  }   or  ! ]  ->  ]   or  ! FROM  ->  FROM
-			if(!exclamationFlg && !dqFlg && !squareBracketsFlg && c == ']')		squareBracketsFlg = true;	//check squareBracketsFlg
-			else if(!exclamationFlg && !dqFlg && squareBracketsFlg && c == '!')	squareBracketsFlg = false;
-			else 
-				if (!dqFlg && i > 2 && !exclamationFlg && !squareBracketsFlg && c == '!'){
-				//check exclamation -> true
- 				exclamationNum = i;
- 				exclamationFlg = true;
-			}else if(exclamationFlg && !Character.isWhitespace(c) && c != '}' && c != ']' && 
-					i < query.length() - 4 && Character.toLowerCase(c) != 'f' && Character.toLowerCase(query.charAt(i+1)) != 'r' && 
-							Character.toLowerCase(query.charAt(i+2)) != 'o' && Character.toLowerCase(query.charAt(i+3)) != 'm'){
-				//check exclamation -> false
-				exclamationNum = 0;
-				exclamationFlg = false;
-			}else if(exclamationFlg && (
-					c == '}' || c == ']' ||
-					(i < query.length() - 4 && Character.toLowerCase(c) == 'f' && Character.toLowerCase(query.charAt(i+1)) == 'r' && 
-							Character.toLowerCase(query.charAt(i+2)) == 'o' && Character.toLowerCase(query.charAt(i+3)) == 'm') )){
-				//replace:  ! }  ->  }  or  ! ]  ->  ]  or  ! FROM  ->  FROM
-				query = query.substring(0,exclamationNum) +" "+ query.substring(i);
-				exclamationFlg = false;
-			}
+//			//20130915  for last '!'
+//			// ! }  ->  }   or  ! ]  ->  ]   or  ! FROM  ->  FROM
+//			if(!exclamationFlg && !dqFlg && !squareBracketsFlg && c == ']')		squareBracketsFlg = true;	//check squareBracketsFlg
+//			else if(!exclamationFlg && !dqFlg && squareBracketsFlg && c == '!')	squareBracketsFlg = false;
+//			else 
+//				if (!dqFlg && i > 2 && !exclamationFlg && !squareBracketsFlg && c == '!'){
+//				//check exclamation -> true
+// 				exclamationNum = i;
+// 				exclamationFlg = true;
+//			}else if(exclamationFlg && !Character.isWhitespace(c) && c != '}' && c != ']' && 
+//					i < query.length() - 4 && Character.toLowerCase(c) != 'f' && Character.toLowerCase(query.charAt(i+1)) != 'r' && 
+//							Character.toLowerCase(query.charAt(i+2)) != 'o' && Character.toLowerCase(query.charAt(i+3)) != 'm'){
+//				//check exclamation -> false
+//				exclamationNum = 0;
+//				exclamationFlg = false;
+//			}else if(exclamationFlg && (
+//					c == '}' || c == ']' ||
+//					(i < query.length() - 4 && Character.toLowerCase(c) == 'f' && Character.toLowerCase(query.charAt(i+1)) == 'r' && 
+//							Character.toLowerCase(query.charAt(i+2)) == 'o' && Character.toLowerCase(query.charAt(i+3)) == 'm') )){
+//				//replace:  ! }  ->  }  or  ! ]  ->  ]  or  ! FROM  ->  FROM
+//				query = query.substring(0,exclamationNum) +" "+ query.substring(i);
+//				exclamationFlg = false;
+//			}
 		}
 		
-		//20130915  for last '!'
-		// if query.endsWith '!' -> ''
-		if(query.endsWith("!"))	query = query.substring(0,query.length()-1);
+//		//20130915  for last '!'
+//		// if query.endsWith '!' -> ''
+//		if(query.endsWith("!"))	query = query.substring(0,query.length()-1);
 		
 		//check by one word and replace
 //		try{
@@ -452,41 +454,9 @@ public class SSQLparser {
 //			}
 //		}catch(Exception e){ }
 		
-		
-		//added by goto For "slideshow"
-		if(media.equals("mobile_html5") && query.contains("slideshow")){
-			// TODO: 1."sslideshow"鐃緒申離潺鐃緒申鐃緒申鐃緒申彁鐃緒申離鐃緒申蕁蕊緒申鐃緒申鐃�.鐃緒申鐃緒申鐃緒申鐃緒申鐃緒申表鐃緒申鐃緒申鐃宿わ申鐃緒申鐃緒申判鐃緒申
-			
-			// 20130122
-			// 鐃瞬器申: replaceAll
-			// <鐃緒申鐃緒申表鐃緒申>
-			// 0文鐃緒申幣鐃緒申任鐃春わ申文鐃緒申鐃緒申.*
-			// 0鐃縦以常申龍鐃緒申鐃�\s*
-			// ( )鐃叔囲っわ申鐃緒申分鐃熟￥申S1,鐃緒申$2鐃緒申箸鐃緒申董鐃緒申峇鐃緒申鐃緒申文鐃緒申鐃緒申忙鐃緒申儔鐃叔緒申鐃緒申峇鐃緒申鐃緒申鐃緒申鐃淑醐申鐃緒申鐃熟￥申$0)
-
-			// "slideshow [" -> "[imagefile("
-			query = query.replaceAll("slideshow\\s*\\[", "\\[imagefile(");
-			// "[imagefile(*,path="*"*]" ->
-			// "[imagefile(*,path="*"*, type="slideshow")"
-			query = query.replaceAll("(\\[imagefile\\(.*,\\spath=\".*\".*)\\]",
-					"$1, type=\"slideshow\")");
-
-			if (query.matches(".*\\[imagefile\\(.*\\)\\s*\\@\\s*\\{.*\\}.*")) {
-				// @鐃緒申鐃緒申
-				// "[imagefile(*) @ {*}" -> "[imagefile(*) @ {*} ]! "
-				query = query.replaceAll(
-								"\\[imagefile\\(.*\\)\\s*\\@\\s*\\{[a-zA-Z0-9=\\s,]*\\}",
-								"$0]! ");
-			} else {
-				// @無鐃緒申
-				// "[imagefile(*) " -> "[imagefile(*)]! "
-				query = query.replaceAll("\\[imagefile\\(.*\\)", // "(\\[imagefile\\(.*\\)[\\s*|\\s*^\\@])",
-						"$0]! ");
-			}
-		}
 		//TODO masato
         //added by goto 20130422  For "!number, / ,number! / ,number!nuber, "
-        //鐃緒申 鐃緒申鐃緒申}(鐃縦わ申鐃暑カ鐃獣ワ申)鐃殉でわ申0文鐃緒申幣鐃緒申任鐃春わ申文鐃緒申鐃緒申: [^\\}]*
+        //��������� ������������������}(���������������������������������)���������������0������������������������������������������������������������: [^\\}]*
 		// 20140611__masato For !number,number%
 		query = query.replaceAll("\\]\\s*\\!\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*%\\s*@\\s*\\{([^\\}]*)", "]!@{$3,row=$1,column=$2");
 		query = query.replaceAll("\\]\\s*\\!\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*%", "]!@{row=$1,column=$2}");
@@ -509,10 +479,12 @@ public class SSQLparser {
 		query = query.replaceAll("\\]\\s*\\,\\s*([0-9]+)\\s*%\\s*@\\s*\\{([^\\}]*)", "],@{$2,column=$1,row=1");
     	query = query.replaceAll("\\]\\s*\\,\\s*([0-9]+)\\s*%", "],@{column=$1,row=1}");
     	
-
-//    	Log.i("	query = "+query);
+		while(query.contains(") ] }@{text}"))						//TODO
+			query = query.replace(") ] }@{text}", ") ]! }@{text}");	//TODO
+    	
+    	//Log.i("query = "+query);
 		return query;
-	}//End of replaceQuery_For_HTML_and_MobileHTML5
+	}
 
 	// to get SSQL file from Internet
 	private String getSSQLQuery2() {
@@ -552,7 +524,7 @@ public class SSQLparser {
 					if (line == null || line.equals("-1"))
 						break;
 
-					if (line != null && line.contains("/*")) {
+					while (line != null && line.contains("/*")) {
 						int s = line.indexOf("/*");
 						String line1 = line.substring(0, s);
 						// tmp.append(" "+line1);
@@ -966,9 +938,7 @@ public class SSQLparser {
 				tfe.append("]%");
 			}
 			
-			// changed by goto 20130122 For "slideshow"
-			if (!tfe.toString().contains("type=\"slideshow\""))
-				System.out.println("[Parser:tfe] tfe = " + tfe);
+			Log.info("[Parser:tfe] tfe = " + tfe);
 
 			Preprocessor preprocessor = new Preprocessor(tfe.toString());
 			tfe = preprocessor.pushAggregate();
@@ -1375,7 +1345,7 @@ public class SSQLparser {
                 if (line == null)
                     break;
 
-                if(line!=null && line.contains("/*"))
+                while(line!=null && line.contains("/*"))
                 {
                 	int s = line.indexOf("/*");
                 	String line1 = line.substring(0,s);
